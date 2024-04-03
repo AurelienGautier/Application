@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Application"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="10">
+        <Button Content="Button" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Magic_Click"/>
 
     </Grid>
 </Window>
