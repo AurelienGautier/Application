@@ -7,14 +7,6 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-enum LineType
-{
-    HEADER,
-    MEASURE_TYPE,
-    VALUE,
-    VOID
-}
-
 namespace Application
 {
     internal class ExcelWriter
@@ -22,6 +14,7 @@ namespace Application
         private Excel.Application excelApp;
         private int currentLine;
         private char currentChar;
+        private List<Piece> data;
 
         [DllImport("Kernel32")]
         public static extern void AllocConsole();
@@ -29,12 +22,13 @@ namespace Application
         [DllImport("Kernel32", SetLastError = true)]
         public static extern void FreeConsole();
 
-        public ExcelWriter() 
+        public ExcelWriter()
         {
             this.excelApp = new Excel.Application();
             this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test.xlsx");
             this.currentLine = 55;
             this.currentChar = 'A';
+            this.data = new List<Piece>();
 
             AllocConsole();
         }
@@ -46,64 +40,56 @@ namespace Application
             FreeConsole();
         }
 
-        public void WriteData(List<String[]> data)
+        public void WriteData(List<Piece> data)
         {
+            this.data = data;
+
             this.WriteExcelHeader();
 
-            this.SkipHeader(data);
+            this.WritePieceBaseValue();
 
-            for (int i = 0; i < data.Count; i++)
-            {
-                LineType type = this.GetLineType(data[i]);
-
-                if(type == LineType.VALUE) 
-                {
-                    this.WriteValue(data[i]);
-                }
-            }
+            this.WritePiecesValues();
         }
 
         public void WriteExcelHeader()
         {
-            excelApp.Range[currentChar + currentLine.ToString()].Value = "Nominal";
+            WriteAndJump("N° Pièce", 0, (char)6);
 
-            this.currentChar += (char)2;
-
-            excelApp.Range[currentChar + currentLine.ToString()].Value = "Tol.+";
-
-            this.currentChar++;
-
-            excelApp.Range[currentChar + currentLine.ToString()].Value = "Tol.-";
-
-            currentChar = 'A';
-
-            currentLine++;
-        }
-
-        public LineType GetLineType(String[] line)
-        {
-            if (line.Length == 0) return LineType.VOID;
-            if (line[0] == "Designation") return LineType.HEADER;
-            if (line[0][0] == '*') return LineType.MEASURE_TYPE;
-            return LineType.VALUE;
-        }
-
-        public void WriteValue(String[] value)
-        {
-            for(int i = 0; i < value.Length; i++) 
+            for (int i = 0; i < this.data.Count; i++)
             {
-                Console.WriteLine(value[i]);
+                this.WriteAndJump((i + 1).ToString(), 0, 1);
+                this.WriteAndJump("Ecart", 0, 1);
+                this.WriteAndJump("HT", 0, 1);
             }
 
-            Console.WriteLine();
+            WriteAndJump("Observations", 1, -(6 + data.Count * 3));
+            WriteAndJump("Nomnial", 0, 2);
+            WriteAndJump("Tol.+", 0, 1);
+            WriteAndJump("Tol.-", 0, 1);
+            WriteAndJump("N° cote", 0, 1);
+            WriteAndJump("N° M.C.", 1, -5);
         }
 
-        public void SkipHeader(List<String[]> data)
+        public void WritePieceBaseValue()
         {
-            for(int i = 0; i < 6; i ++) 
+            this.data[0].WriteBaseValues(this.excelApp, this.currentChar, this.currentLine);
+            this.currentChar += (char)6;
+        }
+
+        public void WritePiecesValues()
+        {
+            for(int i = 0; i < this.data.Count;i++)
             {
-                data.RemoveAt(0);
+                this.data[i].WriteValues(excelApp, this.currentChar, this.currentLine);
+                this.currentChar += (char)3;
             }
+        }
+
+        public void WriteAndJump(String thingToWrite, int lineJump, int columnJump)
+        {
+            this.excelApp.Range[this.currentChar + this.currentLine.ToString()].Value = thingToWrite;
+            this.currentLine += lineJump;
+            this.currentChar += (char)columnJump;
         }
     }
 }

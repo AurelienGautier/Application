@@ -14,7 +14,7 @@ namespace Application.Data
         
         }
 
-        public override void WriteData(Excel.Application excelApp)
+        public new void WriteData(Excel.Application excelApp)
         {
 
         }

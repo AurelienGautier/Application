@@ -27,10 +27,10 @@ namespace Application
         public void Magic_Click(object sender, RoutedEventArgs e)
         {
             Parser parser = new Parser();
-            List<List<String>> data = parser.ParseFile();
+            List<Piece> data = parser.ParseFile();
 
-            /*ExcelWriter excelWriter = new ExcelWriter();
-            excelWriter.WriteData(data);*/
+            ExcelWriter excelWriter = new ExcelWriter();
+            excelWriter.WriteData(data);
         }
     }
 }

@@ -7,7 +7,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
-    internal abstract class Data
+    internal class Data
     {
         List<Double> values;
 
@@ -21,7 +21,35 @@ namespace Application.Data
             this.values.AddRange(values);
         }
 
-        public abstract void WriteData(Excel.Application excelApp);
+        public void WriteData(Excel.Application excelApp)
+        {
+
+        }
+
+        public double getNominalValue()
+        {
+            return this.values[0];
+        }
+
+        public double getTolPlus()
+        {
+            return this.values[1];
+        }
+
+        public double getValue()
+        {
+            return this.values[2];
+        }
+
+        public double getEcart()
+        {
+            return this.values[3];
+        }
+
+        public double getTolMinus() 
+        {
+            return this.values[4];
+        }
 
         public void PrintValues()
         {

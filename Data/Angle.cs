@@ -7,11 +7,14 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
-    internal class DataDiamater : Data
+    internal class Angle : Data
     {
-        public DataDiamater() { }
+        public Angle() : base()
+        {
 
-        public override void WriteData(Excel.Application excelApp)
+        }
+
+        public new void WriteData(Excel.Application excelApp)
         {
 
         }

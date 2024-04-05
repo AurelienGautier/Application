@@ -9,6 +9,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Windows.Shapes;
 using System.Globalization;
+using Application.Data;
 
 namespace Application
 {
@@ -22,7 +23,6 @@ namespace Application
 
     internal class Parser
     {
-        private List<List<String>> linesParsed;
         private List<Piece> dataParsed;
         private StreamReader sr;
 
@@ -34,9 +34,8 @@ namespace Application
 
         public Parser()
         {
-            this.linesParsed = new List<List<String>>();
             this.dataParsed = new List<Piece>();
-            this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test.txt");
+            this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\exemplePlusieurs.mit");
 
             AllocConsole();
         }
@@ -48,37 +47,27 @@ namespace Application
             FreeConsole();
         }
 
-        public List<List<String>> ParseFile()
+        public List<Piece> ParseFile()
         {
-            /*try
-            {*/
-                String? line;
-                List<String> words;
-                int nbLine = 55;
+            String? line;
+            List<String> words;
+            int nbLine = 55;
 
-                while ((line = this.sr.ReadLine()) != null)
-                {
-                    words = line.Split(' ').ToList();
-                    words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
-
-                    this.linesParsed.Add(words);
-
-                    LineType type = this.GetLineType(words);
-
-                    this.ManageLineType(type, words);
-
-                    nbLine++;
-                }
-
-                this.PrintAll();
-            /*}
-            catch
+            while ((line = this.sr.ReadLine()) != null)
             {
-                Console.WriteLine("Erreur : le fichier n'a pas pu être parsé correctement.");
-                this.sr.Close();
-            }*/
+                words = line.Split(' ').ToList();
+                words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
 
-            return this.linesParsed;
+                LineType type = this.GetLineType(words);
+
+                this.ManageLineType(type, words);
+
+                nbLine++;
+            }
+
+            this.PrintAll();
+
+            return this.dataParsed;
         }
 
         public void PrintAll()
@@ -156,19 +145,23 @@ namespace Application
 
         public Data.Data GetData(List<String> line)
         {
-            if (line[2] == "Diameter") return new Data.DataDiamater();
-            if (line[2] == "Concentr") return new Data.DataConcentricity();
-            if (line[2] == "Distance") return new Data.DataDistance();
-            if (line[2] == "Roundnes") return new Data.DataRoundNess();
-            if (line[2] == "Symmetry") return new Data.DataSymmetry();
-            if (line[2] == "Pos.")
+            if (line[2] == "Distance" || line[2] == "Diameter" || line[2] == "Pos." || line[2] == "Angle" || line[2] == "Result")
             {
-                line[2] += line[3];
-                line.RemoveAt(3);
-                return new Data.DataPosX();
+                if (line[2] == "Pos.")
+                {
+                    line[2] += line[3];
+                    line.RemoveAt(3);
+                }
+
+                return new Data.Data();
             }
 
-            return null;
+            if (line[2] == "Concentr") return new Data.DataConcentricity();
+            if (line[2] == "Roundnes") return new Data.DataRoundNess();
+            if (line[2] == "Symmetry") return new Data.DataSymmetry();
+            if (line[2] == "Rectang.") return new Data.Rectangle();
+
+            return new Data.Data();
         }
     }
 }
