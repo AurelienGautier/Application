@@ -32,5 +32,10 @@ namespace Application
             ExcelWriter excelWriter = new ExcelWriter();
             excelWriter.WriteData(data);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

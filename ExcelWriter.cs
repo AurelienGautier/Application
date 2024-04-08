@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.Office.Interop.Excel;
 
 namespace Application
 {
     internal class ExcelWriter
     {
         private Excel.Application excelApp;
+        private Excel.Workbook workbook;
+
         private int currentLine;
         private char currentChar;
         private List<Piece> data;
@@ -25,7 +28,8 @@ namespace Application
         public ExcelWriter()
         {
             this.excelApp = new Excel.Application();
-            this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test.xlsx");
+            this.workbook = this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test.xlsx");
+
             this.currentLine = 55;
             this.currentChar = 'A';
             this.data = new List<Piece>();
@@ -35,7 +39,9 @@ namespace Application
 
         ~ExcelWriter()
         {
-            this.excelApp.Workbooks.Close();
+            this.workbook.Close();
+
+            this.excelApp.Quit();
 
             FreeConsole();
         }
@@ -44,11 +50,16 @@ namespace Application
         {
             this.data = data;
 
+            Console.WriteLine("oui");
+
             this.WriteExcelHeader();
+            Console.WriteLine("non");
 
             this.WritePieceBaseValue();
+            Console.WriteLine("peut-etre");
 
             this.WritePiecesValues();
+            Console.WriteLine("padutou");
         }
 
         public void WriteExcelHeader()

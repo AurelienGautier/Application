@@ -42,7 +42,6 @@ namespace Application
         {
             for(int i = 0; i < pieceData.Count; i++) 
             {
-                /*excelApp.Range["A1"].Value = "coucou les amis";*/
                 excelApp.Range[col + line.ToString()].Value = this.measureTypes[i];
                 line++;
 
