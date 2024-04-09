@@ -19,12 +19,6 @@ namespace Application
         private int currentColumn;
         private List<Piece> pieces;
 
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
-        [DllImport("Kernel32", SetLastError = true)]
-        public static extern void FreeConsole();
-
         public ExcelWriter()
         {
             this.excelApp = new Excel.Application();
@@ -34,8 +28,6 @@ namespace Application
             this.currentColumn = 1;
 
             this.pieces = new List<Piece>();
-
-            AllocConsole();
         }
 
         ~ExcelWriter()
@@ -56,8 +48,6 @@ namespace Application
             this.workbook.Close();
 
             this.excelApp.Quit();
-
-            FreeConsole();
         }
 
         public void CreateWorkSheets()

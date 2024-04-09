@@ -45,13 +45,12 @@ namespace Application
             this.pieceData[pieceData.Count - 1].Add(data);
         }
 
-        public void setValues(List<double> values)
+        public void SetValues(List<double> values)
         {
             int i = pieceData.Count - 1;
             int j = this.pieceData[i].Count - 1;
 
-            this.pieceData[i][j]
-                .setValues(values);
+            this.pieceData[i][j].SetValues(values);
         }
 
         public void WriteBaseValues(Excel.Workbook wb, int line, int col)
@@ -63,11 +62,11 @@ namespace Application
 
                 for(int j = 0; j < pieceData[i].Count; j++)
                 {
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].getNominalValue();
+                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
                     col += 2;
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].getTolPlus();
+                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
                     col++;
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].getTolMinus();
+                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
                     line++;
                     col -= 3;
                 }
@@ -102,14 +101,14 @@ namespace Application
                 {
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].getNominalValue();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].getTolPlus();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].getTolMinus();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].getValue();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetValue();
 
                     line++;
                     linesWritten++;

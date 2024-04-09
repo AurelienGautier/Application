@@ -14,17 +14,17 @@ namespace Application.Data
 
         }
 
-        public override double getNominalValue()
+        public override double GetNominalValue()
         {
             return 0.0;
         }
 
-        public override double getValue() 
+        public override double GetValue() 
         {
             return base.GetValues()[3];
         }
 
-        public override double getTolMinus()
+        public override double GetTolMinus()
         {
             return 0.0;
         }

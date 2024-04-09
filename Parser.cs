@@ -17,8 +17,7 @@ namespace Application
     {
         HEADER,
         MEASURE_TYPE,
-        VALUE,
-        VOID
+        VALUE
     }
 
     internal class Parser
@@ -30,11 +29,6 @@ namespace Application
         {
             this.dataParsed = new List<Piece>();
             this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test1Piece.mit");
-        }
-
-        ~Parser() 
-        {
-            this.sr.Close();
         }
 
         public List<Piece> ParseFile()
@@ -54,6 +48,8 @@ namespace Application
 
                 nbLine++;
             }
+
+            this.sr.Close();
 
             return this.dataParsed;
         }
@@ -110,7 +106,7 @@ namespace Application
                         }
                     }
 
-                    this.dataParsed[this.dataParsed.Count - 1].setValues(values);
+                    this.dataParsed[this.dataParsed.Count - 1].SetValues(values);
 
                     break;
                 }
@@ -119,7 +115,6 @@ namespace Application
 
         public LineType GetLineType(List<String> line)
         {
-            if (line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
             if (line[0][0] == '*') return LineType.MEASURE_TYPE;
             return LineType.VALUE;

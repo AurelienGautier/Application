@@ -16,39 +16,39 @@ namespace Application.Data
             this.values = new List<Double>();
         }
 
-        public void setValues(List<Double> values)
+        public void SetValues(List<Double> values)
         {
             this.values.AddRange(values);
         }
 
-        public virtual double getNominalValue()
+        public virtual double GetNominalValue()
         {
             return this.values[0];
         }
 
-        public virtual double getTolPlus()
+        public virtual double GetTolPlus()
         {
             return this.values[1];
         }
 
-        public virtual double getValue()
+        public virtual double GetValue()
         {
             return this.values[2];
         }
 
-        public virtual double getEcart()
+        public virtual double GetEcart()
         {
             return this.values[3];
         }
 
-        public virtual double getTolMinus() 
+        public virtual double GetTolMinus() 
         {
             this.PrintValues();
 
             return this.values[4];
         }
 
-        public virtual double getOutTolerance()
+        public virtual double GetOutTolerance()
         {
             if(this.values.Count > 5)
             {
