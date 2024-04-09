@@ -16,8 +16,8 @@ namespace Application
         private Excel.Workbook workbook;
 
         private int currentLine;
-        private char currentChar;
-        private List<Piece> data;
+        private int currentColumn;
+        private List<Piece> pieces;
 
         [DllImport("Kernel32")]
         public static extern void AllocConsole();
@@ -28,17 +28,31 @@ namespace Application
         public ExcelWriter()
         {
             this.excelApp = new Excel.Application();
-            this.workbook = this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test.xlsx");
+            this.workbook = this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport1piece");
 
-            this.currentLine = 55;
-            this.currentChar = 'A';
-            this.data = new List<Piece>();
+            this.currentLine = 30;
+            this.currentColumn = 1;
+
+            this.pieces = new List<Piece>();
 
             AllocConsole();
         }
 
         ~ExcelWriter()
         {
+            
+        }
+
+        public void WriteData(List<Piece> data)
+        {
+            this.pieces = data;
+
+            this.CreateWorkSheets();
+
+            this.WritePiecesValues();
+
+            this.workbook.SaveAs("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\rappport1piece");
+
             this.workbook.Close();
 
             this.excelApp.Quit();
@@ -46,61 +60,33 @@ namespace Application
             FreeConsole();
         }
 
-        public void WriteData(List<Piece> data)
+        public void CreateWorkSheets()
         {
-            this.data = data;
+            int linesToWrite = this.pieces[0].GetLinesToWriteNumber();
 
-            Console.WriteLine("oui");
+            int pageNumber = linesToWrite / 22 + 1;
 
-            this.WriteExcelHeader();
-            Console.WriteLine("non");
+            Excel.Worksheet ws = this.workbook.Sheets["Mesures"];
 
-            this.WritePieceBaseValue();
-            Console.WriteLine("peut-etre");
-
-            this.WritePiecesValues();
-            Console.WriteLine("padutou");
-        }
-
-        public void WriteExcelHeader()
-        {
-            WriteAndJump("N° Pièce", 0, (char)6);
-
-            for (int i = 0; i < this.data.Count; i++)
+            for (int i = 4; i <= pageNumber; i++)
             {
-                this.WriteAndJump((i + 1).ToString(), 0, 1);
-                this.WriteAndJump("Ecart", 0, 1);
-                this.WriteAndJump("HT", 0, 1);
+                this.workbook.Sheets["Mesures"].Copy(Type.Missing, this.workbook.Sheets[this.workbook.Sheets.Count]);
             }
-
-            WriteAndJump("Observations", 1, -(6 + data.Count * 3));
-            WriteAndJump("Nomnial", 0, 2);
-            WriteAndJump("Tol.+", 0, 1);
-            WriteAndJump("Tol.-", 0, 1);
-            WriteAndJump("N° cote", 0, 1);
-            WriteAndJump("N° M.C.", 1, -5);
         }
 
         public void WritePieceBaseValue()
         {
-            this.data[0].WriteBaseValues(this.excelApp, this.currentChar, this.currentLine);
-            this.currentChar += (char)6;
+            this.pieces[0].WriteBaseValues(this.workbook, this.currentLine, this.currentColumn);
+            this.currentColumn+= 6;
         }
 
         public void WritePiecesValues()
         {
-            for(int i = 0; i < this.data.Count;i++)
+            for(int i = 0; i < this.pieces.Count;i++)
             {
-                this.data[i].WriteValues(excelApp, this.currentChar, this.currentLine);
-                this.currentChar += (char)3;
+                this.pieces[i].WriteValues(this.workbook, this.currentLine, this.currentColumn);
+                this.currentColumn += 3;
             }
-        }
-
-        public void WriteAndJump(String thingToWrite, int lineJump, int columnJump)
-        {
-            this.excelApp.Range[this.currentChar + this.currentLine.ToString()].Value = thingToWrite;
-            this.currentLine += lineJump;
-            this.currentChar += (char)columnJump;
         }
     }
 }

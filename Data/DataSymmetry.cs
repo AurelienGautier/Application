@@ -13,10 +13,5 @@ namespace Application.Data
         {
 
         }
-
-        public new void WriteData(Excel.Application excelApp)
-        {
-
-        }
     }
 }

@@ -26,25 +26,15 @@ namespace Application
         private List<Piece> dataParsed;
         private StreamReader sr;
 
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
-        [DllImport("Kernel32", SetLastError = true)]
-        public static extern void FreeConsole();
-
         public Parser()
         {
             this.dataParsed = new List<Piece>();
-            this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\exemplePlusieurs.mit");
-
-            AllocConsole();
+            this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test1Piece.mit");
         }
 
         ~Parser() 
         {
             this.sr.Close();
-
-            FreeConsole();
         }
 
         public List<Piece> ParseFile()
@@ -65,17 +55,7 @@ namespace Application
                 nbLine++;
             }
 
-            this.PrintAll();
-
             return this.dataParsed;
-        }
-
-        public void PrintAll()
-        {
-            foreach(Piece piece in this.dataParsed)
-            {
-                piece.PrintTrucs();
-            }
         }
 
         public void ManageLineType(LineType type, List<String> words)
@@ -90,6 +70,7 @@ namespace Application
                     {
                         this.sr.ReadLine();
                     }
+
                     break;
                 }
                 case LineType.MEASURE_TYPE:
@@ -102,6 +83,7 @@ namespace Application
                     }
 
                     this.dataParsed[this.dataParsed.Count - 1].AddMeasureType(measureType);
+
                     break;
                 }
                 case LineType.VALUE:
@@ -159,7 +141,9 @@ namespace Application
             if (line[2] == "Concentr") return new Data.DataConcentricity();
             if (line[2] == "Roundnes") return new Data.DataRoundNess();
             if (line[2] == "Symmetry") return new Data.DataSymmetry();
-            if (line[2] == "Rectang.") return new Data.Rectangle();
+            if (line[2] == "Rectang.") return new Data.DataRectangle();
+            if (line[2] == "Position") return new Data.DataPosition();
+            if (line[2] == "Flatness") return new Data.DataFlatness();
 
             return new Data.Data();
         }

@@ -7,14 +7,9 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
-    internal class Angle : Data
+    internal class DataAngle : Data
     {
-        public Angle() : base()
-        {
-
-        }
-
-        public new void WriteData(Excel.Application excelApp)
+        public DataAngle() : base()
         {
 
         }

@@ -7,14 +7,9 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
-    internal class Rectangle : Data
+    internal class DataRectangle : Data
     {
-        public Rectangle() : base()
-        {
-
-        }
-
-        public new void WriteData(Excel.Application excelApp)
+        public DataRectangle() : base()
         {
 
         }
