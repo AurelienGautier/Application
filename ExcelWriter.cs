@@ -30,11 +30,6 @@ namespace Application
             this.pieces = new List<Piece>();
         }
 
-        ~ExcelWriter()
-        {
-            
-        }
-
         public void WriteData(List<Piece> data)
         {
             this.pieces = data;

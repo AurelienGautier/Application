@@ -19,23 +19,59 @@ namespace Application
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
+        [DllImport("Kernel32", SetLastError = true)]
+        public static extern void FreeConsole();
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public void Magic_Click(object sender, RoutedEventArgs e)
+        public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            Parser parser = new Parser();
+            /*AllocConsole();*/
+
+            String fileName = this.getFileToOpen();
+
+            if (fileName == "") return;
+
+            Parser parser = new Parser(fileName);
             List<Piece> data = parser.ParseFile();
 
             ExcelWriter excelWriter = new ExcelWriter();
             excelWriter.WriteData(data);
+
+            /*FreeConsole();*/
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            
+        }
 
+        private string getFileToOpen()
+        {
+            // Configure open file dialog box
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.FileName = "Document"; // Default file name
+            dialog.DefaultExt = ".txt"; // Default file extension
+
+            // Show open file dialog box
+            bool? result = dialog.ShowDialog();
+
+            string fileName = "";
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Open document
+                fileName = dialog.FileName;
+            }
+
+            return fileName;
         }
     }
 }

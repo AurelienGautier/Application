@@ -11,7 +11,6 @@ namespace Application.Data
     {
         public DataPosition() : base()
         {
-
         }
 
         public override double GetNominalValue()

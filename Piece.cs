@@ -1,10 +1,6 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application
@@ -42,7 +38,8 @@ namespace Application
 
         public void AddData(Data.Data data)
         {
-            this.pieceData[pieceData.Count - 1].Add(data);
+            Console.WriteLine(this.pieceData.Count - 1);
+            this.pieceData[this.pieceData.Count - 1].Add(data);
         }
 
         public void SetValues(List<double> values)

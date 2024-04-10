@@ -17,7 +17,8 @@ namespace Application
     {
         HEADER,
         MEASURE_TYPE,
-        VALUE
+        VALUE,
+        VOID
     }
 
     internal class Parser
@@ -25,10 +26,10 @@ namespace Application
         private List<Piece> dataParsed;
         private StreamReader sr;
 
-        public Parser()
+        public Parser(String fileName)
         {
             this.dataParsed = new List<Piece>();
-            this.sr = new StreamReader("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\test1Piece.mit");
+            this.sr = new StreamReader(fileName);
         }
 
         public List<Piece> ParseFile()
@@ -84,6 +85,7 @@ namespace Application
                 }
                 case LineType.VALUE:
                 {
+                        Console.WriteLine(words);
                     this.dataParsed[this.dataParsed.Count - 1].AddData(this.GetData(words));
 
                     List<double> values = new List<double>();
@@ -115,6 +117,7 @@ namespace Application
 
         public LineType GetLineType(List<String> line)
         {
+            if (line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
             if (line[0][0] == '*') return LineType.MEASURE_TYPE;
             return LineType.VALUE;
