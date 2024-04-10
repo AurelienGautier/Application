@@ -20,12 +20,6 @@ namespace Application
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
-        [DllImport("Kernel32", SetLastError = true)]
-        public static extern void FreeConsole();
-
         public MainWindow()
         {
             InitializeComponent();

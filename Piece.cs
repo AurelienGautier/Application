@@ -1,31 +1,34 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application
 {
     internal class Piece
     {
-        Dictionary<String, List<Data.Data>> measureValues;
-        String currentMeasureType;
+        private List<List<Data.Data>> pieceData;
+        private List<String> measureTypes;
 
         public Piece() 
         {
-            this.measureValues = new Dictionary<string, List<Data.Data>>();
-            this.currentMeasureType = "";
+            this.pieceData = new List<List<Data.Data>>();
+            this.measureTypes = new List<String>();
         }
 
         public int GetLinesToWriteNumber()
         {
             int lineNb = 0;
 
-            foreach(List<Data.Data> data in measureValues.Values) 
-            { 
+            for(int i = 0; i < this.pieceData.Count; i++) 
+            {
                 lineNb++;
 
-                lineNb += data.Count;
+                lineNb += this.pieceData[i].Count;
             }
 
             return lineNb;
@@ -33,9 +36,8 @@ namespace Application
 
         public void AddMeasureType(String measureType)
         {
-            this.currentMeasureType = measureType;
-
-            this.measureValues.Add(this.currentMeasureType, new List<Data.Data>());
+            this.measureTypes.Add(measureType);
+            this.pieceData.Add(new List<Data.Data>());
         }
 
         public void AddData(Data.Data data)
@@ -45,12 +47,15 @@ namespace Application
 
         public void SetValues(List<double> values)
         {
-            this.measureValues[this.currentMeasureType].Last().SetValues(values);
+            int i = pieceData.Count - 1;
+            int j = this.pieceData[i].Count - 1;
+
+            this.pieceData[i][j].SetValues(values);
         }
 
         public void WriteBaseValues(Excel.Workbook wb, int line, int col)
         {
-            /*for(int i = 0; i < pieceData.Count; i++) 
+            for(int i = 0; i < pieceData.Count; i++) 
             {
                 wb.ActiveSheet.Cells[line, col].Value = this.measureTypes[i];
                 line++;
@@ -65,7 +70,7 @@ namespace Application
                     line++;
                     col -= 3;
                 }
-            }*/
+            }
         }
 
         public void WriteValues(Excel.Workbook wb, int line, int col)
@@ -74,10 +79,10 @@ namespace Application
             int linesWritten = 0;
             int pageNumber = 1;
 
-            foreach(var item in this.measureValues)
+            for(int i = 0; i < pieceData.Count; i++)
             {
                 col++;
-                ws.Cells[line, col].Value = item.Key;
+                ws.Cells[line, col].Value = this.measureTypes[i];
                 line++;
                 linesWritten++;
                 col--;
@@ -92,18 +97,18 @@ namespace Application
                     linesWritten = 0;
                 }
 
-                foreach (Data.Data data in item.Value)
+                for (int j = 0; j < this.pieceData[i].Count; j++)
                 {
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = data.GetNominalValue();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = data.GetTolPlus();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
                     col++;
-                    ws.Cells[line, col].Value = data.GetTolMinus();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
                     col++;
-                    ws.Cells[line, col].Value = data.GetValue();
+                    ws.Cells[line, col].Value = this.pieceData[i][j].GetValue();
 
                     line++;
                     linesWritten++;

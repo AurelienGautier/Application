@@ -11,8 +11,7 @@ namespace Application.Data
     {
         public DataRectangle() : base()
         {
+
         }
-
-
     }
 }
