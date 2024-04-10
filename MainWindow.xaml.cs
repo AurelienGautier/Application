@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.Exceptions;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -38,11 +39,18 @@ namespace Application
 
             if (fileName == "") return;
 
-            Parser parser = new Parser(fileName);
-            List<Piece> data = parser.ParseFile();
+            try
+            {
+                Parser parser = new Parser(fileName);
+                List<Piece> data = parser.ParseFile();
 
-            ExcelWriter excelWriter = new ExcelWriter();
-            excelWriter.WriteData(data);
+                ExcelWriter excelWriter = new ExcelWriter();
+                excelWriter.WriteData(data);
+            }
+            catch(IncorrectFormatException)
+            {
+                this.displayError();
+            }
 
             /*FreeConsole();*/
         }
@@ -72,6 +80,17 @@ namespace Application
             }
 
             return fileName;
+        }
+
+        private void displayError()
+        {
+            string messageBoxText = "Le format du fichier est incorrect.";
+            string caption = "Erreur";
+            MessageBoxButton button = MessageBoxButton.OK;
+            MessageBoxImage icon = MessageBoxImage.Error;
+            MessageBoxResult result;
+
+            result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
         }
     }
 }

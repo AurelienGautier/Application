@@ -38,19 +38,26 @@ namespace Application
             List<String> words;
             int nbLine = 55;
 
-            while ((line = this.sr.ReadLine()) != null)
+            try
             {
-                words = line.Split(' ').ToList();
-                words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+                while ((line = this.sr.ReadLine()) != null)
+                {
+                    words = line.Split(' ').ToList();
+                    words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
 
-                LineType type = this.GetLineType(words);
+                    LineType type = this.GetLineType(words);
 
-                this.ManageLineType(type, words);
+                    this.ManageLineType(type, words);
 
-                nbLine++;
+                    nbLine++;
+                }
+
+                this.sr.Close();
             }
-
-            this.sr.Close();
+            catch
+            {
+                throw new Exceptions.IncorrectFormatException();
+            }
 
             return this.dataParsed;
         }

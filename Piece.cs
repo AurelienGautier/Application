@@ -1,30 +1,31 @@
 ﻿using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application
 {
     internal class Piece
     {
-        private List<List<Data.Data>> pieceData;
-        private List<String> measureTypes;
+        Dictionary<String, List<Data.Data>> measureValues;
+        String currentMeasureType;
 
         public Piece() 
         {
-            this.pieceData = new List<List<Data.Data>>();
-            this.measureTypes = new List<String>();
+            this.measureValues = new Dictionary<string, List<Data.Data>>();
+            this.currentMeasureType = "";
         }
 
         public int GetLinesToWriteNumber()
         {
             int lineNb = 0;
 
-            for(int i = 0; i < this.pieceData.Count; i++) 
-            {
+            foreach(List<Data.Data> data in measureValues.Values) 
+            { 
                 lineNb++;
 
-                lineNb += this.pieceData[i].Count;
+                lineNb += data.Count;
             }
 
             return lineNb;
@@ -32,27 +33,24 @@ namespace Application
 
         public void AddMeasureType(String measureType)
         {
-            this.measureTypes.Add(measureType);
-            this.pieceData.Add(new List<Data.Data>());
+            this.currentMeasureType = measureType;
+
+            this.measureValues.Add(this.currentMeasureType, new List<Data.Data>());
         }
 
         public void AddData(Data.Data data)
         {
-            Console.WriteLine(this.pieceData.Count - 1);
-            this.pieceData[this.pieceData.Count - 1].Add(data);
+            this.measureValues[this.currentMeasureType].Add(data);
         }
 
         public void SetValues(List<double> values)
         {
-            int i = pieceData.Count - 1;
-            int j = this.pieceData[i].Count - 1;
-
-            this.pieceData[i][j].SetValues(values);
+            this.measureValues[this.currentMeasureType].Last().SetValues(values);
         }
 
         public void WriteBaseValues(Excel.Workbook wb, int line, int col)
         {
-            for(int i = 0; i < pieceData.Count; i++) 
+            /*for(int i = 0; i < pieceData.Count; i++) 
             {
                 wb.ActiveSheet.Cells[line, col].Value = this.measureTypes[i];
                 line++;
@@ -67,7 +65,7 @@ namespace Application
                     line++;
                     col -= 3;
                 }
-            }
+            }*/
         }
 
         public void WriteValues(Excel.Workbook wb, int line, int col)
@@ -76,10 +74,10 @@ namespace Application
             int linesWritten = 0;
             int pageNumber = 1;
 
-            for(int i = 0; i < pieceData.Count; i++)
+            foreach(var item in this.measureValues)
             {
                 col++;
-                ws.Cells[line, col].Value = this.measureTypes[i];
+                ws.Cells[line, col].Value = item.Key;
                 line++;
                 linesWritten++;
                 col--;
@@ -94,18 +92,18 @@ namespace Application
                     linesWritten = 0;
                 }
 
-                for (int j = 0; j < this.pieceData[i].Count; j++)
+                foreach (Data.Data data in item.Value)
                 {
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
+                    ws.Cells[line, col].Value = data.GetNominalValue();
                     col++;
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
+                    ws.Cells[line, col].Value = data.GetTolPlus();
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
+                    ws.Cells[line, col].Value = data.GetTolMinus();
                     col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetValue();
+                    ws.Cells[line, col].Value = data.GetValue();
 
                     line++;
                     linesWritten++;
