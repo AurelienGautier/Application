@@ -60,7 +60,7 @@ namespace Application
 
         private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
-            AllocConsole();
+            /*AllocConsole();*/
 
             var dialog = new OpenFolderDialog();
             String folderName = "";
@@ -95,7 +95,8 @@ namespace Application
             {
                 try
                 {
-                    data.AddRange(parser.ParseFile(file));
+                    List<Piece> pieces = parser.ParseFile(file);
+                    data.AddRange(pieces);
                 }
                 catch(IncorrectFormatException)
                 {
@@ -103,10 +104,10 @@ namespace Application
                 }
             }
 
-            /*ExcelWriter excelWriter = new ExcelWriter(this.getFileToSave());*/
+            FivePiecesWriter excelWriter = new FivePiecesWriter(this.getFileToSave());
+            excelWriter.WriteData(data);
 
-
-            FreeConsole();
+            /*FreeConsole();*/
         }
 
         private String getFileToOpen()

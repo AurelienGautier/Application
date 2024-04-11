@@ -33,6 +33,7 @@ namespace Application
 
         public List<Piece> ParseFile(String fileName)
         {
+            this.dataParsed = new List<Piece>();
             this.sr = new StreamReader(fileName);
 
             String? line;

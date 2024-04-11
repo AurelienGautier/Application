@@ -11,7 +11,6 @@ namespace Application.Writers
     {
         public OnePieceWriter(string fileName) : base(fileName, 30, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport1piece")
         {
-
         }
 
         public override void CreateWorkSheets()
