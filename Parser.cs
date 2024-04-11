@@ -26,14 +26,15 @@ namespace Application
         private List<Piece> dataParsed;
         private StreamReader sr;
 
-        public Parser(String fileName)
+        public Parser()
         {
             this.dataParsed = new List<Piece>();
-            this.sr = new StreamReader(fileName);
         }
 
-        public List<Piece> ParseFile()
+        public List<Piece> ParseFile(String fileName)
         {
+            this.sr = new StreamReader(fileName);
+
             String? line;
             List<String> words;
 

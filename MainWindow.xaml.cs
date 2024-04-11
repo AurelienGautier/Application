@@ -1,4 +1,5 @@
 ﻿using Application.Exceptions;
+using Application.Writers;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -34,8 +35,6 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            /*AllocConsole();*/
-
             String fileToParse = this.getFileToOpen();
             if (fileToParse == "") return;
             String fileToSave = this.getFileToSave();
@@ -43,10 +42,10 @@ namespace Application
 
             try
             {
-                Parser parser = new Parser(fileToParse);
-                List<Piece> data = parser.ParseFile();
+                Parser parser = new Parser();
+                List<Piece> data = parser.ParseFile(fileToParse);
 
-                ExcelWriter excelWriter = new ExcelWriter(fileToSave);
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave);
                 excelWriter.WriteData(data);
             }
             catch(IncorrectFormatException)
@@ -57,22 +56,66 @@ namespace Application
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
-
-            /*FreeConsole();*/
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
-            
+            AllocConsole();
+
+            var dialog = new OpenFolderDialog();
+            String folderName = "";
+
+            // Récupération du dossier contenant les fichiers à traiter
+            if(dialog.ShowDialog() == true)
+            {
+                folderName = dialog.FolderName;
+            }
+
+            if (folderName == "") return;
+
+            List<String> files = new List<String>();
+
+            DirectoryInfo directory = new DirectoryInfo(folderName);
+
+            // Récupération de la liste des fichiers du répertoire
+            if(directory.Exists)
+            {
+                foreach(FileInfo file in directory.GetFiles())
+                {
+                    files.Add(file.FullName);
+                }
+            }
+
+            Parser parser = new Parser();
+
+            List<Piece> data = new List<Piece>();
+
+            // Traitement de chaque fichier
+            foreach(String file in files)
+            {
+                try
+                {
+                    data.AddRange(parser.ParseFile(file));
+                }
+                catch(IncorrectFormatException)
+                {
+                    this.displayError("Le format du fichier " + file + " est incorrect.");
+                }
+            }
+
+            /*ExcelWriter excelWriter = new ExcelWriter(this.getFileToSave());*/
+
+
+            FreeConsole();
         }
 
-        private string getFileToOpen()
+        private String getFileToOpen()
         {
             var dialog = new OpenFileDialog();
             dialog.FileName = "Document";
             dialog.DefaultExt = ".txt";
 
-            string fileName = "";
+            String fileName = "";
 
             if (dialog.ShowDialog() == true)
             {
@@ -103,7 +146,7 @@ namespace Application
 
         private void displayError(String errorMessage)
         {
-            string caption = "Erreur";
+            String caption = "Erreur";
             MessageBoxButton button = MessageBoxButton.OK;
             MessageBoxImage icon = MessageBoxImage.Error;
             MessageBoxResult result;

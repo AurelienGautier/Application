@@ -78,6 +78,16 @@ namespace Application
             }
         }
 
+        public List<String> GetMeasureTypes()
+        {
+            return this.measureTypes;
+        }
+
+        public List<List<Data.Data>> GetDatas()
+        {
+            return this.pieceData;
+        }
+
         public void WriteValues(Excel.Workbook wb, int line, int col)
         {
             Excel.Worksheet ws = wb.Sheets["Mesures"];
@@ -110,12 +120,9 @@ namespace Application
                 // Écriture des données ligne par ligne
                 for (int j = 0; j < this.pieceData[i].Count; j++)
                 {
-                    col++;
-                    col++;
+                    col += 2;
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
-                    col++;
-                    col++;
-
+                    col += 2;
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
                     col++;
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
