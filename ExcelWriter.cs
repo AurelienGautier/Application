@@ -7,6 +7,8 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
+using Microsoft.Win32;
+using System.IO;
 
 namespace Application
 {
@@ -14,25 +16,22 @@ namespace Application
     {
         private Excel.Application excelApp;
         private Excel.Workbook workbook;
+        private String fileToSaveName;
 
         private int currentLine;
         private int currentColumn;
         private List<Piece> pieces;
 
-        public ExcelWriter()
+        public ExcelWriter(String fileName)
         {
             this.excelApp = new Excel.Application();
             this.workbook = this.excelApp.Workbooks.Open("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport1piece");
+            this.fileToSaveName = fileName;
 
             this.currentLine = 30;
             this.currentColumn = 1;
 
             this.pieces = new List<Piece>();
-        }
-
-        ~ExcelWriter()
-        {
-            
         }
 
         public void WriteData(List<Piece> data)
@@ -43,7 +42,14 @@ namespace Application
 
             this.WritePiecesValues();
 
-            this.workbook.SaveAs("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\rappport1piece");
+            try
+            {
+                this.workbook.SaveAs(this.fileToSaveName);
+            }
+            catch
+            {
+                throw new Exceptions.ExcelFileAlreadyInUse();
+            }
 
             this.workbook.Close();
 

@@ -1,4 +1,5 @@
 ﻿using Application.Exceptions;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -20,6 +21,12 @@ namespace Application
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
+        [DllImport("Kernel32", SetLastError = true)]
+        public static extern void FreeConsole();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,21 +36,26 @@ namespace Application
         {
             /*AllocConsole();*/
 
-            String fileName = this.getFileToOpen();
-
-            if (fileName == "") return;
+            String fileToParse = this.getFileToOpen();
+            if (fileToParse == "") return;
+            String fileToSave = this.getFileToSave();
+            if (fileToSave == "") return;
 
             try
             {
-                Parser parser = new Parser(fileName);
+                Parser parser = new Parser(fileToParse);
                 List<Piece> data = parser.ParseFile();
 
-                ExcelWriter excelWriter = new ExcelWriter();
+                ExcelWriter excelWriter = new ExcelWriter(fileToSave);
                 excelWriter.WriteData(data);
             }
             catch(IncorrectFormatException)
             {
-                this.displayError();
+                this.displayError("Le format du fichier est incorrect.");
+            }
+            catch(ExcelFileAlreadyInUse)
+            {
+                this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
 
             /*FreeConsole();*/
@@ -56,35 +68,47 @@ namespace Application
 
         private string getFileToOpen()
         {
-            // Configure open file dialog box
-            var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.FileName = "Document"; // Default file name
-            dialog.DefaultExt = ".txt"; // Default file extension
-
-            // Show open file dialog box
-            bool? result = dialog.ShowDialog();
+            var dialog = new OpenFileDialog();
+            dialog.FileName = "Document";
+            dialog.DefaultExt = ".txt";
 
             string fileName = "";
 
-            // Process open file dialog box results
-            if (result == true)
+            if (dialog.ShowDialog() == true)
             {
-                // Open document
                 fileName = dialog.FileName;
             }
 
             return fileName;
         }
 
-        private void displayError()
+        private String getFileToSave()
         {
-            string messageBoxText = "Le format du fichier est incorrect.";
+            var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Fichiers Excel (*.xlsx)|*.xlsx";
+            saveFileDialog.FileName = "rappport1piece";
+
+            String fileName = "";
+         
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                fileName = saveFileDialog.FileName;
+            }
+
+            if(fileName.Length > 5)
+                fileName = fileName.Remove(fileName.Length - 5);
+
+            return fileName;
+        }
+
+        private void displayError(String errorMessage)
+        {
             string caption = "Erreur";
             MessageBoxButton button = MessageBoxButton.OK;
             MessageBoxImage icon = MessageBoxImage.Error;
             MessageBoxResult result;
 
-            result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+            result = MessageBox.Show(errorMessage, caption, button, icon, MessageBoxResult.Yes);
         }
     }
 }

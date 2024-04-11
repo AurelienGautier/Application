@@ -43,8 +43,6 @@ namespace Application.Data
 
         public virtual double GetTolMinus() 
         {
-            this.PrintValues();
-
             return this.values[4];
         }
 
@@ -58,7 +56,7 @@ namespace Application.Data
             return 0.0;
         }
 
-        protected List<double> GetValues()
+        public List<double> GetValues()
         {
             return this.values;
         }

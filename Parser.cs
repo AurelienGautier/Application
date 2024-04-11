@@ -36,7 +36,6 @@ namespace Application
         {
             String? line;
             List<String> words;
-            int nbLine = 55;
 
             try
             {
@@ -48,8 +47,6 @@ namespace Application
                     LineType type = this.GetLineType(words);
 
                     this.ManageLineType(type, words);
-
-                    nbLine++;
                 }
 
                 this.sr.Close();
@@ -92,14 +89,17 @@ namespace Application
                 }
                 case LineType.VALUE:
                 {
-                        Console.WriteLine(words);
-                    this.dataParsed[this.dataParsed.Count - 1].AddData(this.GetData(words));
+                    this.dataParsed.Last().AddData(this.GetData(words));
 
                     List<double> values = new List<double>();
 
+                    // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
+                    int testInt;
+                    if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
+
                     for(int i = 3; i < words.Count - 1; i++)
                     {
-                        values.Add(Convert.ToDouble(words[i], new CultureInfo("en-US")));
+                        values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
                     }
 
                     String? nextLine = this.sr.ReadLine();
@@ -124,7 +124,7 @@ namespace Application
 
         public LineType GetLineType(List<String> line)
         {
-            if (line.Count == 0) return LineType.VOID;
+            if(line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
             if (line[0][0] == '*') return LineType.MEASURE_TYPE;
             return LineType.VALUE;
@@ -143,14 +143,12 @@ namespace Application
                 return new Data.Data();
             }
 
-            if (line[2] == "Concentr") return new Data.DataConcentricity();
-            if (line[2] == "Roundnes") return new Data.DataRoundNess();
-            if (line[2] == "Symmetry") return new Data.DataSymmetry();
-            if (line[2] == "Rectang.") return new Data.DataRectangle();
-            if (line[2] == "Position") return new Data.DataPosition();
-            if (line[2] == "Flatness") return new Data.DataFlatness();
+            if (line[2] == "Ax:R/Out" || line[2] == "CirR/Out" || line[2] == "Symmetry")
+                return new Data.DataAxCirOut();
 
-            return new Data.Data();
+            if (line[2] == "Concentr") return new Data.DataConcentricity();
+
+            return new Data.DataSimple();
         }
     }
 }

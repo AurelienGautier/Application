@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
-    internal class DataConcentricity : Data
+    internal class DataSimple : Data
     {
-        public DataConcentricity() : base()
+        public DataSimple() : base()
         {
-        
         }
 
         public override double GetNominalValue()
         {
             return 0.0;
+        }
+
+        public override double GetValue()
+        {
+            return base.GetValues()[0];
         }
 
         public override double GetTolPlus()
@@ -29,9 +32,11 @@ namespace Application.Data
             return 0.0;
         }
 
-        public override double GetValue()
+        public override double GetOutTolerance()
         {
-            return base.GetValues()[3];
+            if(base.GetValues().Count > 2) return base.GetValues()[2];
+
+            return 0.0;
         }
     }
 }

@@ -42,7 +42,12 @@ namespace Application
 
         public void AddData(Data.Data data)
         {
-            this.measureValues[this.currentMeasureType].Add(data);
+            if (this.pieceData.Count == 0)
+            {
+                this.AddMeasureType("");
+            }
+
+            this.pieceData[this.pieceData.Count - 1].Add(data);
         }
 
         public void SetValues(List<double> values)
@@ -81,12 +86,17 @@ namespace Application
 
             for(int i = 0; i < pieceData.Count; i++)
             {
-                col++;
-                ws.Cells[line, col].Value = this.measureTypes[i];
-                line++;
-                linesWritten++;
-                col--;
+                // Écriture du plan
+                if (this.measureTypes[i] != "")
+                {
+                    col++;
+                    ws.Cells[line, col].Value = this.measureTypes[i];
+                    line++;
+                    linesWritten++;
+                    col--;
+                }
 
+                // Changement de page si l'actuelle est complète
                 if(linesWritten == 22)
                 {
                     pageNumber++;
@@ -97,6 +107,7 @@ namespace Application
                     linesWritten = 0;
                 }
 
+                // Écriture des données ligne par ligne
                 for (int j = 0; j < this.pieceData[i].Count; j++)
                 {
                     col++;
@@ -104,6 +115,7 @@ namespace Application
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
                     col++;
                     col++;
+
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
                     col++;
                     ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
