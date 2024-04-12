@@ -52,7 +52,7 @@ namespace Application
             {
                 this.displayError("Le format du fichier est incorrect.");
             }
-            catch(ExcelFileAlreadyInUse)
+            catch(ExcelFileAlreadyInUseException)
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
@@ -60,7 +60,7 @@ namespace Application
 
         private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
-            /*AllocConsole();*/
+            AllocConsole();
 
             var dialog = new OpenFolderDialog();
             String folderName = "";
@@ -104,10 +104,17 @@ namespace Application
                 }
             }
 
-            FivePiecesWriter excelWriter = new FivePiecesWriter(this.getFileToSave());
-            excelWriter.WriteData(data);
+            try
+            {
+                FivePiecesWriter excelWriter = new FivePiecesWriter(this.getFileToSave());
+                excelWriter.WriteData(data);
+            }
+            catch (ExcelFileAlreadyInUseException)
+            {
+                this.displayError("Le fichier excel est déjà en cours d'utilisation");
+            }
 
-            /*FreeConsole();*/
+            FreeConsole();
         }
 
         private String getFileToOpen()
@@ -130,7 +137,7 @@ namespace Application
         {
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Fichiers Excel (*.xlsx)|*.xlsx";
-            saveFileDialog.FileName = "rappport1piece";
+            saveFileDialog.FileName = "rapport";
 
             String fileName = "";
          

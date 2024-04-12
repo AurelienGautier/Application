@@ -58,92 +58,14 @@ namespace Application
             this.pieceData[i][j].SetValues(values);
         }
 
-        public void WriteBaseValues(Excel.Workbook wb, int line, int col)
-        {
-            for(int i = 0; i < pieceData.Count; i++) 
-            {
-                wb.ActiveSheet.Cells[line, col].Value = this.measureTypes[i];
-                line++;
-
-                for(int j = 0; j < pieceData[i].Count; j++)
-                {
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
-                    col += 2;
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
-                    col++;
-                    wb.ActiveSheet.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
-                    line++;
-                    col -= 3;
-                }
-            }
-        }
-
         public List<String> GetMeasureTypes()
         {
             return this.measureTypes;
         }
 
-        public List<List<Data.Data>> GetDatas()
+        public List<List<Data.Data>> GetData()
         {
             return this.pieceData;
-        }
-
-        public void WriteValues(Excel.Workbook wb, int line, int col)
-        {
-            Excel.Worksheet ws = wb.Sheets["Mesures"];
-            int linesWritten = 0;
-            int pageNumber = 1;
-
-            for(int i = 0; i < pieceData.Count; i++)
-            {
-                // Écriture du plan
-                if (this.measureTypes[i] != "")
-                {
-                    col++;
-                    ws.Cells[line, col].Value = this.measureTypes[i];
-                    line++;
-                    linesWritten++;
-                    col--;
-                }
-
-                // Changement de page si l'actuelle est complète
-                if(linesWritten == 22)
-                {
-                    pageNumber++;
-
-                    ws = wb.Sheets["Mesures (" + pageNumber.ToString() + ")"];
-
-                    line -= linesWritten;
-                    linesWritten = 0;
-                }
-
-                // Écriture des données ligne par ligne
-                for (int j = 0; j < this.pieceData[i].Count; j++)
-                {
-                    col += 2;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetNominalValue();
-                    col += 2;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolPlus();
-                    col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetTolMinus();
-                    col++;
-                    ws.Cells[line, col].Value = this.pieceData[i][j].GetValue();
-
-                    line++;
-                    linesWritten++;
-                    col -= 6;
-
-                    if (linesWritten == 22)
-                    {
-                        pageNumber++;
-                        
-                        ws = wb.Sheets["Mesures (" + pageNumber.ToString() + ")"];
-
-                        line -= linesWritten;
-                        linesWritten = 0;
-                    }
-                }
-            }
         }
     }
 }

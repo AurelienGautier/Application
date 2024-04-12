@@ -57,7 +57,7 @@ namespace Application.Writers
             }
             catch
             {
-                throw new Exceptions.ExcelFileAlreadyInUse();
+                throw new Exceptions.ExcelFileAlreadyInUseException();
             }
 
             workbook.Close();

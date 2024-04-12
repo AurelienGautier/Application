@@ -28,7 +28,6 @@ namespace Application
 
         public Parser()
         {
-            this.dataParsed = new List<Piece>();
         }
 
         public List<Piece> ParseFile(String fileName)
@@ -134,7 +133,7 @@ namespace Application
 
         public Data.Data GetData(List<String> line)
         {
-            if (line[2] == "Distance" || line[2] == "Diameter" || line[2] == "Pos." || line[2] == "Angle" || line[2] == "Result")
+            if (line[2] == "Distance" || line[2] == "Diameter" || line[2] == "Pos." || line[2] == "Angle" || line[2] == "Result" || line[2] == "Min.Ax/2")
             {
                 if (line[2] == "Pos.")
                 {
@@ -149,6 +148,7 @@ namespace Application
                 return new Data.DataAxCirOut();
 
             if (line[2] == "Concentr") return new Data.DataConcentricity();
+            if (line[2] == "Position") return new Data.DataPosition();
 
             return new Data.DataSimple();
         }
