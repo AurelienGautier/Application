@@ -10,8 +10,17 @@ namespace Application.Writers
 {
     internal class FivePiecesWriter : ExcelWriter
     {
+        int pageNumber;
+        List<List<String>> measureTypes;
+        List<List<List<Data.Data>>> pieceData;
+        int linesWritten;
+
         public FivePiecesWriter(string fileName) : base(fileName, 17, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport5pieces")
         {
+            this.pageNumber = 1;
+            this.measureTypes = new List<List<String>>();
+            this.pieceData = new List<List<List<Data.Data>>>();
+            this.linesWritten = 0;
         }
 
         public override void CreateWorkSheets()
@@ -28,19 +37,24 @@ namespace Application.Writers
         {
             Excel.Worksheet ws = base.workbook.Sheets["Mesures"];
 
-            List<List<String>> measureTypes = new List<List<String>>();
-            List<List<List<Data.Data>>> pieceData = new List<List<List<Data.Data>>>();
-
             for(int i = 0; i < base.pieces.Count; i++)
             {
-                measureTypes.Add(base.pieces[i].GetMeasureTypes());
-                pieceData.Add(base.pieces[i].GetData());
+                this.measureTypes.Add(base.pieces[i].GetMeasureTypes());
+                this.pieceData.Add(base.pieces[i].GetData());
             }
 
-            int linesWritten = 0;
-            int pageNumber = 1;
+            for(int k = 0; k < pieceData.Count / 5; k++)
+            {
+                this.Write5pieces(ws);
+            }
 
-            for(int i = 0; i < pieceData[0].Count; i++)
+        }
+
+        public void Write5pieces(Excel.Worksheet ws)
+        {
+            int linesWritten = 0;
+
+            for (int i = 0; i < pieceData[0].Count; i++)
             {
                 // Écriture du plan
                 if (measureTypes[0][i] != "")
@@ -51,41 +65,32 @@ namespace Application.Writers
                 }
 
                 // Changement de page si l'actuelle est complète
-                if (linesWritten == 22)
-                {
-                    pageNumber++;
-
-                    ws = this.workbook.Sheets["Mesures (" + pageNumber.ToString() + ")"];
-
-                    base.currentLine -= linesWritten;
-                    linesWritten = 0;
-                }
+                if (linesWritten == 22) this.ChangePage(ws);
 
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
                     ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetNominalValue();
-                    base.currentColumn+=2;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetTolPlus();
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetTolMinus();
+                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].GetTolPlus();
+                    ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].GetTolMinus();
                     base.currentLine++;
-                    linesWritten++;
+                    this.linesWritten++;
 
-                    // à enlever après
-                    base.currentColumn -= 3;
-
-                    // Changement de page si l'actuelle est complète
-                    if (linesWritten == 22 || j == pieceData[0][i].Count)
-                    {
-                        pageNumber++;
-
-                        ws = this.workbook.Sheets["Mesures (" + pageNumber.ToString() + ")"];
-
-                        base.currentLine -= linesWritten;
-                        linesWritten = 0;
-                    }
+                    // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
+                    if (this.linesWritten == 22 || j == pieceData[0][i].Count - 1) this.ChangePage(ws);
                 }
             }
+        }
+
+        public void ChangePage(Excel.Worksheet ws)
+        {
+            this.pageNumber++;
+
+            Console.WriteLine("Page number: " + this.pageNumber);
+
+            ws = this.workbook.Sheets["Mesures (" + this.pageNumber.ToString() + ")"];
+
+            base.currentLine -= linesWritten;
+            this.linesWritten = 0;
         }
 
         public int GetWorksheetNumberToCreate()
