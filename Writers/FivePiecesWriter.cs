@@ -56,8 +56,6 @@ namespace Application.Writers
                 this.max += 5;
                 if(i < pieceData.Count / 5 - 1) this.ChangePage();
             }
-
-            this.ws = base.workbook.Sheets["Mesures"];
         }
 
         public void Write5pieces()
@@ -81,14 +79,19 @@ namespace Application.Writers
                     ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].GetTolPlus();
                     ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].GetTolMinus();
 
-                    base.currentLine++;
-                    this.linesWritten++;
+                    base.currentColumn += 3;
 
                     // Écriture des valeurs des pièces
                     for(int k = this.min; k < this.max; k++)
                     {
-
+                        base.currentColumn += 3;
+                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[k][i][j].GetValue();
                     }
+
+                    base.currentColumn -= 18;
+
+                    base.currentLine++;
+                    this.linesWritten++;
 
                     // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
                     if (this.linesWritten == MAX_LINES) this.ChangePage();
