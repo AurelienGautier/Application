@@ -15,6 +15,8 @@ namespace Application.Writers
         List<List<List<Data.Data>>> pieceData;
         int linesWritten;
         Excel.Worksheet ws;
+        int min;
+        int max;
         const int MAX_LINES = 23;
 
         public FivePiecesWriter(string fileName) : base(fileName, 17, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport5pieces")
@@ -24,6 +26,8 @@ namespace Application.Writers
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
             this.ws = base.workbook.Sheets["Mesures"];
+            this.min = 0;
+            this.max = 5;
         }
 
         public override void CreateWorkSheets()
@@ -48,6 +52,8 @@ namespace Application.Writers
             {
                 this.Write5pieces();
 
+                this.min += 5;
+                this.max += 5;
                 if(i < pieceData.Count / 5 - 1) this.ChangePage();
             }
 
@@ -78,6 +84,12 @@ namespace Application.Writers
                     base.currentLine++;
                     this.linesWritten++;
 
+                    // Écriture des valeurs des pièces
+                    for(int k = this.min; k < this.max; k++)
+                    {
+
+                    }
+
                     // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
                     if (this.linesWritten == MAX_LINES) this.ChangePage();
                 }
@@ -92,6 +104,14 @@ namespace Application.Writers
 
             base.currentLine = 17;
             this.linesWritten = 0;
+
+            int col = 7;
+
+            for (int i = this.min; i < this.max; i++)
+            {
+                ws.Cells[15, col].Value = i + 1;
+                col += 3;
+            }
         }
 
         public int GetWorksheetNumberToCreate()
