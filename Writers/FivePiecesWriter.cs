@@ -8,6 +8,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
+
     internal class FivePiecesWriter : ExcelWriter
     {
         int pageNumber;

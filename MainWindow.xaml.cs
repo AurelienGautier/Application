@@ -35,6 +35,8 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
+            AllocConsole();
+
             String fileToParse = this.getFileToOpen();
             if (fileToParse == "") return;
             String fileToSave = this.getFileToSave();
@@ -48,59 +50,41 @@ namespace Application
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave);
                 excelWriter.WriteData(data);
             }
-            catch(IncorrectFormatException)
+            catch (IncorrectFormatException)
             {
                 this.displayError("Le format du fichier est incorrect.");
             }
-            catch(ExcelFileAlreadyInUseException)
+            catch (ExcelFileAlreadyInUseException)
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
+
+            FreeConsole();
         }
 
         private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
-            AllocConsole();
+            /*AllocConsole();*/
 
-            var dialog = new OpenFolderDialog();
-            String folderName = "";
-
-            // Récupération du dossier contenant les fichiers à traiter
-            if(dialog.ShowDialog() == true)
-            {
-                folderName = dialog.FolderName;
-            }
-
+            String folderName = this.getFolderToOpen();
             if (folderName == "") return;
 
-            List<String> files = new List<String>();
-
             DirectoryInfo directory = new DirectoryInfo(folderName);
-
-            // Récupération de la liste des fichiers du répertoire
-            if(directory.Exists)
-            {
-                foreach(FileInfo file in directory.GetFiles())
-                {
-                    files.Add(file.FullName);
-                }
-            }
+            if(!directory.Exists) return;
 
             Parser parser = new Parser();
-
             List<Piece> data = new List<Piece>();
 
-            // Traitement de chaque fichier
-            foreach(String file in files)
+            // Parsing de tous les fichiers du répertoire
+            foreach(FileInfo file in directory.GetFiles())
             {
                 try
                 {
-                    List<Piece> pieces = parser.ParseFile(file);
-                    data.AddRange(pieces);
+                    data.AddRange(parser.ParseFile(file.FullName));
                 }
-                catch(IncorrectFormatException)
+                catch (IncorrectFormatException) 
                 {
-                    this.displayError("Le format du fichier " + file + " est incorrect.");
+                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
                 }
             }
 
@@ -114,23 +98,30 @@ namespace Application
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
 
-            FreeConsole();
+            /*FreeConsole();*/
         }
+
 
         private String getFileToOpen()
         {
             var dialog = new OpenFileDialog();
-            dialog.FileName = "Document";
-            dialog.DefaultExt = ".txt";
 
             String fileName = "";
 
-            if (dialog.ShowDialog() == true)
-            {
-                fileName = dialog.FileName;
-            }
+            if (dialog.ShowDialog() == true) fileName = dialog.FileName;
 
             return fileName;
+        }
+
+        private String getFolderToOpen()
+        {
+            var dialog = new OpenFolderDialog();
+
+            String folderName = "";
+
+            if (dialog.ShowDialog() == true) folderName = dialog.FolderName;
+
+            return folderName;
         }
 
         private String getFileToSave()

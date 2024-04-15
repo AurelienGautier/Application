@@ -34,7 +34,7 @@ namespace Application
         public List<Piece> ParseFile(String fileName)
         {
             this.dataParsed = new List<Piece>();
-            this.sr = new StreamReader(fileName);
+            this.sr = new StreamReader(fileName, Encoding.GetEncoding("iso-8859-1"));
 
             String? line;
             List<String> words;
@@ -128,7 +128,11 @@ namespace Application
         {
             if(line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
-            if (line[0][0] == '*') return LineType.MEASURE_TYPE;
+            if (line[0][0] == '*')
+            {
+                Console.WriteLine(line[2]);
+                return LineType.MEASURE_TYPE;
+            }
             return LineType.VALUE;
         }
 

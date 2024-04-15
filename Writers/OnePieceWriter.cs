@@ -20,8 +20,6 @@ namespace Application.Writers
 
             int pageNumber = linesToWrite / 22 + 1;
 
-            Excel.Worksheet ws = workbook.Sheets["Mesures"];
-
             for (int i = 4; i <= pageNumber; i++)
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
@@ -43,6 +41,7 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measureTypes[i] != "")
                 {
+                    Console.WriteLine(measureTypes[i]);
                     base.currentColumn++;
                     ws.Cells[base.currentLine, base.currentColumn].Value = measureTypes[i];
                     base.currentLine++;
