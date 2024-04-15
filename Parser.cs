@@ -28,6 +28,7 @@ namespace Application
 
         public Parser()
         {
+            this.dataParsed = new List<Piece>();
         }
 
         public List<Piece> ParseFile(String fileName)

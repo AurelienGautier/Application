@@ -14,6 +14,8 @@ namespace Application.Writers
         List<List<String>> measureTypes;
         List<List<List<Data.Data>>> pieceData;
         int linesWritten;
+        Excel.Worksheet ws;
+        const int MAX_LINES = 23;
 
         public FivePiecesWriter(string fileName) : base(fileName, 17, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport5pieces")
         {
@@ -21,6 +23,7 @@ namespace Application.Writers
             this.measureTypes = new List<List<String>>();
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
+            this.ws = base.workbook.Sheets["Mesures"];
         }
 
         public override void CreateWorkSheets()
@@ -35,53 +38,52 @@ namespace Application.Writers
 
         public override void WritePiecesValues()
         {
-            Excel.Worksheet ws = base.workbook.Sheets["Mesures"];
-
             for(int i = 0; i < base.pieces.Count; i++)
             {
                 this.measureTypes.Add(base.pieces[i].GetMeasureTypes());
                 this.pieceData.Add(base.pieces[i].GetData());
             }
 
-            for(int k = 0; k < pieceData.Count / 5; k++)
-            {
-                this.Write5pieces(ws);
-            }
+            /*for(int j = 0; j < pieceData.Count / 5; j++)
+            {*/
+                this.Write5pieces();
+            /*}*/
 
         }
 
-        public void Write5pieces(Excel.Worksheet ws)
+        public void Write5pieces()
         {
-            int linesWritten = 0;
-
             for (int i = 0; i < pieceData[0].Count; i++)
             {
                 // Écriture du plan
                 if (measureTypes[0][i] != "")
                 {
+                    Console.WriteLine(measureTypes[0][i]);
                     ws.Cells[base.currentLine, base.currentColumn].Value = measureTypes[0][i];
                     base.currentLine++;
-                    linesWritten++;
+                    this.linesWritten++;
                 }
 
                 // Changement de page si l'actuelle est complète
-                if (linesWritten == 22) this.ChangePage(ws);
+                if (this.linesWritten == MAX_LINES) this.ChangePage();
 
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
+                    /*Console.WriteLine("CurrentLine : " + base.currentLine + "   CurrentColumn: " + base.currentColumn);*/
                     ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetNominalValue();
                     ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].GetTolPlus();
                     ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].GetTolMinus();
+
                     base.currentLine++;
                     this.linesWritten++;
 
                     // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
-                    if (this.linesWritten == 22 || j == pieceData[0][i].Count - 1) this.ChangePage(ws);
+                    if (this.linesWritten == MAX_LINES /*|| j == pieceData[0][i].Count - 1*/) this.ChangePage();
                 }
             }
         }
 
-        public void ChangePage(Excel.Worksheet ws)
+        public void ChangePage()
         {
             this.pageNumber++;
 
@@ -100,7 +102,7 @@ namespace Application.Writers
             int min = 0;
             int max = 5;
 
-            while(max <= base.pieces.Count)
+            while (max <= base.pieces.Count)
             {
                 int temp = 0;
                 for (int i = min; i < max; i++)
@@ -108,7 +110,7 @@ namespace Application.Writers
                     temp += pieces[i].GetLinesToWriteNumber();
                 }
 
-                temp = temp / 22 + 1;
+                temp = temp / MAX_LINES + 1;
                 temp = temp / 5;
 
                 lineNumber += temp;
