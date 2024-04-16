@@ -35,7 +35,7 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            AllocConsole();
+            /*AllocConsole();*/
 
             String fileToParse = this.getFileToOpen();
             if (fileToParse == "") return;
@@ -59,7 +59,7 @@ namespace Application
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
 
-            FreeConsole();
+            /*FreeConsole();*/
         }
 
         private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
@@ -85,12 +85,16 @@ namespace Application
                 catch (IncorrectFormatException) 
                 {
                     this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
+                    return;
                 }
             }
 
+            String fileToSave = this.getFileToSave();
+            if (fileToSave == "") return;
+
             try
             {
-                FivePiecesWriter excelWriter = new FivePiecesWriter(this.getFileToSave());
+                FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave);
                 excelWriter.WriteData(data);
             }
             catch (ExcelFileAlreadyInUseException)

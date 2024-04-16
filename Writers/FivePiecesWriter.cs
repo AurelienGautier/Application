@@ -8,7 +8,6 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
-
     internal class FivePiecesWriter : ExcelWriter
     {
         int pageNumber;
@@ -33,9 +32,14 @@ namespace Application.Writers
 
         public override void CreateWorkSheets()
         {
-            int workSheetNumber = GetWorksheetNumberToCreate();
+            int pageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
 
-            for(int i = 0; i < workSheetNumber; i++)
+            int iterations = base.pieces.Count / 5;
+            if (base.pieces.Count % 5 != 0) iterations++;
+
+            pageNumber *= iterations;
+
+            for(int i = 4; i <= pageNumber; i++)
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
@@ -49,13 +53,19 @@ namespace Application.Writers
                 this.pieceData.Add(base.pieces[i].GetData());
             }
 
-            for (int i = 0; i < pieceData.Count / 5; i++)
+            int iterations = pieceData.Count / 5;
+            if(pieceData.Count % 5 != 0) iterations++;
+
+            for (int i = 0; i < iterations; i++)
             {
                 this.Write5pieces();
 
                 this.min += 5;
-                this.max += 5;
-                if(i < pieceData.Count / 5 - 1) this.ChangePage();
+
+                if (i == pieceData.Count / 5 - 1 && pieceData.Count % 5 != 0) this.max = pieceData.Count;
+                else this.max += 5;
+
+                if(i < iterations - 1) this.ChangePage();
             }
         }
 
@@ -72,7 +82,7 @@ namespace Application.Writers
                 }
 
                 // Changement de page si l'actuelle est complète
-                if (this.linesWritten == MAX_LINES) this.ChangePage();
+                if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
 
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
@@ -89,13 +99,13 @@ namespace Application.Writers
                         ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[k][i][j].GetValue();
                     }
 
-                    base.currentColumn -= 18;
+                    base.currentColumn -= (3 + 3 * (this.max - this.min));
 
                     base.currentLine++;
                     this.linesWritten++;
 
                     // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
-                    if (this.linesWritten == MAX_LINES) this.ChangePage();
+                    if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
                 }
             }
         }
@@ -111,38 +121,11 @@ namespace Application.Writers
 
             int col = 7;
 
-            for (int i = this.min; i < this.max; i++)
+            for (int i = this.min; i < this.min + 5; i++)
             {
                 ws.Cells[15, col].Value = i + 1;
                 col += 3;
             }
-        }
-
-        public int GetWorksheetNumberToCreate()
-        {
-            int lineNumber = 0;
-
-            int min = 0;
-            int max = 5;
-
-            while (max <= base.pieces.Count)
-            {
-                int temp = 0;
-                for (int i = min; i < max; i++)
-                {
-                    temp += pieces[i].GetLinesToWriteNumber();
-                }
-
-                temp = temp / MAX_LINES + 1;
-                temp = temp / 5;
-
-                lineNumber += temp;
-
-                min += 5;
-                max += 5;
-            }
-
-            return lineNumber;
         }
     }
 }

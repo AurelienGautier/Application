@@ -128,11 +128,7 @@ namespace Application
         {
             if(line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
-            if (line[0][0] == '*')
-            {
-                Console.WriteLine(line[2]);
-                return LineType.MEASURE_TYPE;
-            }
+            if (line[0][0] == '*') return LineType.MEASURE_TYPE;
             return LineType.VALUE;
         }
 
