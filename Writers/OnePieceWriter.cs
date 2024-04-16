@@ -10,7 +10,9 @@ namespace Application.Writers
 {
     internal class OnePieceWriter : ExcelWriter
     {
-        public OnePieceWriter(string fileName) : base(fileName, 30, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport1piece")
+        private const int MAX_LINES = 22;
+
+        public OnePieceWriter(string fileName, int firstLine, string formPath) : base(fileName, firstLine, 1, formPath)
         {
         }
 
@@ -18,9 +20,9 @@ namespace Application.Writers
         {
             int linesToWrite = pieces[0].GetLinesToWriteNumber();
 
-            int pageNumber = linesToWrite / 22 + 1;
+            int pageNumber = linesToWrite / MAX_LINES + 1;
 
-            for (int i = 4; i <= pageNumber; i++)
+            for (int i = 2; i <= pageNumber; i++)
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
@@ -50,7 +52,7 @@ namespace Application.Writers
                 }
 
                 // Changement de page si l'actuelle est complète
-                if (linesWritten == 22)
+                if (linesWritten == MAX_LINES)
                 {
                     pageNumber++;
 
@@ -76,7 +78,7 @@ namespace Application.Writers
                     linesWritten++;
                     base.currentColumn -= 6;
 
-                    if (linesWritten == 22)
+                    if (linesWritten == MAX_LINES)
                     {
                         pageNumber++;
 

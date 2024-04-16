@@ -19,7 +19,7 @@ namespace Application.Writers
         int max;
         const int MAX_LINES = 23;
 
-        public FivePiecesWriter(string fileName) : base(fileName, 17, 1, "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\form\\rapport5pieces")
+        public FivePiecesWriter(string fileName) : base(fileName, 17, 1, Environment.CurrentDirectory + "\\form\\rapport5pieces")
         {
             this.pageNumber = 1;
             this.measureTypes = new List<List<String>>();
@@ -114,7 +114,7 @@ namespace Application.Writers
         {
             this.pageNumber++;
 
-            ws = this.workbook.Sheets["Mesures (" + this.pageNumber.ToString() + ")"];
+            ws = base.workbook.Sheets["Mesures (" + this.pageNumber.ToString() + ")"];
 
             base.currentLine = 17;
             this.linesWritten = 0;

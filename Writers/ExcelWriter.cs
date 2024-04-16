@@ -51,6 +51,8 @@ namespace Application.Writers
 
         public void SaveAndQuit()
         {
+            this.workbook.Sheets[1].Activate();
+
             try
             {
                 workbook.SaveAs(fileToSaveName);

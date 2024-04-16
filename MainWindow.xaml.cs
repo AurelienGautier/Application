@@ -46,8 +46,9 @@ namespace Application
             {
                 Parser parser = new Parser();
                 List<Piece> data = parser.ParseFile(fileToParse);
+                string formtPath = Environment.CurrentDirectory + "\\form\\rapport1piece";
 
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave);
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, 30, formtPath);
                 excelWriter.WriteData(data);
             }
             catch (IncorrectFormatException)
@@ -62,7 +63,37 @@ namespace Application
             /*FreeConsole();*/
         }
 
-        private void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
+        public void OutillageControle_Click(object sender, RoutedEventArgs e)
+        {
+            /*AllocConsole();*/
+
+            String fileToParse = this.getFileToOpen();
+            if (fileToParse == "") return;
+            String fileToSave = this.getFileToSave();
+            if (fileToSave == "") return;
+
+            try
+            {
+                Parser parser = new Parser();
+                List<Piece> data = parser.ParseFile(fileToParse);
+                string formtPath = Environment.CurrentDirectory + "\\form\\outillageDeControle";
+
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, 26, formtPath);
+                excelWriter.WriteData(data);
+            }
+            catch (IncorrectFormatException)
+            {
+                this.displayError("Le format du fichier est incorrect.");
+            }
+            catch (ExcelFileAlreadyInUseException)
+            {
+                this.displayError("Le fichier excel est déjà en cours d'utilisation");
+            }
+
+            /*FreeConsole();*/
+        }
+
+        public void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
             /*AllocConsole();*/
 
@@ -104,7 +135,6 @@ namespace Application
 
             /*FreeConsole();*/
         }
-
 
         private String getFileToOpen()
         {
