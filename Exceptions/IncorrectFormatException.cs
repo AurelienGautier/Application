@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Exceptions
 {
-    internal class IncorrectFormatException : Exception
+    public class IncorrectFormatException : Exception
     {
     }
 }

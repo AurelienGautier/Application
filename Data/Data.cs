@@ -9,7 +9,7 @@ namespace Application.Data
 {
     internal class Data
     {
-        List<Double> values;
+        private readonly List<Double> values;
 
         public Data() 
         {

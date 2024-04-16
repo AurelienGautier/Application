@@ -1,5 +1,6 @@
 ﻿using Application.Exceptions;
 using Application.Writers;
+using Microsoft.Office.Interop.Excel;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -22,12 +23,6 @@ namespace Application
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
-        [DllImport("Kernel32", SetLastError = true)]
-        public static extern void FreeConsole();
-
         public MainWindow()
         {
             InitializeComponent();
@@ -35,38 +30,16 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            /*AllocConsole();*/
-
-            String fileToParse = this.getFileToOpen();
-            if (fileToParse == "") return;
-            String fileToSave = this.getFileToSave();
-            if (fileToSave == "") return;
-
-            try
-            {
-                Parser parser = new Parser();
-                List<Piece> data = parser.ParseFile(fileToParse);
-                string formtPath = Environment.CurrentDirectory + "\\form\\rapport1piece";
-
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, 30, formtPath);
-                excelWriter.WriteData(data);
-            }
-            catch (IncorrectFormatException)
-            {
-                this.displayError("Le format du fichier est incorrect.");
-            }
-            catch (ExcelFileAlreadyInUseException)
-            {
-                this.displayError("Le fichier excel est déjà en cours d'utilisation");
-            }
-
-            /*FreeConsole();*/
+            this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece");
         }
 
         public void OutillageControle_Click(object sender, RoutedEventArgs e)
         {
-            /*AllocConsole();*/
+            this.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle");
+        }
 
+        public void FullOnePieceFile(int firstLine, String formPath)
+        {
             String fileToParse = this.getFileToOpen();
             if (fileToParse == "") return;
             String fileToSave = this.getFileToSave();
@@ -76,9 +49,8 @@ namespace Application
             {
                 Parser parser = new Parser();
                 List<Piece> data = parser.ParseFile(fileToParse);
-                string formtPath = Environment.CurrentDirectory + "\\form\\outillageDeControle";
 
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, 26, formtPath);
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
                 excelWriter.WriteData(data);
             }
             catch (IncorrectFormatException)
@@ -89,36 +61,21 @@ namespace Application
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
-
-            /*FreeConsole();*/
         }
 
         public void Rapport5Pieces_Click(object sender, RoutedEventArgs e)
         {
-            /*AllocConsole();*/
-
             String folderName = this.getFolderToOpen();
             if (folderName == "") return;
 
             DirectoryInfo directory = new DirectoryInfo(folderName);
-            if(!directory.Exists) return;
+            if (!directory.Exists) return;
 
             Parser parser = new Parser();
             List<Piece> data = new List<Piece>();
 
             // Parsing de tous les fichiers du répertoire
-            foreach(FileInfo file in directory.GetFiles())
-            {
-                try
-                {
-                    data.AddRange(parser.ParseFile(file.FullName));
-                }
-                catch (IncorrectFormatException) 
-                {
-                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
-                    return;
-                }
-            }
+            data.AddRange((IEnumerable<Piece>)directory.GetFiles().Select(file => parser.ParseFile(file.FullName)));
 
             String fileToSave = this.getFileToSave();
             if (fileToSave == "") return;
@@ -132,8 +89,6 @@ namespace Application
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
-
-            /*FreeConsole();*/
         }
 
         private String getFileToOpen()
@@ -182,9 +137,8 @@ namespace Application
             String caption = "Erreur";
             MessageBoxButton button = MessageBoxButton.OK;
             MessageBoxImage icon = MessageBoxImage.Error;
-            MessageBoxResult result;
 
-            result = MessageBox.Show(errorMessage, caption, button, icon, MessageBoxResult.Yes);
+            MessageBox.Show(errorMessage, caption, button, icon, MessageBoxResult.Yes);
         }
     }
 }

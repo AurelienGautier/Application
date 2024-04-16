@@ -23,13 +23,8 @@ namespace Application
 
     internal class Parser
     {
-        private List<Piece> dataParsed;
-        private StreamReader sr;
-
-        public Parser()
-        {
-            this.dataParsed = new List<Piece>();
-        }
+        private List<Piece>? dataParsed;
+        private StreamReader? sr;
 
         public List<Piece> ParseFile(String fileName)
         {
@@ -44,7 +39,7 @@ namespace Application
                 while ((line = this.sr.ReadLine()) != null)
                 {
                     words = line.Split(' ').ToList();
-                    words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+                    words = (words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
 
                     LineType type = this.GetLineType(words);
 
@@ -58,75 +53,78 @@ namespace Application
                 throw new Exceptions.IncorrectFormatException();
             }
 
-            return this.dataParsed;
+            return this.dataParsed!;
         }
 
         public void ManageLineType(LineType type, List<String> words)
         {
-            switch(type)
+            switch (type)
             {
                 case LineType.HEADER:
-                {
-                    this.dataParsed.Add(new Piece());
-
-                    for (int i = 0; i < 5; i++)
                     {
-                        this.sr.ReadLine();
-                    }
+                        this.dataParsed!.Add(new Piece());
 
-                    break;
-                }
-                case LineType.MEASURE_TYPE:
-                {
-                    String measureType = words[0].Substring(5);
-
-                    for(int i = 1; i < words.Count; i++)
-                    {
-                        measureType += " " + words[i];
-                    }
-
-                    this.dataParsed[this.dataParsed.Count - 1].AddMeasureType(measureType);
-
-                    break;
-                }
-                case LineType.VALUE:
-                {
-                    this.dataParsed.Last().AddData(this.GetData(words));
-
-                    List<double> values = new List<double>();
-
-                    // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
-                    int testInt;
-                    if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
-
-                    for(int i = 3; i < words.Count - 1; i++)
-                    {
-                        values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
-                    }
-
-                    String? nextLine = this.sr.ReadLine();
-
-                    if(nextLine != null)
-                    {
-                        words = nextLine.Split(' ').ToList();
-                        words = ((String[])words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
-
-                        for(int i = 0; i < words.Count; i++)
+                        for (int i = 0; i < 5; i++)
                         {
-                            values.Add(Convert.ToDouble(words[i], new CultureInfo("en-US")));
+                            if(this.sr != null)
+                                this.sr.ReadLine();
                         }
+
+                        break;
                     }
+                case LineType.MEASURE_TYPE:
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(words[0].Substring(5));
 
-                    this.dataParsed[this.dataParsed.Count - 1].SetValues(values);
+                        for (int i = 1; i < words.Count; i++)
+                        {
+                            sb.Append(" " + words[i]);
+                        }
 
-                    break;
-                }
+                        String measureType = sb.ToString();
+                        this.dataParsed![this.dataParsed!.Count - 1].AddMeasureType(measureType);
+
+                        break;
+                    }
+                case LineType.VALUE:
+                    {
+                        this.dataParsed![this.dataParsed!.Count - 1].AddData(this.GetData(words));
+
+                        List<double> values = new List<double>();
+
+                        // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
+                        int testInt;
+                        if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
+
+                        for (int i = 3; i < words.Count - 1; i++)
+                        {
+                            values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
+                        }
+
+                        String? nextLine = this.sr != null ? this.sr.ReadLine() : null;
+
+                        if (nextLine != null)
+                        {
+                            words = nextLine.Split(' ').ToList();
+                            words = (words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+
+                            for (int i = 0; i < words.Count; i++)
+                            {
+                                values.Add(Convert.ToDouble(words[i], new CultureInfo("en-US")));
+                            }
+                        }
+
+                        this.dataParsed![this.dataParsed!.Count - 1].SetValues(values);
+
+                        break;
+                    }
             }
         }
 
         public LineType GetLineType(List<String> line)
         {
-            if(line.Count == 0) return LineType.VOID;
+            if (line.Count == 0) return LineType.VOID;
             if (line[0] == "Designation") return LineType.HEADER;
             if (line[0][0] == '*') return LineType.MEASURE_TYPE;
             return LineType.VALUE;

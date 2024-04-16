@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Exceptions
 {
-    internal class ExcelFileAlreadyInUseException : Exception
+    public class ExcelFileAlreadyInUseException : Exception
     {
     }
 }

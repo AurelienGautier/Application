@@ -13,7 +13,7 @@ namespace Application.Writers
 {
     internal abstract class ExcelWriter
     {
-        private string fileToSaveName;
+        private readonly string fileToSaveName;
 
         protected Excel.Application excelApp;
         protected Excel.Workbook workbook;
@@ -22,7 +22,7 @@ namespace Application.Writers
         protected int currentColumn;
         protected List<Piece> pieces;
 
-        public ExcelWriter(string fileName, int line, int col, string workBookPath)
+        protected ExcelWriter(string fileName, int line, int col, string workBookPath)
         {
             fileToSaveName = fileName;
             excelApp = new Excel.Application();

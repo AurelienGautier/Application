@@ -11,8 +11,8 @@ namespace Application
 {
     internal class Piece
     {
-        private List<List<Data.Data>> pieceData;
-        private List<String> measureTypes;
+        private readonly List<List<Data.Data>> pieceData;
+        private readonly List<String> measureTypes;
 
         public Piece() 
         {

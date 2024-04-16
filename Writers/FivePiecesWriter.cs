@@ -10,14 +10,14 @@ namespace Application.Writers
 {
     internal class FivePiecesWriter : ExcelWriter
     {
-        int pageNumber;
-        List<List<String>> measureTypes;
-        List<List<List<Data.Data>>> pieceData;
-        int linesWritten;
-        Excel.Worksheet ws;
-        int min;
-        int max;
-        const int MAX_LINES = 23;
+        private int pageNumber;
+        private readonly List<List<String>> measureTypes;
+        private readonly List<List<List<Data.Data>>> pieceData;
+        private int linesWritten;
+        private Excel.Worksheet ws;
+        private int min;
+        private int max;
+        private const int MAX_LINES = 23;
 
         public FivePiecesWriter(string fileName) : base(fileName, 17, 1, Environment.CurrentDirectory + "\\form\\rapport5pieces")
         {
@@ -32,14 +32,14 @@ namespace Application.Writers
 
         public override void CreateWorkSheets()
         {
-            int pageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
+            int TotalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
 
             int iterations = base.pieces.Count / 5;
             if (base.pieces.Count % 5 != 0) iterations++;
 
-            pageNumber *= iterations;
+            TotalPageNumber *= iterations;
 
-            for(int i = 4; i <= pageNumber; i++)
+            for(int i = 4; i <= TotalPageNumber; i++)
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
@@ -71,6 +71,7 @@ namespace Application.Writers
 
         public void Write5pieces()
         {
+            // Pour chaque plan
             for (int i = 0; i < pieceData[0].Count; i++)
             {
                 // Écriture du plan
@@ -84,6 +85,7 @@ namespace Application.Writers
                 // Changement de page si l'actuelle est complète
                 if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
 
+                // Pour chaque mesure du plan
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
                     ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetNominalValue();
@@ -104,7 +106,7 @@ namespace Application.Writers
                     base.currentLine++;
                     this.linesWritten++;
 
-                    // Changement de page si l'actuelle est complète ou si arrivé à la fin des 5 pièces
+                    // Changement de page si l'actuelle est complète
                     if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
                 }
             }
