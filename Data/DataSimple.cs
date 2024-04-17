@@ -19,12 +19,12 @@ namespace Application.Data
 
         public override double GetValue()
         {
-            return base.GetValues()[0];
+            return base.GetValues()[1];
         }
 
         public override double GetTolPlus()
         {
-            return base.GetValues()[1];
+            return base.GetValues()[0];
         }
 
         public override double GetTolMinus()

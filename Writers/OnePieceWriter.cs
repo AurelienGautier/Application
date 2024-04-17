@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -43,7 +44,6 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measureTypes[i] != "")
                 {
-                    Console.WriteLine(measureTypes[i]);
                     base.currentColumn++;
                     ws.Cells[base.currentLine, base.currentColumn].Value = measureTypes[i];
                     base.currentLine++;
@@ -89,6 +89,16 @@ namespace Application.Writers
                     }
                 }
             }
+        }
+
+        public void WriteHeader(Dictionary<string, string> header, int designLine, int operatorLine)
+        {
+            Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
+
+            ws.Cells[designLine, 4] = header["Designation"];
+            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
+            ws.Cells[designLine + 4, 4] = header["Indice"];
+            ws.Cells[operatorLine, 14] = header["Opérateurs"];
         }
     }
 }

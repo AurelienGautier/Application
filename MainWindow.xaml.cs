@@ -23,6 +23,12 @@ namespace Application
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
+        [DllImport("Kernel32", SetLastError = true)]
+        public static extern void FreeConsole();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -30,15 +36,16 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece");
+            AllocConsole();
+            this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 66);
         }
 
         public void OutillageControle_Click(object sender, RoutedEventArgs e)
         {
-            this.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle");
+            this.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 62);
         }
 
-        public void FullOnePieceFile(int firstLine, String formPath)
+        public void FullOnePieceFile(int firstLine, String formPath, int designLine, int operatorLine)
         {
             String fileToParse = this.getFileToOpen();
             if (fileToParse == "") return;
@@ -49,8 +56,10 @@ namespace Application
             {
                 Parser parser = new Parser();
                 List<Piece> data = parser.ParseFile(fileToParse);
+                Dictionary<string, string> header = parser.GetHeader();
 
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
+                excelWriter.WriteHeader(header, designLine, operatorLine);
                 excelWriter.WriteData(data);
             }
             catch (IncorrectFormatException)

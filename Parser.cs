@@ -25,6 +25,32 @@ namespace Application
     {
         private List<Piece>? dataParsed;
         private StreamReader? sr;
+        private Dictionary<String, String>? header;
+
+        public void CreateHeader(string text)
+        {
+            this.header = new Dictionary<string, string>();
+
+            string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            foreach (var line in lines)
+            {
+                string[] parts = line.Split(new[] { ':' }, 3);
+
+                string key = parts[0].Trim();
+                string value = parts[2].Trim();
+
+                this.header[key] = value;
+            }
+
+            string[] words = this.header["Opérateurs"].Split(' ');
+            this.header["Opérateurs"] = words[1] + " " + words[0];
+        }
+
+        public Dictionary<String, String> GetHeader()
+        {
+            return this.header!;
+        }
 
         public List<Piece> ParseFile(String fileName)
         {
@@ -43,7 +69,7 @@ namespace Application
 
                     LineType type = this.GetLineType(words);
 
-                    this.ManageLineType(type, words);
+                    this.ManageLineType(type, words, line);
                 }
 
                 this.sr.Close();
@@ -56,7 +82,7 @@ namespace Application
             return this.dataParsed!;
         }
 
-        public void ManageLineType(LineType type, List<String> words)
+        public void ManageLineType(LineType type, List<String> words, String line)
         {
             switch (type)
             {
@@ -64,11 +90,16 @@ namespace Application
                     {
                         this.dataParsed!.Add(new Piece());
 
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(line);
+
                         for (int i = 0; i < 5; i++)
                         {
                             if(this.sr != null)
-                                this.sr.ReadLine();
+                                sb.Append('\n' + this.sr.ReadLine());
                         }
+
+                        this.CreateHeader(sb.ToString());
 
                         break;
                     }
