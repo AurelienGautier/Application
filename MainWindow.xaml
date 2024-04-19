@@ -7,23 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Button Grid.Column="1" Content="Rapport 1 pièce" HorizontalAlignment="Left" VerticalAlignment="Center" Click="Rapport1Piece_Click" Margin="88,0,0,0" RenderTransformOrigin="1.13,1.755"/>
-        <Button Content="Outillage de contrôle" HorizontalAlignment="Left" Margin="219,0,0,0" VerticalAlignment="Center" Click="OutillageControle_Click"/>
-        <Button Grid.Column="1" Content="Rapport 5 pièces" HorizontalAlignment="Left" Margin="253,0,0,0" VerticalAlignment="Center" RenderTransformOrigin="-0.353,0.827" Click="Rapport5Pieces_Click"/>
-        <Button Content="Capabilité" HorizontalAlignment="Left" Margin="82,0,0,0" VerticalAlignment="Center"/>
-        <Button Content="Bague lisse" HorizontalAlignment="Left" Margin="93,104,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="0,0.702"/>
-        <Button Content="Tampon lisse" HorizontalAlignment="Left" Margin="241,104,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button Grid.Column="1" Content="Étalon de colonne de mesure" HorizontalAlignment="Left" Margin="37,104,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <Button Grid.Column="1" Content="Calibre à machoire" HorizontalAlignment="Left" Margin="232,104,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Button Content="Rapport 1 pièce" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Rapport1Piece_Click" Margin="647,147,0,0" RenderTransformOrigin="1.13,1.755"/>
+        <Button Content="Outillage de contrôle" HorizontalAlignment="Left" Margin="507,147,0,0" VerticalAlignment="Top" Click="OutillageControle_Click"/>
+        <Button Content="Rapport 5 pièces" HorizontalAlignment="Left" Margin="647,191,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.353,0.827" Click="Rapport5Pieces_Click"/>
+        <Button Content="Capabilité" HorizontalAlignment="Left" Margin="683,355,0,0" VerticalAlignment="Top"/>
+        <Button Content="Bague lisse" HorizontalAlignment="Left" Margin="534,250,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.702"/>
+        <Button Content="Tampon lisse" HorizontalAlignment="Left" Margin="529,196,0,0" VerticalAlignment="Top"/>
+        <Button Content="Étalon de colonne de mesure" HorizontalAlignment="Left" Margin="577,304,0,0" VerticalAlignment="Top"/>
+        <Button Content="Calibre à machoire" HorizontalAlignment="Left" Margin="632,250,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

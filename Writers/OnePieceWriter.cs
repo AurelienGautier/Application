@@ -65,7 +65,9 @@ namespace Application.Writers
                 // Écriture des données ligne par ligne
                 for (int j = 0; j < pieceData[i].Count; j++)
                 {
-                    base.currentColumn += 2;
+                    base.currentColumn++;
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetSymbol();
+                    base.currentColumn++;
                     ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetNominalValue();
                     base.currentColumn += 2;
                     ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetTolPlus();
@@ -98,7 +100,6 @@ namespace Application.Writers
             ws.Cells[designLine, 4] = header["Designation"];
             ws.Cells[designLine + 2, 4] = header["N° de Plan"];
             ws.Cells[designLine + 4, 4] = header["Indice"];
-            ws.Cells[operatorLine, 14] = header["Opérateurs"];
         }
     }
 }

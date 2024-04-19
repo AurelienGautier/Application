@@ -9,7 +9,7 @@ namespace Application.Data
 {
     internal class DataConcentricity : Data
     {
-        public DataConcentricity() : base()
+        public DataConcentricity(String symbol) : base(symbol)
         {
         
         }

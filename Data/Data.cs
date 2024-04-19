@@ -10,10 +10,12 @@ namespace Application.Data
     internal class Data
     {
         private readonly List<Double> values;
+        private readonly String symbol;
 
-        public Data() 
+        public Data(String symbol) 
         {
             this.values = new List<Double>();
+            this.symbol = symbol;
         }
 
         public void SetValues(List<Double> values)
@@ -59,6 +61,11 @@ namespace Application.Data
         public List<double> GetValues()
         {
             return this.values;
+        }
+
+        public String GetSymbol()
+        {
+            return this.symbol;
         }
 
         public void PrintValues()

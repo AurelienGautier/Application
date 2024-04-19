@@ -129,5 +129,14 @@ namespace Application.Writers
                 col += 3;
             }
         }
+
+        public void WriteHeader(Dictionary<string, string> header, int designLine, int operatorLine)
+        {
+            Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
+
+            ws.Cells[designLine, 4] = header["Designation"];
+            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
+            ws.Cells[designLine + 4, 4] = header["Indice"];
+        }
     }
 }

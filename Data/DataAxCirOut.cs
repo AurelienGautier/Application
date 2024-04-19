@@ -8,7 +8,7 @@ namespace Application.Data
 {
     internal class DataAxCirOut : Data
     {
-        public DataAxCirOut() : base()
+        public DataAxCirOut(string symbol) : base(symbol)
         {
 
         }

@@ -36,7 +36,6 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            AllocConsole();
             this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 66);
         }
 
@@ -84,7 +83,19 @@ namespace Application
             List<Piece> data = new List<Piece>();
 
             // Parsing de tous les fichiers du répertoire
-            data.AddRange((IEnumerable<Piece>)directory.GetFiles().Select(file => parser.ParseFile(file.FullName)));
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                try
+                {
+                    data.AddRange(parser.ParseFile(file.FullName));
+                }
+                catch (IncorrectFormatException)
+                {
+                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
+                    return;
+                }
+            }
+            Dictionary<string, string> header = parser.GetHeader();
 
             String fileToSave = this.getFileToSave();
             if (fileToSave == "") return;
@@ -92,6 +103,7 @@ namespace Application
             try
             {
                 FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave);
+                excelWriter.WriteHeader(header, 25, 62);
                 excelWriter.WriteData(data);
             }
             catch (ExcelFileAlreadyInUseException)

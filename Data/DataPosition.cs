@@ -9,7 +9,7 @@ namespace Application.Data
 {
     internal class DataPosition : Data
     {
-        public DataPosition() : base()
+        public DataPosition(String symbol) : base(symbol)
         {
 
         }

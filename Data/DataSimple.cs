@@ -8,7 +8,7 @@ namespace Application.Data
 {
     internal class DataSimple : Data
     {
-        public DataSimple() : base()
+        public DataSimple(string symbol) : base(symbol)
         {
         }
 
