@@ -37,7 +37,11 @@ namespace Application
 
                 this.sr.Close();
             }
-            catch
+            catch (Exceptions.MeasureTypeNotFoundException)
+            {
+                throw new Exceptions.MeasureTypeNotFoundException();
+            }
+            catch (Exception e)
             {
                 throw new Exceptions.IncorrectFormatException();
             }

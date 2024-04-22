@@ -25,7 +25,6 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
-            AllocConsole();
             this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 66);
         }
 
@@ -50,6 +49,10 @@ namespace Application
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
                 excelWriter.WriteHeader(header, designLine);
                 excelWriter.WriteData(data);
+            }
+            catch(MeasureTypeNotFoundException)
+            {
+                this.displayError("Un type de mesure n'a pas été reconnu dans le fichier " + fileToParse);
             }
             catch (IncorrectFormatException)
             {
@@ -82,6 +85,11 @@ namespace Application
                 catch (IncorrectFormatException)
                 {
                     this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
+                    return;
+                }
+                catch(MeasureTypeNotFoundException)
+                {
+                    this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + file.FullName);
                     return;
                 }
             }
