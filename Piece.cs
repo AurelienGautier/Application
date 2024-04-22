@@ -75,23 +75,6 @@
         /*-------------------------------------------------------------------------*/
 
         /**
-         * SetValues
-         * 
-         * Définit les valeurs de mesure de la pièce
-         * values : List<double> - Liste des valeurs
-         * 
-         */
-        public void SetValues(List<double> values)
-        {
-            int i = pieceData.Count - 1;
-            int j = this.pieceData[i].Count - 1;
-
-            this.pieceData[i][j].SetValues(values);
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
          * GetMeasurePlans
          * 
          * Retourne la liste des plans de mesure utilisés pour mesurer la pièce

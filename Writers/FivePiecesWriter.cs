@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
+﻿using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
     internal class FivePiecesWriter : ExcelWriter
     {
         private int pageNumber;
-        private readonly List<List<String>> measureTypes;
+        private readonly List<List<String>> measurePlans;
         private readonly List<List<List<Data.Data>>> pieceData;
         private int linesWritten;
         private Excel.Worksheet ws;
@@ -19,10 +13,17 @@ namespace Application.Writers
         private int max;
         private const int MAX_LINES = 23;
 
+        /**
+         * FivePiecesWriter
+         * 
+         * Constructeur de la classe
+         * fileName : string - Nom du fichier à sauvegarder
+         * 
+         */
         public FivePiecesWriter(string fileName) : base(fileName, 17, 1, Environment.CurrentDirectory + "\\form\\rapport5pieces")
         {
             this.pageNumber = 1;
-            this.measureTypes = new List<List<String>>();
+            this.measurePlans = new List<List<String>>();
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
             this.ws = base.workbook.Sheets["Mesures"];
@@ -30,6 +31,12 @@ namespace Application.Writers
             this.max = 5;
         }
 
+        /**
+         * CreateWorkSheets
+         * 
+         * Crée toutes les pages Excel nécessaire pour insérer toutes les données
+         * 
+         */
         public override void CreateWorkSheets()
         {
             int TotalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
@@ -45,11 +52,17 @@ namespace Application.Writers
             }
         }
 
+        /**
+         * WritePiecesValues
+         * 
+         * Écrit les valeurs de mesure des pièces dans le fichier Excel
+         * 
+         */
         public override void WritePiecesValues()
         {
             for(int i = 0; i < base.pieces.Count; i++)
             {
-                this.measureTypes.Add(base.pieces[i].GetMeasureTypes());
+                this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
                 this.pieceData.Add(base.pieces[i].GetData());
             }
 
@@ -69,15 +82,21 @@ namespace Application.Writers
             }
         }
 
+        /**
+         * Write5pieces
+         * 
+         * Écrit toutes les valeurs pour un groupe de 5 pièces dans le fichier Excel
+         * 
+         */
         public void Write5pieces()
         {
             // Pour chaque plan
             for (int i = 0; i < pieceData[0].Count; i++)
             {
                 // Écriture du plan
-                if (measureTypes[0][i] != "")
+                if (measurePlans[0][i] != "")
                 {
-                    ws.Cells[base.currentLine, base.currentColumn].Value = measureTypes[0][i];
+                    ws.Cells[base.currentLine, base.currentColumn].Value = measurePlans[0][i];
                     base.currentLine++;
                     this.linesWritten++;
                 }
@@ -112,6 +131,12 @@ namespace Application.Writers
             }
         }
 
+        /**
+         * ChangePage
+         * 
+         * Passe à la page de mesure suivante
+         * 
+         */
         public void ChangePage()
         {
             this.pageNumber++;
@@ -130,7 +155,16 @@ namespace Application.Writers
             }
         }
 
-        public void WriteHeader(Dictionary<string, string> header, int designLine, int operatorLine)
+        /**
+         * WriteHeader
+         * 
+         * Remplit l'entête du rapport Excel
+         * 
+         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
+         * designLine : int - Numéro de la ligne où écrire la désignation
+         * 
+         */
+        public void WriteHeader(Dictionary<string, string> header, int designLine)
         {
             Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
 

@@ -1,81 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
-
-namespace Application.Data
+﻿namespace Application.Data
 {
     internal class Data
     {
-        private readonly List<Double> values;
-        private readonly String symbol;
+        private double nominalValue;
+        private double tolerancePlus;
+        private double toleranceMinus;
+        private double value;
 
-        public Data(String symbol) 
+        // Le symbole du type de mesure
+        private String symbol;
+
+        public Data()
         {
-            this.values = new List<Double>();
+            this.nominalValue = 0.0;
+            this.tolerancePlus = 0.0;
+            this.toleranceMinus = 0.0;
+            this.value = 0.0;
+            this.symbol = "";
+        }
+
+        public void SetNominalValue(double nominalValue)
+        {
+            this.nominalValue = nominalValue;
+        }
+
+        public double GetNominalValue()
+        {
+            return this.nominalValue;
+        }
+
+        public void SetTolPlus(double tolerancePlus)
+        {
+            this.tolerancePlus = tolerancePlus;
+        }
+
+        public double GetTolPlus()
+        {
+            return this.tolerancePlus;
+        }
+
+        public void SetValue(double value)
+        {
+            this.value = value;
+        }
+
+        public double GetValue()
+        {
+            return this.value;
+        }
+
+        public void SetTolMinus(double toleranceMinus)
+        {
+            this.toleranceMinus = toleranceMinus;
+        }
+
+        public double GetTolMinus() 
+        {
+            return this.toleranceMinus;
+        }
+
+        public void SetSymbol(String symbol)
+        {
             this.symbol = symbol;
-        }
-
-        public void SetValues(List<Double> values)
-        {
-            this.values.AddRange(values);
-        }
-
-        public virtual double GetNominalValue()
-        {
-            return this.values[0];
-        }
-
-        public virtual double GetTolPlus()
-        {
-            return this.values[1];
-        }
-
-        public virtual double GetValue()
-        {
-            return this.values[2];
-        }
-
-        public virtual double GetEcart()
-        {
-            return this.values[3];
-        }
-
-        public virtual double GetTolMinus() 
-        {
-            return this.values[4];
-        }
-
-        public virtual double GetOutTolerance()
-        {
-            if(this.values.Count > 5)
-            {
-                return this.values[5];
-            }
-
-            return 0.0;
-        }
-
-        public List<double> GetValues()
-        {
-            return this.values;
         }
 
         public String GetSymbol()
         {
             return this.symbol;
-        }
-
-        public void PrintValues()
-        {
-            foreach (Double value in this.values)
-            {
-                Console.WriteLine(value);
-            }
-
-            Console.WriteLine();
         }
     }
 }

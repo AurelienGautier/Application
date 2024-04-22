@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Microsoft.Win32;
-using System.IO;
+﻿using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -22,21 +13,38 @@ namespace Application.Writers
         protected int currentColumn;
         protected List<Piece> pieces;
 
+        /**
+         * ExcelWriter
+         * 
+         * Constructeur de la classe
+         * fileName : string - Nom du fichier à sauvegarder
+         * line : int - Ligne de la première cellule à remplir
+         * col : int - Colonne de la première cellule à remplir
+         * workBookPath : string - Chemin du formulaire vierge dans lequel écrire
+         * 
+         */
         protected ExcelWriter(string fileName, int line, int col, string workBookPath)
         {
-            fileToSaveName = fileName;
-            excelApp = new Excel.Application();
-            workbook = excelApp.Workbooks.Open(workBookPath);
+            this.fileToSaveName = fileName;
+            this.excelApp = new Excel.Application();
+            this.workbook = excelApp.Workbooks.Open(workBookPath);
 
-            currentLine = line;
-            currentColumn = col;
+            this.currentLine = line;
+            this.currentColumn = col;
 
-            pieces = new List<Piece>();
+            this.pieces = new List<Piece>();
         }
 
+        /**
+         * WriteData
+         * 
+         * Ecrit les données des pièces dans le fichier excel
+         * data : List<Piece> - Liste des pièces à écrire
+         * 
+         */
         public void WriteData(List<Piece> data)
         {
-            pieces = data;
+            this.pieces = data;
 
             CreateWorkSheets();
 
@@ -45,10 +53,28 @@ namespace Application.Writers
             SaveAndQuit();
         }
 
+        /**
+         * CreateWorkSheets
+         * 
+         * Crée les feuilles de calculs nécessaires (délégué aux classes filles)
+         * 
+         */
         public abstract void CreateWorkSheets();
 
+        /**
+         * WritePiecesValues
+         * 
+         * Ecrit les valeurs des pièces dans le fichier excel (délégué aux classes filles)
+         * 
+         */
         public abstract void WritePiecesValues();
 
+        /**
+         * SaveAndQuit
+         * 
+         * Sauvegarde le fichier et ferme l'application
+         * 
+         */
         public void SaveAndQuit()
         {
             this.workbook.Sheets[1].Activate();

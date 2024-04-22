@@ -1,20 +1,9 @@
 ﻿using Application.Exceptions;
 using Application.Writers;
-using Microsoft.Office.Interop.Excel;
 using Microsoft.Win32;
-using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Application
 {
@@ -36,6 +25,7 @@ namespace Application
 
         public void Rapport1Piece_Click(object sender, RoutedEventArgs e)
         {
+            AllocConsole();
             this.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 66);
         }
 
@@ -58,7 +48,7 @@ namespace Application
                 Dictionary<string, string> header = parser.GetHeader();
 
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
-                excelWriter.WriteHeader(header, designLine, operatorLine);
+                excelWriter.WriteHeader(header, designLine);
                 excelWriter.WriteData(data);
             }
             catch (IncorrectFormatException)
@@ -103,7 +93,7 @@ namespace Application
             try
             {
                 FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave);
-                excelWriter.WriteHeader(header, 25, 62);
+                excelWriter.WriteHeader(header, 25);
                 excelWriter.WriteData(data);
             }
             catch (ExcelFileAlreadyInUseException)

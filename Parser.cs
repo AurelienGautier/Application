@@ -122,33 +122,40 @@ namespace Application
          */
         private void manageValueType(List<String> words)
         {
-            this.dataParsed![this.dataParsed!.Count - 1].AddData(this.getData(words));
-
-            List<double> values = new List<double>();
-
             // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
             int testInt;
             if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
 
-            for (int i = 3; i < words.Count - 1; i++)
-            {
-                values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
-            }
+            List<double> values = this.getLineToDoubleList(words, 3, words.Count - 1);
 
             String? nextLine = this.sr != null ? this.sr.ReadLine() : null;
 
             if (nextLine != null)
             {
-                words = nextLine.Split(' ').ToList();
-                words = (words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+                List<String> nextLineWords = nextLine.Split(' ').ToList();
+                nextLineWords = (nextLineWords.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
 
-                for (int i = 0; i < words.Count; i++)
-                {
-                    values.Add(Convert.ToDouble(words[i], new CultureInfo("en-US")));
-                }
+                values.AddRange(this.getLineToDoubleList(nextLineWords, 0, nextLineWords.Count));
+            }
+            
+            this.dataParsed![this.dataParsed!.Count - 1].AddData(this.getData(words, values));
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private List<double> getLineToDoubleList(List<String> words, int startIndex, int endIndex)
+        {
+            List<double> values = new List<double>();
+
+            double testDouble;
+
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                if (double.TryParse(words[i].Replace('.', ','), out testDouble))
+                    values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
             }
 
-            this.dataParsed![this.dataParsed!.Count - 1].SetValues(values);
+            return values;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -188,36 +195,9 @@ namespace Application
          * return : Data - Type de mesure de la ligne
          *
          */
-        private Data.Data getData(List<String> line)
+        private Data.Data getData(List<String> line, List<Double> values)
         {
-            String symbol = "";
-
-            if (line[2] == "Distance" || line[2] == "Diameter" || line[2] == "Pos." || line[2] == "Angle" || line[2] == "Result" || line[2] == "Min.Ax/2")
-            {
-                if (line[2] == "Diameter") symbol = "⌀";
-
-                if (line[2] == "Pos.")
-                {
-                    symbol = line[3];
-                    line[2] += line[3];
-                    line.RemoveAt(3);
-                }
-
-                return new Data.Data(symbol);
-            }
-            else if (line[2] == "Ax:R/Out" || line[2] == "CirR/Out" || line[2] == "Symmetry")
-                return new Data.DataAxCirOut("");
-            else if (line[2] == "Concentr") return new Data.DataConcentricity("");
-            else if (line[2] == "Position")
-            {
-                symbol = "⊕";
-                return new Data.DataPosition(symbol);
-            }
-            else if (line[2] == "Flatness") symbol = "⏥";
-            else if (line[2] == "Rectang.") symbol = "_";
-            else if (line[2] == "Parallel") symbol = "//";
-
-            return new Data.DataSimple(symbol);
+            return ConfigSingleton.Instance.GetData(line, values);
         }
 
         /*-------------------------------------------------------------------------*/

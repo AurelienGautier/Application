@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Shapes;
-using Excel = Microsoft.Office.Interop.Excel;
+﻿using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -17,6 +10,13 @@ namespace Application.Writers
         {
         }
 
+        /**
+         * Crée suffisamment de pages Excel pour écrire les données de la pièce.
+         * 
+         * La première feuille est la feuille "Mesures" qui contient les données de la pièce.
+         * 
+         * Si le nombre de lignes à écrire est supérieur à MAX_LINES, des copies de la feuille "Mesures" sont créées.
+         */
         public override void CreateWorkSheets()
         {
             int linesToWrite = pieces[0].GetLinesToWriteNumber();
@@ -29,11 +29,15 @@ namespace Application.Writers
             }
         }
 
+        /**
+         * Écrit les valeurs de mesure des pièces dans les feuilles Excel.
+         * 
+         */
         public override void WritePiecesValues()
         {
             Excel.Worksheet ws = base.workbook.Sheets["Mesures"];
 
-            List<String> measureTypes = pieces[0].GetMeasureTypes();
+            List<String> measurePlans = pieces[0].GetMeasurePlans();
             List<List<Data.Data>> pieceData = pieces[0].GetData();
 
             int linesWritten = 0;
@@ -42,10 +46,10 @@ namespace Application.Writers
             for (int i = 0; i < pieceData.Count; i++)
             {
                 // Écriture du plan
-                if (measureTypes[i] != "")
+                if (measurePlans[i] != "")
                 {
                     base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = measureTypes[i];
+                    ws.Cells[base.currentLine, base.currentColumn].Value = measurePlans[i];
                     base.currentLine++;
                     linesWritten++;
                     base.currentColumn--;
@@ -93,7 +97,16 @@ namespace Application.Writers
             }
         }
 
-        public void WriteHeader(Dictionary<string, string> header, int designLine, int operatorLine)
+        /**
+         * WriteHeader
+         * 
+         * Remplit l'entête du rapport Excel
+         * 
+         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
+         * designLine : int - Numéro de la ligne où écrire la désignation
+         * 
+         */
+        public void WriteHeader(Dictionary<string, string> header, int designLine)
         {
             Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
 
