@@ -8,7 +8,7 @@ namespace Application
     {
         private const String ENCODING = "iso-8859-1";
 
-        private List<Piece>? dataParsed;
+        private List<Data.Piece>? dataParsed;
         private StreamReader? sr;
         private Dictionary<String, String>? header;
 
@@ -18,12 +18,12 @@ namespace Application
          * 
          * Parse un fichier texte et retourne une liste de pièces
          * fileName : String - Nom du fichier à parser
-         * return : List<Piece> - Liste de pièces
+         * return : List<Data.Piece> - Liste de pièces
          * 
          */
-        public List<Piece> ParseFile(String fileName)
+        public List<Data.Piece> ParseFile(String fileName)
         {
-            this.dataParsed = new List<Piece>();
+            this.dataParsed = new List<Data.Piece>();
             this.sr = new StreamReader(fileName, Encoding.GetEncoding(ENCODING));
 
             String? line;
@@ -80,7 +80,7 @@ namespace Application
          */
         private void manageHeaderType(String line)
         {
-            this.dataParsed!.Add(new Piece());
+            this.dataParsed!.Add(new Data.Piece());
 
             StringBuilder sb = new StringBuilder();
             sb.Append(line);
@@ -201,7 +201,7 @@ namespace Application
          */
         private Data.Data getData(List<String> line, List<Double> values)
         {
-            return ConfigSingleton.Instance.GetData(line, values);
+            return Data.ConfigSingleton.Instance.GetData(line, values);
         }
 
         /*-------------------------------------------------------------------------*/

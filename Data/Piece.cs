@@ -1,9 +1,9 @@
-﻿namespace Application
+﻿namespace Application.Data
 {
     internal class Piece
     {
         // Il y a une liste de données pour chaque plan de mesure pour les données de la pièce
-        private readonly List<List<Data.Data>> pieceData;
+        private readonly List<List<Data>> pieceData;
 
         private readonly List<String> measurePlans;
 
@@ -11,7 +11,7 @@
 
         public Piece() 
         {
-            this.pieceData = new List<List<Data.Data>>();
+            this.pieceData = new List<List<Data>>();
             this.measurePlans = new List<String>();
         }
 
@@ -50,7 +50,7 @@
         public void AddMeasurePlan(String measurePlan)
         {
             this.measurePlans.Add(measurePlan);
-            this.pieceData.Add(new List<Data.Data>());
+            this.pieceData.Add(new List<Data>());
         }
 
         /*-------------------------------------------------------------------------*/
@@ -62,7 +62,7 @@
          * data : Data.Data - Donnée à ajouter
          * 
          */
-        public void AddData(Data.Data data)
+        public void AddData(Data data)
         {
             if (this.pieceData.Count == 0)
             {
@@ -95,7 +95,7 @@
          * return : List<List<Data.Data>> - Liste des données
          * 
          */
-        public List<List<Data.Data>> GetData()
+        public List<List<Data>> GetData()
         {
             return this.pieceData;
         }

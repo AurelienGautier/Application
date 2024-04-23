@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application
+namespace Application.Data
 {
     internal class ConfigSingleton
     {
         private static ConfigSingleton instance = null;
-        private readonly List<Data.MeasureType> measureTypes;
+        private readonly List<MeasureType> measureTypes;
 
         private ConfigSingleton()
         {
-            this.measureTypes = new List<Data.MeasureType>();
+            this.measureTypes = new List<MeasureType>();
 
             this.getMeasureDataFromFile();
         }
@@ -62,7 +62,7 @@ namespace Application
 
         private void addDataType(String type, List<int> indexes, String symbol)
         {
-            this.measureTypes.Add(new Data.MeasureType
+            this.measureTypes.Add(new MeasureType
             {
                 Name = type,
                 NominalValueIndex = indexes[0],
@@ -83,7 +83,7 @@ namespace Application
             return -1;
         }
 
-        public Data.Data GetData(List<String> line, List<double> values)
+        public Data GetData(List<String> line, List<double> values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
 
@@ -91,12 +91,12 @@ namespace Application
 
             if(index == -1) throw new Exceptions.MeasureTypeNotFoundException();
 
-            Data.Data data = this.measureTypes[index].CreateData(values);
+            Data data = this.measureTypes[index].CreateData(values);
 
             return data;
         }
 
-        public List<Data.MeasureType> GetMeasureTypes()
+        public List<MeasureType> GetMeasureTypes()
         {
             return this.measureTypes;
         }

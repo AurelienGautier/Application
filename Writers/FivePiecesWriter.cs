@@ -166,11 +166,11 @@ namespace Application.Writers
          */
         public void WriteHeader(Dictionary<string, string> header, int designLine)
         {
-            Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
+            Excel.Worksheet worksheet = base.workbook.Sheets["Rapport d'essai dimensionnel"];
 
-            ws.Cells[designLine, 4] = header["Designation"];
-            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
-            ws.Cells[designLine + 4, 4] = header["Indice"];
+            worksheet.Cells[designLine, 4] = header["Designation"];
+            worksheet.Cells[designLine + 2, 4] = header["N° de Plan"];
+            worksheet.Cells[designLine + 4, 4] = header["Indice"];
         }
     }
 }

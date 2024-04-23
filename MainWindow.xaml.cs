@@ -12,35 +12,42 @@ namespace Application
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : System.Windows.Window
+    public partial class MainWindow : Window
     {
-        [DllImport("Kernel32")]
+        /*[DllImport("Kernel32")]
         public static extern void AllocConsole();
 
         [DllImport("Kernel32", SetLastError = true)]
         public static extern void FreeConsole();
-
-        private FillFormControl fillFormControl;
-        private MeasureTypesControl measureTypesControl;
+*/
+        private UI.UserControls.FillMitutoyoFormControl fillMitutoyoFormControl;
+        private UI.UserControls.FillAyonisFormControl fillAyonisFormControl;
+        private UI.UserControls.MeasureTypesControl measureTypesControl;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            this.fillFormControl = new FillFormControl();
-            this.measureTypesControl = new MeasureTypesControl();
+            fillMitutoyoFormControl = new UI.UserControls.FillMitutoyoFormControl();
+            fillAyonisFormControl = new UI.UserControls.FillAyonisFormControl();
+            measureTypesControl = new UI.UserControls.MeasureTypesControl();
 
-            CurrentControl.Content = this.fillFormControl;
+            CurrentControl.Content = fillMitutoyoFormControl;
         }
 
-        private void goToFillForm(object sender, RoutedEventArgs e)
+        private void goToFillMitutoyoForm(object sender, RoutedEventArgs e)
         {
-            CurrentControl.Content = this.fillFormControl;
+            CurrentControl.Content = fillMitutoyoFormControl;
+        }
+
+        private void goToFillAyonisForm(object sender, RoutedEventArgs e)
+        {
+            CurrentControl.Content = fillAyonisFormControl;
         }
 
         private void goToMeasureTypes(object sender, RoutedEventArgs e)
         {
-            CurrentControl.Content = this.measureTypesControl;
+            CurrentControl.Content = measureTypesControl;
         }
     }
 }

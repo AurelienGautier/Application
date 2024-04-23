@@ -1,30 +1,18 @@
 ﻿using Application.Exceptions;
 using Application.Writers;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace Application
+namespace Application.UI.UserControls
 {
     /// <summary>
     /// Logique d'interaction pour FillForm.xaml
     /// </summary>
-    public partial class FillFormControl : UserControl
+    public partial class FillMitutoyoFormControl : UserControl
     {
-        public FillFormControl()
+        public FillMitutoyoFormControl()
         {
             InitializeComponent();
 
@@ -68,7 +56,7 @@ namespace Application
             try
             {
                 Parser parser = new Parser();
-                List<Piece> data = parser.ParseFile(fileToParse);
+                List<Data.Piece> data = parser.ParseFile(fileToParse);
                 Dictionary<string, string> header = parser.GetHeader();
 
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
@@ -98,7 +86,7 @@ namespace Application
             if (!directory.Exists) return;
 
             Parser parser = new Parser();
-            List<Piece> data = new List<Piece>();
+            List<Data.Piece> data = new List<Data.Piece>();
 
             // Parsing de tous les fichiers du répertoire
             foreach (FileInfo file in directory.GetFiles())

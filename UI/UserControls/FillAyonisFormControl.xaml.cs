@@ -13,20 +13,27 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Application
+namespace Application.UI.UserControls
 {
     /// <summary>
-    /// Logique d'interaction pour MeasureTypesControl.xaml
+    /// Logique d'interaction pour FillAyonisForm.xaml
     /// </summary>
-    public partial class MeasureTypesControl : UserControl
+    public partial class FillAyonisFormControl : UserControl
     {
-        public MeasureTypesControl()
+        public FillAyonisFormControl()
         {
             InitializeComponent();
+        }
 
-            var myList = ConfigSingleton.Instance.GetMeasureTypes();
-
-            MeasureTypes.ItemsSource = myList; 
+        private void FillAform(object sender, RoutedEventArgs e)
+        {
+            switch (Forms.SelectedItem)
+            {
+                case "Rapport 1 pièce":
+                    break;
+                case "Rapport 5 pièces":
+                    break;
+            }
         }
     }
 }

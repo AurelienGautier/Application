@@ -11,7 +11,7 @@ namespace Application.Writers
 
         protected int currentLine;
         protected int currentColumn;
-        protected List<Piece> pieces;
+        protected List<Data.Piece> pieces;
 
         /**
          * ExcelWriter
@@ -32,7 +32,7 @@ namespace Application.Writers
             this.currentLine = line;
             this.currentColumn = col;
 
-            this.pieces = new List<Piece>();
+            this.pieces = new List<Data.Piece>();
         }
 
         /**
@@ -42,7 +42,7 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Piece> data)
+        public void WriteData(List<Data.Piece> data)
         {
             this.pieces = data;
 
