@@ -24,7 +24,7 @@ namespace Application
         {
             InitializeComponent();
 
-            var myList = ConfigSingleton.Instance.GetMeasureTypesNames();
+            var myList = ConfigSingleton.Instance.GetMeasureTypes();
 
             MeasureTypes.ItemsSource = myList; 
         }
