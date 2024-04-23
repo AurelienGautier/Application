@@ -2,40 +2,40 @@
 using System.IO;
 using System.Globalization;
 
-namespace Application
+namespace Application.Parser
 {
-    internal class Parser
+    internal class TextFileParser : Parser
     {
-        private const String ENCODING = "iso-8859-1";
+        private const string ENCODING = "iso-8859-1";
 
         private List<Data.Piece>? dataParsed;
         private StreamReader? sr;
-        private Dictionary<String, String>? header;
+        private Dictionary<string, string>? header;
 
         /*-------------------------------------------------------------------------*/
 
         /* ParseFile
          * 
          * Parse un fichier texte et retourne une liste de pièces
-         * fileName : String - Nom du fichier à parser
+         * fileToParse : String - Nom du fichier à parser
          * return : List<Data.Piece> - Liste de pièces
          * 
          */
-        public List<Data.Piece> ParseFile(String fileName)
+        public List<Data.Piece> ParseFile(string fileToParse)
         {
-            this.dataParsed = new List<Data.Piece>();
-            this.sr = new StreamReader(fileName, Encoding.GetEncoding(ENCODING));
+            dataParsed = new List<Data.Piece>();
+            sr = new StreamReader(fileToParse, Encoding.GetEncoding(ENCODING));
 
-            String? line;
+            string? line;
 
             try
             {
-                while ((line = this.sr.ReadLine()) != null)
+                while ((line = sr.ReadLine()) != null)
                 {
-                    this.manageLineType(line);
+                    manageLineType(line);
                 }
 
-                this.sr.Close();
+                sr.Close();
             }
             catch (Exceptions.MeasureTypeNotFoundException)
             {
@@ -46,7 +46,7 @@ namespace Application
                 throw new Exceptions.IncorrectFormatException();
             }
 
-            return this.dataParsed!;
+            return dataParsed!;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -57,17 +57,17 @@ namespace Application
          * line : String - Ligne à analyser
          *                                 
          */
-        private void manageLineType(String line)
+        private void manageLineType(string line)
         {
-            List<String> words;
+            List<string> words;
 
             // Récupération de chaque mot de la ligne dans words en supprimant les espaces
             words = line.Split(' ').ToList();
-            words = (words.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+            words = words.Where((item, index) => item != "" && item != " ").ToArray().ToList();
 
-            if (words[0] == "Designation") this.manageHeaderType(line);
-            else if (words[0][0] == '*') this.manageMeasurePlan(words);
-            else this.manageValueType(words);
+            if (words[0] == "Designation") manageHeaderType(line);
+            else if (words[0][0] == '*') manageMeasurePlan(words);
+            else manageValueType(words);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -78,20 +78,20 @@ namespace Application
          * line : String - Ligne à analyser
          *                                 
          */
-        private void manageHeaderType(String line)
+        private void manageHeaderType(string line)
         {
-            this.dataParsed!.Add(new Data.Piece());
+            dataParsed!.Add(new Data.Piece());
 
             StringBuilder sb = new StringBuilder();
             sb.Append(line);
 
             for (int i = 0; i < 5; i++)
             {
-                if (this.sr != null)
-                    sb.Append('\n' + this.sr.ReadLine());
+                if (sr != null)
+                    sb.Append('\n' + sr.ReadLine());
             }
 
-            this.createHeader(sb.ToString());
+            createHeader(sb.ToString());
         }
 
         /*-------------------------------------------------------------------------*/
@@ -102,7 +102,7 @@ namespace Application
          * words : List<String> - Ligne à analyser sous forme de liste des mots
          *
          */
-        private void manageMeasurePlan(List<String> words)
+        private void manageMeasurePlan(List<string> words)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(words[0].Substring(5));
@@ -112,8 +112,8 @@ namespace Application
                 sb.Append(" " + words[i]);
             }
 
-            String measurePlan = sb.ToString();
-            this.dataParsed![this.dataParsed!.Count - 1].AddMeasurePlan(measurePlan);
+            string measurePlan = sb.ToString();
+            dataParsed![dataParsed!.Count - 1].AddMeasurePlan(measurePlan);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -124,30 +124,30 @@ namespace Application
          * words : List<String> - Ligne à analyser sous forme de liste des mots
          *
          */
-        private void manageValueType(List<String> words)
+        private void manageValueType(List<string> words)
         {
             // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
             int testInt;
             if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
 
-            List<double> values = this.getLineToDoubleList(words, 3, words.Count - 1);
+            List<double> values = getLineToDoubleList(words, 3, words.Count - 1);
 
-            String? nextLine = this.sr != null ? this.sr.ReadLine() : null;
+            string? nextLine = sr != null ? sr.ReadLine() : null;
 
             if (nextLine != null)
             {
-                List<String> nextLineWords = nextLine.Split(' ').ToList();
-                nextLineWords = (nextLineWords.Where((item, index) => item != "" && item != " ").ToArray()).ToList();
+                List<string> nextLineWords = nextLine.Split(' ').ToList();
+                nextLineWords = nextLineWords.Where((item, index) => item != "" && item != " ").ToArray().ToList();
 
-                values.AddRange(this.getLineToDoubleList(nextLineWords, 0, nextLineWords.Count));
+                values.AddRange(getLineToDoubleList(nextLineWords, 0, nextLineWords.Count));
             }
-            
-            this.dataParsed![this.dataParsed!.Count - 1].AddData(this.getData(words, values));
+
+            dataParsed![dataParsed!.Count - 1].AddData(getData(words, values));
         }
 
         /*-------------------------------------------------------------------------*/
 
-        private List<double> getLineToDoubleList(List<String> words, int startIndex, int endIndex)
+        private List<double> getLineToDoubleList(List<string> words, int startIndex, int endIndex)
         {
             List<double> values = new List<double>();
 
@@ -172,7 +172,7 @@ namespace Application
          */
         private void createHeader(string text)
         {
-            this.header = new Dictionary<string, string>();
+            header = new Dictionary<string, string>();
 
             string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
@@ -183,11 +183,11 @@ namespace Application
                 string key = parts[0].Trim();
                 string value = parts[2].Trim();
 
-                this.header[key] = value;
+                header[key] = value;
             }
 
-            string[] words = this.header["Opérateurs"].Split(' ');
-            this.header["Opérateurs"] = words[1] + " " + words[0];
+            string[] words = header["Opérateurs"].Split(' ');
+            header["Opérateurs"] = words[1] + " " + words[0];
         }
 
         /*-------------------------------------------------------------------------*/
@@ -199,7 +199,7 @@ namespace Application
          * return : Data - Type de mesure de la ligne
          *
          */
-        private Data.Data getData(List<String> line, List<Double> values)
+        private Data.Data getData(List<string> line, List<double> values)
         {
             return Data.ConfigSingleton.Instance.GetData(line, values);
         }
@@ -211,9 +211,9 @@ namespace Application
          * Retourne l'en-tête du fichier
          * 
          */
-        public Dictionary<String, String> GetHeader()
+        public Dictionary<string, string> GetHeader()
         {
-            return this.header!;
+            return header!;
         }
 
         /*-------------------------------------------------------------------------*/
