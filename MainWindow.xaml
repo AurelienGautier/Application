@@ -6,14 +6,17 @@
         xmlns:local="clr-namespace:Application"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="10">
-        <Button Content="Rapport 1 pièce" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Rapport1Piece_Click" Margin="647,147,0,0" RenderTransformOrigin="1.13,1.755"/>
-        <Button Content="Outillage de contrôle" HorizontalAlignment="Left" Margin="507,147,0,0" VerticalAlignment="Top" Click="OutillageControle_Click"/>
-        <Button Content="Rapport 5 pièces" HorizontalAlignment="Left" Margin="647,191,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.353,0.827" Click="Rapport5Pieces_Click"/>
-        <Button Content="Capabilité" HorizontalAlignment="Left" Margin="683,355,0,0" VerticalAlignment="Top"/>
-        <Button Content="Bague lisse" HorizontalAlignment="Left" Margin="534,250,0,0" VerticalAlignment="Top" RenderTransformOrigin="0,0.702"/>
-        <Button Content="Tampon lisse" HorizontalAlignment="Left" Margin="529,196,0,0" VerticalAlignment="Top"/>
-        <Button Content="Étalon de colonne de mesure" HorizontalAlignment="Left" Margin="577,304,0,0" VerticalAlignment="Top"/>
-        <Button Content="Calibre à machoire" HorizontalAlignment="Left" Margin="632,250,0,0" VerticalAlignment="Top"/>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="25*" />
+            <ColumnDefinition Width="75*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle Grid.Column="0" Fill="#FF9CA9D0"/>
+        <Button Click="goToFillForm" Grid.Column="0" Content="Remplir un formulaire" VerticalAlignment="Top" Background="#FF9CA9D0" FontFamily="Verdana" BorderThickness="0" FontSize="16" Height="40"/>
+        <Button Click="goToMeasureTypes" Grid.Column="0" Content="Types de mesure" VerticalAlignment="Top" Background="#FF9CA9D0" FontFamily="Verdana" BorderThickness="0" FontSize="16" Height="40" Margin="0,45,0,0"/>
+
+        <ContentControl x:Name="CurrentControl" Grid.Column="1" />
     </Grid>
 </Window>

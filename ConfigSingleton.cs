@@ -123,5 +123,10 @@ namespace Application
 
             return data;
         }
+
+        public List<String> GetMeasureTypesNames()
+        {
+            return this.measureTypesNames;
+        }
     }
 }

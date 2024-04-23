@@ -41,7 +41,7 @@ namespace Application
             {
                 throw new Exceptions.MeasureTypeNotFoundException();
             }
-            catch (Exception e)
+            catch
             {
                 throw new Exceptions.IncorrectFormatException();
             }
