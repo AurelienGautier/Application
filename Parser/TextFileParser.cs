@@ -13,8 +13,6 @@ namespace Application.Parser
 
         public TextFileParser()
         {
-            base.header = new Dictionary<string, string>();
-            base.dataParsed = new List<Data.Piece>();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -28,6 +26,9 @@ namespace Application.Parser
          */
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
+            base.header = new Dictionary<string, string>();
+            base.dataParsed = new List<Data.Piece>();
+
             sr = new StreamReader(fileToParse, Encoding.GetEncoding(ENCODING));
 
             string? line;

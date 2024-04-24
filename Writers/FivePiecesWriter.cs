@@ -41,10 +41,18 @@ namespace Application.Writers
         {
             int TotalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
 
+            Console.WriteLine("le nombre de pièces : " + base.pieces.Count);
+
             int iterations = base.pieces.Count / 5;
             if (base.pieces.Count % 5 != 0) iterations++;
 
+            Console.WriteLine("le nombre d'itérations : " + iterations);
+
             TotalPageNumber *= iterations;
+
+            Console.WriteLine("L'un x l'autre : " + TotalPageNumber);
+
+            Console.WriteLine(TotalPageNumber);
 
             for(int i = 4; i <= TotalPageNumber; i++)
             {

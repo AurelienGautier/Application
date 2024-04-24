@@ -49,15 +49,22 @@ namespace Application.Writers
         {
             this.pieces = data;
 
+            Console.WriteLine("ptdr oui");
+
             CreateWorkSheets();
+            Console.WriteLine("ptdr non");
 
             WritePiecesValues();
+            Console.WriteLine("ptdr peut-être");
 
             SignForm();
+            Console.WriteLine("ptdr c'est pas sûr");
 
             ExportFirstPageToPdf();
+            Console.WriteLine("coucou les musulmans");
 
             SaveAndQuit();
+            Console.WriteLine("moi je mange la glace");
         }
 
         /**
@@ -111,8 +118,6 @@ namespace Application.Writers
                 false,
                 Type.Missing
             );
-
-            Console.WriteLine("Exportation en PDF réussie");
         }
 
         /**

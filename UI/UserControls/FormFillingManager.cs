@@ -11,15 +11,19 @@ namespace Application.UI.UserControls
     {
         public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser)
         {
-            String fileToParse = this.getFileToOpen();
-            if (fileToParse == "") return;
-            String fileToSave = this.getFileToSave();
-            if (fileToSave == "") return;
+            String fileToParse = "";
+            String fileToSave = "";
 
             try
             {
+                fileToParse = this.getFileToOpen();
+                if (fileToParse == "") return;
+
                 List<Data.Piece> data = parser.ParseFile(fileToParse);
                 Dictionary<string, string> header = parser.GetHeader();
+
+                fileToSave = this.getFileToSave();
+                if (fileToSave == "") return;
 
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
                 excelWriter.WriteHeader(header, designLine);
@@ -42,7 +46,7 @@ namespace Application.UI.UserControls
         public void FullFivePieesFile(Parser.Parser parser)
         {
             List<Data.Piece> data;
-            if(parser is TextFileParser)
+            if (parser is TextFileParser)
             {
                 data = this.getDataFromFolder(parser);
             }
