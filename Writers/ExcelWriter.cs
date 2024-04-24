@@ -1,6 +1,7 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
 using System.Drawing;
 using System.Windows;
+using Application.Data;
 
 namespace Application.Writers
 {
@@ -81,7 +82,7 @@ namespace Application.Writers
          */
         public void SignForm()
         {
-            Image image = Image.FromFile("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg");
+            Image image = Image.FromFile(ConfigSingleton.Instance.Signature);
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
             Clipboard.SetDataObject(image, true);

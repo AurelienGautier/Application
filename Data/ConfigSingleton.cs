@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Application.Data
 {
@@ -11,6 +13,8 @@ namespace Application.Data
     {
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
+
+        public String Signature { get; set; }
 
         private ConfigSingleton()
         {
@@ -58,6 +62,8 @@ namespace Application.Data
             this.addDataType("Flatness", new List<int> { -1, 0, 1, -1 }, "⏥");
             this.addDataType("Rectang.", new List<int> { -1, 0, 1, -1 }, "_");
             this.addDataType("Parallele", new List<int> { -1, 0, 1, -1 }, "//");
+
+            this.Signature = "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg";
         }
 
         private void addDataType(String type, List<int> indexes, String symbol)

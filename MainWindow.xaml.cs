@@ -51,5 +51,16 @@ namespace Application
         {
             CurrentControl.Content = measureTypesControl;
         }
+
+        private void chooseSignature(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+
+            String fileName = "";
+
+            if (dialog.ShowDialog() == true) fileName = dialog.FileName;
+
+            Data.ConfigSingleton.Instance.Signature = fileName;
+        }
     }
 }
