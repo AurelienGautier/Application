@@ -1,25 +1,101 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Parser
 {
     internal class ExcelParser : Parser
     {
+        protected Excel.Application excelApp;
+        protected Excel.Workbook? workbook;
+
         public ExcelParser()
         {
+            this.excelApp = new Excel.Application();
+
+            base.header = new Dictionary<string, string>();
+
+            base.header["Designation"] = "";
+            base.header["N° de Plan"] = "";
+            base.header["Client"] = "";
+            base.header["Indice"] = "";
+            base.header["Opérateurs"] = "";
+            base.header["Observations"] = "";
         }
 
-        public List<Data.Piece> ParseFile(string fileToParse)
+        public override List<Data.Piece> ParseFile(string fileToParse)
         {
-            return new List<Data.Piece>();
+            base.dataParsed = new List<Data.Piece>();
+            this.workbook = excelApp.Workbooks.Open(fileToParse);
+
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Sheets[1];
+
+            int row = 6;
+            int col = 4;
+
+            bool multiplePieces = worksheet.Cells[35, 1].Value == "Calcul";
+            int nbPieces = 1;
+            base.dataParsed.Add(new Data.Piece());
+
+            if(multiplePieces)
+            {
+                nbPieces = this.getPiecesNumber(worksheet);
+
+                for(int i = 1; i < nbPieces; i++)
+                {
+                    base.dataParsed.Add(new Data.Piece());
+                }
+            }
+
+            String libelle = "";
+
+            while (worksheet.Cells[row, col].Value != null)
+            {
+                libelle = worksheet.Cells[row + 7, col].Value;
+
+                double nominalValue = worksheet.Cells[row, col].Value;
+                double tolPlus = worksheet.Cells[row + 2, col].Value;
+                double tolMinus = worksheet.Cells[row + 1, col].Value;
+                String symbol = Data
+                    .ConfigSingleton
+                    .Instance
+                    .GetMeasureTypeFromLibelle(libelle)
+                    .Symbol;
+
+                // Pour chaque pièce (parcours de lignes)
+                for(int i = 0; i < nbPieces; i++)
+                {
+                    int valueRow = multiplePieces ? 118 : 37;
+
+                    Data.Data data = new Data.Data();
+                    data.SetNominalValue(nominalValue);
+                    data.SetTolPlus(tolPlus);
+                    data.SetTolMinus(tolMinus);
+                    data.SetSymbol(symbol);
+                    data.SetValue(worksheet.Cells[valueRow + i, col].Value);
+
+                    base.dataParsed[i].AddData(data);
+                }
+
+                col++;
+            }
+
+            this.workbook.Close();
+            this.excelApp.Quit();
+
+            return base.dataParsed;
         }
 
-        public Dictionary<string, string> GetHeader()
+        private int getPiecesNumber(Excel.Worksheet ws)
         {
-            return new Dictionary<string, string>();
+            int row = 118;
+            int nbPieces = 0;
+
+            while (ws.Cells[row, 1].Value != null)
+            {
+                nbPieces = (int)ws.Cells[row, 1].Value;
+                row++;
+            }
+
+            return nbPieces;
         }
     }
 }

@@ -41,32 +41,16 @@ namespace Application.UI.UserControls
 
         public void FullFivePieesFile(Parser.Parser parser)
         {
-            String folderName = this.getFolderToOpen();
-            if (folderName == "") return;
-
-            DirectoryInfo directory = new DirectoryInfo(folderName);
-            if (!directory.Exists) return;
-
-            List<Data.Piece> data = new List<Data.Piece>();
-
-            // Parsing de tous les fichiers du répertoire
-            foreach (FileInfo file in directory.GetFiles())
+            List<Data.Piece> data;
+            if(parser is TextFileParser)
             {
-                try
-                {
-                    data.AddRange(parser.ParseFile(file.FullName));
-                }
-                catch (IncorrectFormatException)
-                {
-                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
-                    return;
-                }
-                catch (MeasureTypeNotFoundException)
-                {
-                    this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + file.FullName);
-                    return;
-                }
+                data = this.getDataFromFolder(parser);
             }
+            else
+            {
+                data = parser.ParseFile(this.getFileToOpen());
+            }
+
             Dictionary<string, string> header = parser.GetHeader();
 
             String fileToSave = this.getFileToSave();
@@ -82,6 +66,34 @@ namespace Application.UI.UserControls
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
+        }
+
+        private List<Data.Piece> getDataFromFolder(Parser.Parser parser)
+        {
+            List<Data.Piece> data = new List<Data.Piece>();
+
+            String folderName = this.getFolderToOpen();
+
+            DirectoryInfo directory = new DirectoryInfo(folderName);
+
+            // Parsing de tous les fichiers du répertoire
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                try
+                {
+                    data.AddRange(parser.ParseFile(file.FullName));
+                }
+                catch (IncorrectFormatException)
+                {
+                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
+                }
+                catch (MeasureTypeNotFoundException)
+                {
+                    this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + file.FullName);
+                }
+            }
+
+            return data;
         }
 
         private String getFileToOpen()

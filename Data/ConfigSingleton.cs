@@ -9,7 +9,7 @@ namespace Application.Data
 {
     internal class ConfigSingleton
     {
-        private static ConfigSingleton instance = null;
+        private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
 
         private ConfigSingleton()
@@ -73,25 +73,21 @@ namespace Application.Data
             });
         }
 
-        private int getDataIndex(String type)
+        public MeasureType GetMeasureTypeFromLibelle(String libelle)
         {
-            for(int i = 0; i < this.measureTypes.Count; i++)
+            foreach (MeasureType measureType in this.measureTypes)
             {
-                if (this.measureTypes[i].GetName() == type) return i;
+                if (measureType.GetName() == libelle) return measureType;
             }
 
-            return -1;
+            throw new Exceptions.MeasureTypeNotFoundException();
         }
 
         public Data GetData(List<String> line, List<double> values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
 
-            int index = this.getDataIndex(line[2]);
-
-            if(index == -1) throw new Exceptions.MeasureTypeNotFoundException();
-
-            Data data = this.measureTypes[index].CreateData(values);
+            Data data = this.GetMeasureTypeFromLibelle(line[2]).CreateData(values);
 
             return data;
         }

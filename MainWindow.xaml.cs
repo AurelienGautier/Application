@@ -14,18 +14,20 @@ namespace Application
     /// </summary>
     public partial class MainWindow : Window
     {
-        /*[DllImport("Kernel32")]
+        [DllImport("Kernel32")]
         public static extern void AllocConsole();
 
         [DllImport("Kernel32", SetLastError = true)]
         public static extern void FreeConsole();
-*/
+
         private UI.UserControls.FillMitutoyoFormControl fillMitutoyoFormControl;
         private UI.UserControls.FillAyonisFormControl fillAyonisFormControl;
         private UI.UserControls.MeasureTypesControl measureTypesControl;
 
         public MainWindow()
         {
+            AllocConsole();
+
             InitializeComponent();
 
             fillMitutoyoFormControl = new UI.UserControls.FillMitutoyoFormControl();

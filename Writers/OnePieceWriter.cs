@@ -1,4 +1,6 @@
-﻿using Excel = Microsoft.Office.Interop.Excel;
+﻿using Microsoft.Office.Interop.Excel;
+using System.Windows;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -113,6 +115,16 @@ namespace Application.Writers
             ws.Cells[designLine, 4] = header["Designation"];
             ws.Cells[designLine + 2, 4] = header["N° de Plan"];
             ws.Cells[designLine + 4, 4] = header["Indice"];
+        }
+
+        /**
+         * ExcportFirstPageToPdf
+         * 
+         * Exporte la première page du formulaire Excel en PDF
+         * 
+         */
+        public override void ExportFirstPageToPdf()
+        {
         }
     }
 }

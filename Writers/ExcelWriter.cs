@@ -1,4 +1,6 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
+using System.Drawing;
+using System.Windows;
 
 namespace Application.Writers
 {
@@ -50,6 +52,8 @@ namespace Application.Writers
 
             WritePiecesValues();
 
+            SignForm();
+
             SaveAndQuit();
         }
 
@@ -68,6 +72,30 @@ namespace Application.Writers
          * 
          */
         public abstract void WritePiecesValues();
+
+        /**
+         * SignForm
+         * 
+         * Signe le formulaire
+         * 
+         */
+        public void SignForm()
+        {
+            Image image = Image.FromFile("C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg");
+            var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
+
+            Clipboard.SetDataObject(image, true);
+            var cellRngImg = (Excel.Range)_xlSheet.Cells[55, 14];
+            _xlSheet.Paste(cellRngImg, image);
+        }
+
+        /**
+         * ExcportFirstPageToPdf
+         * 
+         * Exporte la première page du fichier excel en pdf (délégué aux classes filles)
+         * 
+         */
+        public abstract void ExportFirstPageToPdf();
 
         /**
          * SaveAndQuit

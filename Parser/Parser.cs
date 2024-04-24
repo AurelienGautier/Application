@@ -6,9 +6,20 @@ using System.Threading.Tasks;
 
 namespace Application.Parser
 {
-    internal interface Parser
+    internal abstract class Parser
     {
-        List<Data.Piece> ParseFile(String fileToParse);
-        Dictionary<string, string> GetHeader();
+        protected Dictionary<string, string>? header;
+        protected List<Data.Piece>? dataParsed;
+
+        public abstract List<Data.Piece> ParseFile(String fileToParse);
+        public Dictionary<string, string> GetHeader()
+        {
+            if(this.header == null)
+            {
+                this.header = new Dictionary<string, string>();
+            }
+            
+            return this.header;
+        }
     }
 }

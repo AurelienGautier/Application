@@ -7,10 +7,15 @@ namespace Application.Parser
     internal class TextFileParser : Parser
     {
         private const string ENCODING = "iso-8859-1";
-
-        private List<Data.Piece>? dataParsed;
         private StreamReader? sr;
-        private Dictionary<string, string>? header;
+
+        /*-------------------------------------------------------------------------*/
+
+        public TextFileParser()
+        {
+            base.header = new Dictionary<string, string>();
+            base.dataParsed = new List<Data.Piece>();
+        }
 
         /*-------------------------------------------------------------------------*/
 
@@ -21,9 +26,8 @@ namespace Application.Parser
          * return : List<Data.Piece> - Liste de pièces
          * 
          */
-        public List<Data.Piece> ParseFile(string fileToParse)
+        public override List<Data.Piece> ParseFile(string fileToParse)
         {
-            dataParsed = new List<Data.Piece>();
             sr = new StreamReader(fileToParse, Encoding.GetEncoding(ENCODING));
 
             string? line;
@@ -63,7 +67,7 @@ namespace Application.Parser
 
             // Récupération de chaque mot de la ligne dans words en supprimant les espaces
             words = line.Split(' ').ToList();
-            words = words.Where((item, index) => item != "" && item != " ").ToArray().ToList();
+            words = words.Where((item, index) => item != "" && item != " ").ToList();
 
             if (words[0] == "Designation") manageHeaderType(line);
             else if (words[0][0] == '*') manageMeasurePlan(words);
@@ -80,7 +84,7 @@ namespace Application.Parser
          */
         private void manageHeaderType(string line)
         {
-            dataParsed!.Add(new Data.Piece());
+            dataParsed.Add(new Data.Piece());
 
             StringBuilder sb = new StringBuilder();
             sb.Append(line);
@@ -137,7 +141,7 @@ namespace Application.Parser
             if (nextLine != null)
             {
                 List<string> nextLineWords = nextLine.Split(' ').ToList();
-                nextLineWords = nextLineWords.Where((item, index) => item != "" && item != " ").ToArray().ToList();
+                nextLineWords = nextLineWords.Where((item, index) => item != "" && item != " ").ToList();
 
                 values.AddRange(getLineToDoubleList(nextLineWords, 0, nextLineWords.Count));
             }
@@ -202,18 +206,6 @@ namespace Application.Parser
         private Data.Data getData(List<string> line, List<double> values)
         {
             return Data.ConfigSingleton.Instance.GetData(line, values);
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /* GetHeader
-         * 
-         * Retourne l'en-tête du fichier
-         * 
-         */
-        public Dictionary<string, string> GetHeader()
-        {
-            return header!;
         }
 
         /*-------------------------------------------------------------------------*/
