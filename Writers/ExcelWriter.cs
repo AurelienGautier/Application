@@ -55,6 +55,8 @@ namespace Application.Writers
 
             SignForm();
 
+            ExportFirstPageToPdf();
+
             SaveAndQuit();
         }
 
@@ -91,12 +93,27 @@ namespace Application.Writers
         }
 
         /**
-         * ExcportFirstPageToPdf
+         * ExportFirstPageToPdf
          * 
          * Exporte la première page du fichier excel en pdf (délégué aux classes filles)
          * 
          */
-        public abstract void ExportFirstPageToPdf();
+        public void ExportFirstPageToPdf()
+        {
+            this.workbook.ExportAsFixedFormat(
+                Excel.XlFixedFormatType.xlTypePDF, 
+                this.fileToSaveName.Replace(".xlsx", ".pdf"),
+                Type.Missing,
+                Type.Missing,
+                Type.Missing,
+                1,
+                1,
+                false,
+                Type.Missing
+            );
+
+            Console.WriteLine("Exportation en PDF réussie");
+        }
 
         /**
          * SaveAndQuit

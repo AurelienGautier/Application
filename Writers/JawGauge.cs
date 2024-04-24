@@ -20,9 +20,5 @@ namespace Application.Writers
         public override void WritePiecesValues()
         {
         }
-
-        public override void ExportFirstPageToPdf()
-        {
-        }
     }
 }

@@ -172,15 +172,5 @@ namespace Application.Writers
             worksheet.Cells[designLine + 2, 4] = header["N° de Plan"];
             worksheet.Cells[designLine + 4, 4] = header["Indice"];
         }
-
-        /**
-         * ExcportFirstPageToPdf
-         * 
-         * Exporte la première page du formulaire Excel en PDF
-         * 
-         */
-        public override void ExportFirstPageToPdf()
-        {
-        }
     }
 }
