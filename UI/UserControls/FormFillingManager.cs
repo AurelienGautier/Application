@@ -33,13 +33,13 @@ namespace Application.UI.UserControls
             {
                 this.displayError(e.Message);
             }
-            catch (IncorrectFormatException)
+            catch (IncorrectFormatException e)
             {
-                this.displayError("Le format du fichier est incorrect.");
+                this.displayError(e.Message);
             }
-            catch (ExcelFileAlreadyInUseException)
+            catch (ExcelFileAlreadyInUseException e)
             {
-                this.displayError("Le fichier excel est déjà en cours d'utilisation");
+                this.displayError(e.Message);
             }
         }
 

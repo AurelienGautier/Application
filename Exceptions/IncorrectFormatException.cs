@@ -8,5 +8,6 @@ namespace Application.Exceptions
 {
     public class IncorrectFormatException : Exception
     {
+        public IncorrectFormatException() : base("Le format du fichier est incorrect.") { }
     }
 }

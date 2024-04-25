@@ -8,5 +8,7 @@ namespace Application.Exceptions
 {
     public class ExcelFileAlreadyInUseException : Exception
     {
+        public ExcelFileAlreadyInUseException(String fileName) : 
+            base("Le fichier excel \"" + fileName + "\" est déjà en cours d'utilisation. Veuillez le fermer puis réessayer.") { }
     }
 }

@@ -12,5 +12,10 @@ namespace Application.Exceptions
             base("Type de mesure \"" + measureType + "\" non identifié dans le fichier \"" + file + "\" à la ligne " + line)
         {
         }
+
+        public MeasureTypeNotFoundException(string measureType, string file, string cell) : 
+            base("Type de mesure \"" + measureType + "\" non identifié dans le fichier \"" + file + "\" dans la cellule \""+ cell + "\"")
+        {
+        }
     }
 }

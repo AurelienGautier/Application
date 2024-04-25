@@ -54,11 +54,14 @@ namespace Application.Parser
                 double nominalValue = worksheet.Cells[row, col].Value;
                 double tolPlus = worksheet.Cells[row + 2, col].Value;
                 double tolMinus = worksheet.Cells[row + 1, col].Value;
-                String symbol = Data
-                    .ConfigSingleton
-                    .Instance
-                    .GetMeasureTypeFromLibelle(libelle)
-                    .Symbol;
+
+                Data.MeasureType? measureType = Data.ConfigSingleton.Instance.GetMeasureTypeFromLibelle(libelle);
+                if(measureType == null)
+                {
+                    throw new Exceptions.MeasureTypeNotFoundException(libelle, fileToParse, worksheet.Cells[row + 7, col].Address);
+                }
+
+                String symbol = measureType.Symbol;
 
                 // Pour chaque pièce (parcours de lignes)
                 for(int i = 0; i < nbPieces; i++)
