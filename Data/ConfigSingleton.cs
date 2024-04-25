@@ -5,7 +5,10 @@ using System.Linq;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
+using System.IO;
+using System.Data;
 
 namespace Application.Data
 {
@@ -40,41 +43,47 @@ namespace Application.Data
 
         private void getMeasureDataFromFile()
         {
-            // Valeurs banales
-            this.addDataType("Distance", new List<int> { 0, 1, 2, 4 }, "");
-            this.addDataType("Diameter", new List<int> { 0, 1, 2, 4 }, "⌀");
-            this.addDataType("Pos.X", new List<int> { 0, 1, 2, 4 }, "X");
-            this.addDataType("Pos.Y", new List<int> { 0, 1, 2, 4 }, "Y");
-            this.addDataType("Pos.Z", new List<int> { 0, 1, 2, 4 }, "Z");
-            this.addDataType("Angle", new List<int> { 0, 1, 2, 4 }, "");
-            this.addDataType("Result", new List<int> { 0, 1, 2, 4 }, "");
-            this.addDataType("Min.Ax/2", new List<int> { 0, 1, 2, 4 }, "");
-            this.addDataType("X-Angle", new List<int> { 0, 1, 2, 4 }, "");
+            String filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            // Valeurs spéciales
-            this.addDataType("Ax:R/Out", new List<int> { 0, 1, 2, -1 }, "");
-            this.addDataType("CirR/Out", new List<int> { 0, 1, 2, -1 }, "");
-            this.addDataType("Symmetry", new List<int> { 0, 1, 2, -1 }, "");
+            StreamReader reader = new StreamReader(filePath);
+            String json = reader.ReadToEnd();
+            reader.Close();
 
-            this.addDataType("Cylinder", new List<int> { 0, 0, 1, -1 }, "");
+            DataSet? dataSet = JsonConvert.DeserializeObject<DataSet>(json);
 
-            this.addDataType("Concentr", new List<int> { -1, 1, 3, -1 }, "");
-            this.addDataType("Position", new List<int> { -1, 1, 3, -1 }, "⊕");
+            if (dataSet == null) 
+                throw new Exceptions.ConfigDataException("Une erreur s'est produite lors de la récupération des types de mesure.");
 
-            this.addDataType("Flatness", new List<int> { -1, 0, 1, -1 }, "⏥");
-            this.addDataType("Rectang.", new List<int> { -1, 0, 1, -1 }, "_");
-            this.addDataType("Parallele", new List<int> { -1, 0, 1, -1 }, "//");
+            DataTable? dataTable = dataSet.Tables["Measures"];
+
+            if (dataTable == null) 
+                throw new Exceptions.ConfigDataException("La syntaxe du fichier contenant les types de mesure est incorrecte.");
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                this.addData(row);
+            }
         }
 
-        private void addDataType(String type, List<int> indexes, String symbol)
+        private void addData(DataRow row)
         {
+            String? name = row["Name"].ToString();
+            String? nominalValueIndex = row["NominalValueIndex"].ToString();
+            String? tolPlusIndex = row["TolPlusIndex"].ToString();
+            String? valueIndex = row["ValueIndex"].ToString();
+            String? tolMinusIndex = row["TolMinusIndex"].ToString();
+            String? symbol = row["Symbol"].ToString();
+
+            if(name == null || nominalValueIndex == null || tolPlusIndex == null || valueIndex == null || tolMinusIndex == null || symbol == null)
+                throw new Exceptions.ConfigDataException("Il existe au moins un type de mesure dont la syntaxe n'est pas correcte. Veuillez vérifier le contenu du fichier de configuration.");
+
             this.measureTypes.Add(new MeasureType
             {
-                Name = type,
-                NominalValueIndex = indexes[0],
-                TolPlusIndex = indexes[1],
-                ValueIndex = indexes[2],
-                TolMinusIndex = indexes[3],
+                Name = name,
+                NominalValueIndex = int.Parse(nominalValueIndex),
+                TolPlusIndex = int.Parse(tolPlusIndex),
+                ValueIndex = int.Parse(valueIndex),
+                TolMinusIndex = int.Parse(tolMinusIndex),
                 Symbol = symbol
             });
         }

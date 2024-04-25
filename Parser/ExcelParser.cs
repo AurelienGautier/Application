@@ -35,6 +35,7 @@ namespace Application.Parser
             int nbPieces = 1;
             base.dataParsed.Add(new Data.Piece());
 
+            // Vérifie s'il y a une ou plusieurs pièces
             if(multiplePieces)
             {
                 nbPieces = this.getPiecesNumber(worksheet);
@@ -58,7 +59,10 @@ namespace Application.Parser
                 Data.MeasureType? measureType = Data.ConfigSingleton.Instance.GetMeasureTypeFromLibelle(libelle);
                 if(measureType == null)
                 {
-                    throw new Exceptions.MeasureTypeNotFoundException(libelle, fileToParse, worksheet.Cells[row + 7, col].Address);
+                    String cellName = worksheet.Cells[row + 7, col].Address;
+                    this.workbook.Close();
+                    this.excelApp.Quit();
+                    throw new Exceptions.MeasureTypeNotFoundException(libelle, fileToParse, cellName);
                 }
 
                 String symbol = measureType.Symbol;
