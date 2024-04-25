@@ -57,7 +57,7 @@ namespace Application
 
             if (dialog.ShowDialog() == true) fileName = dialog.FileName;
 
-            Data.ConfigSingleton.Instance.Signature = fileName;
+            Data.ConfigSingleton.Instance.SetSignature(fileName);
         }
     }
 }

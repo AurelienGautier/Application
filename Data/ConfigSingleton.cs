@@ -19,14 +19,18 @@ namespace Application.Data
 
         public String Signature { get; set; }
 
+        /*-------------------------------------------------------------------------*/
+
         private ConfigSingleton()
         {
             this.measureTypes = new List<MeasureType>();
 
-            this.Signature = "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg";
+            this.Signature = this.getSignature();
 
             this.getMeasureDataFromFile();
         }
+
+        /*-------------------------------------------------------------------------*/
 
         public static ConfigSingleton Instance
         {
@@ -41,13 +45,27 @@ namespace Application.Data
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
+        private String getSignature()
+        {
+            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
+
+            Dictionary<String, String>? data = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+
+            if (data == null)
+                throw new Exceptions.ConfigDataException("Une erreur s'est produite lors de la récupération de la signature.");
+
+            return data["Signature"];
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         private void getMeasureDataFromFile()
         {
             String filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            StreamReader reader = new StreamReader(filePath);
-            String json = reader.ReadToEnd();
-            reader.Close();
+            String json = this.getFileContent(filePath);
 
             DataSet? dataSet = JsonConvert.DeserializeObject<DataSet>(json);
 
@@ -64,6 +82,8 @@ namespace Application.Data
                 this.addData(row);
             }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private void addData(DataRow row)
         {
@@ -88,6 +108,19 @@ namespace Application.Data
             });
         }
 
+        /*-------------------------------------------------------------------------*/
+
+        private String getFileContent(String filePath)
+        {
+            StreamReader reader = new StreamReader(filePath);
+            String content = reader.ReadToEnd();
+            reader.Close();
+
+            return content;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         public MeasureType? GetMeasureTypeFromLibelle(String libelle)
         {
             foreach (MeasureType measureType in this.measureTypes)
@@ -97,6 +130,8 @@ namespace Application.Data
 
             return null;
         }
+
+        /*-------------------------------------------------------------------------*/
 
         public Data? GetData(List<String> line, List<double> values)
         {
@@ -110,9 +145,31 @@ namespace Application.Data
             return measureType.CreateData(values);
         }
 
+        /*-------------------------------------------------------------------------*/
+
         public List<MeasureType> GetMeasureTypes()
         {
             return this.measureTypes;
         }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void SetSignature(String signature)
+        {
+            this.Signature = signature;
+
+            Dictionary<String, String> data = new Dictionary<String, String>
+            {
+                { "Signature", signature }
+            };
+
+            String json = JsonConvert.SerializeObject(data);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\conf.json");
+            writer.Write(json);
+            writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }
