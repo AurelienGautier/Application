@@ -8,11 +8,14 @@ namespace Application.Parser
     {
         private const string ENCODING = "iso-8859-1";
         private StreamReader? sr;
+        private String fileToParse;
+        int lineIndex = 1;
 
         /*-------------------------------------------------------------------------*/
 
         public TextFileParser()
         {
+            this.fileToParse = "";
         }
 
         /*-------------------------------------------------------------------------*/
@@ -26,6 +29,7 @@ namespace Application.Parser
          */
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
+            this.fileToParse = fileToParse;
             base.header = new Dictionary<string, string>();
             base.dataParsed = new List<Data.Piece>();
 
@@ -33,23 +37,13 @@ namespace Application.Parser
 
             string? line;
 
-            try
+            while ((line = sr.ReadLine()) != null)
             {
-                while ((line = sr.ReadLine()) != null)
-                {
-                    manageLineType(line);
-                }
+                manageLineType(line);
+                lineIndex++;
+            }
 
-                sr.Close();
-            }
-            catch (Exceptions.MeasureTypeNotFoundException)
-            {
-                throw new Exceptions.MeasureTypeNotFoundException();
-            }
-            catch
-            {
-                throw new Exceptions.IncorrectFormatException();
-            }
+            sr.Close();
 
             return dataParsed!;
         }
@@ -85,6 +79,8 @@ namespace Application.Parser
          */
         private void manageHeaderType(string line)
         {
+            if (dataParsed == null) return;
+
             dataParsed.Add(new Data.Piece());
 
             StringBuilder sb = new StringBuilder();
@@ -95,6 +91,8 @@ namespace Application.Parser
                 if (sr != null)
                     sb.Append('\n' + sr.ReadLine());
             }
+
+            this.lineIndex += 5;
 
             createHeader(sb.ToString());
         }
@@ -204,9 +202,16 @@ namespace Application.Parser
          * return : Data - Type de mesure de la ligne
          *
          */
-        private Data.Data getData(List<string> line, List<double> values)
+        private Data.Data getData(List<string> line, List<double> values) 
         {
-            return Data.ConfigSingleton.Instance.GetData(line, values);
+            Data.Data? data = Data.ConfigSingleton.Instance.GetData(line, values);
+
+            if (data == null)
+            {
+                throw new Application.Exceptions.MeasureTypeNotFoundException(line[2], this.fileToParse, this.lineIndex);
+            }
+
+            return data;
         }
 
         /*-------------------------------------------------------------------------*/

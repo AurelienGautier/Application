@@ -29,9 +29,9 @@ namespace Application.UI.UserControls
                 excelWriter.WriteHeader(header, designLine);
                 excelWriter.WriteData(data);
             }
-            catch (MeasureTypeNotFoundException)
+            catch (MeasureTypeNotFoundException e)
             {
-                this.displayError("Un type de mesure n'a pas été reconnu dans le fichier " + fileToParse);
+                this.displayError(e.Message);
             }
             catch (IncorrectFormatException)
             {
@@ -45,7 +45,7 @@ namespace Application.UI.UserControls
 
         public void FullFivePieesFile(Parser.Parser parser)
         {
-            List<Data.Piece> data;
+            List<Data.Piece>? data;
             if (parser is TextFileParser)
             {
                 data = this.getDataFromFolder(parser);
@@ -54,6 +54,8 @@ namespace Application.UI.UserControls
             {
                 data = parser.ParseFile(this.getFileToOpen());
             }
+
+            if (data == null) return;
 
             Dictionary<string, string> header = parser.GetHeader();
 
@@ -72,11 +74,12 @@ namespace Application.UI.UserControls
             }
         }
 
-        private List<Data.Piece> getDataFromFolder(Parser.Parser parser)
+        private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
         {
             List<Data.Piece> data = new List<Data.Piece>();
 
             String folderName = this.getFolderToOpen();
+            if (folderName == "") return null;
 
             DirectoryInfo directory = new DirectoryInfo(folderName);
 

@@ -8,5 +8,9 @@ namespace Application.Exceptions
 {
     public class MeasureTypeNotFoundException : Exception
     {
+        public MeasureTypeNotFoundException(string measureType, string file, int line) :
+            base("Type de mesure \"" + measureType + "\" non identifié dans le fichier \"" + file + "\" à la ligne " + line)
+        {
+        }
     }
 }

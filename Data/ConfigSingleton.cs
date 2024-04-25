@@ -20,6 +20,8 @@ namespace Application.Data
         {
             this.measureTypes = new List<MeasureType>();
 
+            this.Signature = "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg";
+
             this.getMeasureDataFromFile();
         }
 
@@ -62,8 +64,6 @@ namespace Application.Data
             this.addDataType("Flatness", new List<int> { -1, 0, 1, -1 }, "⏥");
             this.addDataType("Rectang.", new List<int> { -1, 0, 1, -1 }, "_");
             this.addDataType("Parallele", new List<int> { -1, 0, 1, -1 }, "//");
-
-            this.Signature = "C:\\Users\\LaboTri-PC2\\Desktop\\dev\\test\\theRock.jpg";
         }
 
         private void addDataType(String type, List<int> indexes, String symbol)
@@ -79,23 +79,26 @@ namespace Application.Data
             });
         }
 
-        public MeasureType GetMeasureTypeFromLibelle(String libelle)
+        public MeasureType? GetMeasureTypeFromLibelle(String libelle)
         {
             foreach (MeasureType measureType in this.measureTypes)
             {
                 if (measureType.GetName() == libelle) return measureType;
             }
 
-            throw new Exceptions.MeasureTypeNotFoundException();
+            return null;
         }
 
-        public Data GetData(List<String> line, List<double> values)
+        public Data? GetData(List<String> line, List<double> values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
 
-            Data data = this.GetMeasureTypeFromLibelle(line[2]).CreateData(values);
+            MeasureType? measureType = this.GetMeasureTypeFromLibelle(line[2]);
 
-            return data;
+            if (measureType == null)
+                return null;
+
+            return measureType.CreateData(values);
         }
 
         public List<MeasureType> GetMeasureTypes()
