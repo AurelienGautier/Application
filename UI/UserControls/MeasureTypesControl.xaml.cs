@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Application.UI.UserControls
@@ -8,13 +9,19 @@ namespace Application.UI.UserControls
     /// </summary>
     public partial class MeasureTypesControl : UserControl
     {
+        private ObservableCollection<Data.MeasureType> myItems { get; } = new ObservableCollection<Data.MeasureType>();
+
         public MeasureTypesControl()
         {
             InitializeComponent();
+        }
+        
+        public void BindData()
+        {
+            List<Data.MeasureType> list = Data.ConfigSingleton.Instance.GetMeasureTypes();
+            ObservableCollection<Data.MeasureType> newItems = new ObservableCollection<Data.MeasureType>(list);
 
-            var myList = Data.ConfigSingleton.Instance.GetMeasureTypes();
-
-            MeasureTypes.ItemsSource = myList; 
+            MeasureTypes.ItemsSource = newItems;
         }
 
         private void modifyMeasureType(object sender, System.Windows.RoutedEventArgs e)

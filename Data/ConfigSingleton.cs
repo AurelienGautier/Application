@@ -171,5 +171,51 @@ namespace Application.Data
         }
 
         /*-------------------------------------------------------------------------*/
+
+        public void UpdateMeasureType(MeasureType measureType, MeasureType newMeasureType)
+        {
+            for (int i = 0; i < this.measureTypes.Count; i++)
+            {
+                if (this.measureTypes[i] == measureType)
+                {
+                    this.measureTypes[i] = newMeasureType;
+                    break;
+                }
+            }
+
+            DataSet dataSet = new DataSet();
+            DataTable dataTable = new DataTable("Measures");
+            dataTable.Columns.Add("Name");
+            dataTable.Columns.Add("NominalValueIndex");
+            dataTable.Columns.Add("TolPlusIndex");
+            dataTable.Columns.Add("ValueIndex");
+            dataTable.Columns.Add("TolMinusIndex");
+            dataTable.Columns.Add("Symbol");
+            
+            dataSet.Tables.Add(dataTable);
+
+            foreach (MeasureType measure in this.measureTypes)
+            {
+                DataRow row = dataTable.NewRow();
+                row["Name"] = measure.Name;
+                row["NominalValueIndex"] = measure.NominalValueIndex;
+                row["TolPlusIndex"] = measure.TolPlusIndex;
+                row["ValueIndex"] = measure.ValueIndex;
+                row["TolMinusIndex"] = measure.TolMinusIndex;
+                row["Symbol"] = measure.Symbol;
+
+                dataTable.Rows.Add(row);
+            }
+
+            dataSet.AcceptChanges();
+
+            String json = JsonConvert.SerializeObject(dataSet, Formatting.Indented);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\measureTypes.json");
+            writer.Write(json);
+            writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

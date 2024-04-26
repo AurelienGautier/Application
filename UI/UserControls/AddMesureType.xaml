@@ -9,22 +9,24 @@
     <Grid Background="White">
         <StackPanel>
             <Label Content="Nom de la mesure" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureName" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="MeasureName" FontFamily="Verdana" FontSize="16" />
 
             <Label Content="Indice de la valeur nominale (-1 si pas présente)" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureNominalValueIndex" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="MeasureNominalValueIndex" FontFamily="Verdana" FontSize="16" />
 
             <Label Content="Indice de la tolérance supérieure" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureTolerancePlusIndex" FontFamily="Verdana" FontSize="16" />
-
+            <TextBox x:Name="MeasureTolerancePlusIndex" FontFamily="Verdana" FontSize="16" />
+            
             <Label Content="Indice de la tolérance inférieure" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureToleranceMinusIndex" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="MeasureToleranceMinusIndex" FontFamily="Verdana" FontSize="16" />
 
             <Label Content="Indice de la valeur" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureValueIndex" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="MeasureValueIndex" FontFamily="Verdana" FontSize="16" />
 
             <Label Content="Symbole du type de mesure" FontFamily="Verdana" FontSize="16" />
-            <TextBox x:Name="measureSymbol" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="MeasureSymbol" FontFamily="Verdana" FontSize="16" />
+
+            <Button Content="Valider" FontFamily="Verdana" FontSize="16" Click="saveMeasureType" Background="White" />
         </StackPanel>
 
     </Grid>

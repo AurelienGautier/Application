@@ -46,8 +46,9 @@ namespace Application
             CurrentControl.Content = this.fillAyonisFormControl;
         }
 
-        private void goToMeasureTypes(object sender, RoutedEventArgs e)
+        public void goToMeasureTypes(object sender, RoutedEventArgs e)
         {
+            this.measureTypesControl.BindData();
             CurrentControl.Content = this.measureTypesControl;
         }
 
@@ -64,6 +65,7 @@ namespace Application
 
         public void goToModifyMeasureType(Data.MeasureType measureType)
         {
+            this.addMesureTypeControl.LoadMeasureType(measureType);
             CurrentControl.Content = this.addMesureTypeControl;
         }
     }
