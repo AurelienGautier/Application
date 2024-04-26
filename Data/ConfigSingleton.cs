@@ -21,6 +21,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * ConfigSingleton
+         * 
+         * Constructeur de la classe (privé car singleton donc doit être inaccessible de l'extérieur de la classe)
+         * 
+         */
         private ConfigSingleton()
         {
             this.measureTypes = new List<MeasureType>();
@@ -32,6 +38,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Singleton instance
+         * 
+         * Retourne l'instance du singleton et la crée si elle n'existe pas
+         * 
+         */
         public static ConfigSingleton Instance
         {
             get
@@ -47,6 +59,14 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * getSignature
+         * 
+         * Récupère la signature dans le fichier de configuration
+         * 
+         * @return String
+         * 
+         */
         private String getSignature()
         {
             String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
@@ -61,6 +81,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * getMeasureDataFromFile
+         * 
+         * Récupère les types de mesure depuis le fichier de configuration
+         * 
+         */
         private void getMeasureDataFromFile()
         {
             String filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
@@ -85,8 +111,17 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * addData
+         * 
+         * Désérialise une ligne du fichier de configuration et l'ajoute dans la liste des types de mesure
+         * 
+         * @param DataRow row
+         * 
+         */
         private void addData(DataRow row)
         {
+            // Récupération de chaque champ de la ligne
             String? name = row["Name"].ToString();
             String? nominalValueIndex = row["NominalValueIndex"].ToString();
             String? tolPlusIndex = row["TolPlusIndex"].ToString();
@@ -94,6 +129,7 @@ namespace Application.Data
             String? tolMinusIndex = row["TolMinusIndex"].ToString();
             String? symbol = row["Symbol"].ToString();
 
+            // Lance une exception si un champ est null
             if(name == null || nominalValueIndex == null || tolPlusIndex == null || valueIndex == null || tolMinusIndex == null || symbol == null)
                 throw new Exceptions.ConfigDataException("Il existe au moins un type de mesure dont la syntaxe n'est pas correcte. Veuillez vérifier le contenu du fichier de configuration.");
 
@@ -110,6 +146,16 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * getFileContent
+         * 
+         * Récupère le contenu entier d'un fichier
+         * 
+         * @param String filePath - Chemin du fichier dont le contenu est à récupérer
+         * 
+         * @return String
+         * 
+         */
         private String getFileContent(String filePath)
         {
             StreamReader reader = new StreamReader(filePath);
@@ -121,6 +167,16 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * GetMeasureTypeFromLibelle
+         * 
+         * Retourne le type de mesure dont le libellé est passé en paramètre
+         * 
+         * @param String libelle
+         * 
+         * @return MeasureType? - Le type de mesure ou null s'il n'existe pas
+         * 
+         */
         public MeasureType? GetMeasureTypeFromLibelle(String libelle)
         {
             foreach (MeasureType measureType in this.measureTypes)
@@ -133,6 +189,17 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * GetData
+         * 
+         * Crée un objet Data à partir des valeurs passées en paramètre
+         * 
+         * @param List<String> line - Ligne du fichier de données
+         * @param List<double> values - Toutes les valeurs relatives à la ligne
+         * 
+         * @return Data? - L'objet Data créé ou null si le type de mesure n'existe pas
+         * 
+         */
         public Data? GetData(List<String> line, List<double> values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
@@ -154,6 +221,14 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * SetSignature
+         * 
+         * Modifie la signature dans le fichier de configuration et dans l'instance
+         * 
+         * @param String signature
+         * 
+         */
         public void SetSignature(String signature)
         {
             this.Signature = signature;
@@ -172,6 +247,14 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * UpdateMeasureType
+         * 
+         * Modifie un type de mesure dans le fichier de configuration et dans l'instance
+         * 
+         * @param MeasureType measureType - Le type de mesure à modifier
+         * 
+         */
         public void UpdateMeasureType(MeasureType measureType, MeasureType newMeasureType)
         {
             for (int i = 0; i < this.measureTypes.Count; i++)
@@ -188,6 +271,14 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * DeleteMeasureType
+         * 
+         * Supprime un type de mesure dans le fichier de configuration et dans l'instance
+         * 
+         * @param MeasureType measureType - Le type de mesure à supprimer
+         * 
+         */
         public void DeleteMeasureType(String libelle)
         {
             for (int i = 0; i < this.measureTypes.Count; i++)
@@ -204,6 +295,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * serializeMeasureTypes
+         * 
+         * Convertir les types de mesure en JSON et les écrit dans le fichier de configuration
+         * 
+         */
         private void serializeMeasureTypes()
         {
             DataSet dataSet = new DataSet();

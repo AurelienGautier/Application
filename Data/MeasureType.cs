@@ -15,6 +15,12 @@ namespace Application.Data
         public int TolMinusIndex { get; set; }
         public required String Symbol { get; set; }
 
+        /**
+         * CreateData
+         * 
+         * Créer un objet Data à partir d'une liste de valeurs et des index en attribut
+         * 
+         */
         public Data CreateData(List<double> values)
         {
             Data data = new Data();
