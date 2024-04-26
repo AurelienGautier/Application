@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Data
 {
-    internal class MeasureType
+    public class MeasureType
     {
         public required String Name { get; set; }
         public int NominalValueIndex { get; set; }

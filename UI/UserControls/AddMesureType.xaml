@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Application.UI.UserControls.AddMesureType"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Application.UI.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White">
+        <StackPanel>
+            <Label Content="Nom de la mesure" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureName" FontFamily="Verdana" FontSize="16" />
+
+            <Label Content="Indice de la valeur nominale (-1 si pas présente)" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureNominalValueIndex" FontFamily="Verdana" FontSize="16" />
+
+            <Label Content="Indice de la tolérance supérieure" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureTolerancePlusIndex" FontFamily="Verdana" FontSize="16" />
+
+            <Label Content="Indice de la tolérance inférieure" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureToleranceMinusIndex" FontFamily="Verdana" FontSize="16" />
+
+            <Label Content="Indice de la valeur" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureValueIndex" FontFamily="Verdana" FontSize="16" />
+
+            <Label Content="Symbole du type de mesure" FontFamily="Verdana" FontSize="16" />
+            <TextBox x:Name="measureSymbol" FontFamily="Verdana" FontSize="16" />
+        </StackPanel>
+
+    </Grid>
+</UserControl>

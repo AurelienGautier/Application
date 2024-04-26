@@ -19,14 +19,14 @@
                     <GridViewColumn Header="" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Modifier" Click="modifyMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
+                                <Button Tag="{Binding Name}" Content="Modifier" Click="modifyMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Supprimer" Click="deleteMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
+                                <Button Tag="{Binding Name}" Content="Supprimer" Click="deleteMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

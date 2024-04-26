@@ -1,6 +1,6 @@
 ﻿namespace Application.Data
 {
-    internal class Data
+    public class Data
     {
         public double NominalValue { get; set; }
         public double TolerancePlus { get; set; }
