@@ -115,9 +115,9 @@ namespace Application.Writers
                 // Pour chaque mesure du plan
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].GetNominalValue();
-                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].GetTolPlus();
-                    ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].GetTolMinus();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].NominalValue;
+                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].TolerancePlus;
+                    ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].ToleranceMinus;
 
                     base.currentColumn += 3;
 
@@ -125,7 +125,7 @@ namespace Application.Writers
                     for(int k = this.min; k < this.max; k++)
                     {
                         base.currentColumn += 3;
-                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[k][i][j].GetValue();
+                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[k][i][j].Value;
                     }
 
                     base.currentColumn -= (3 + 3 * (this.max - this.min));

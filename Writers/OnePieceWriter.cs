@@ -72,15 +72,15 @@ namespace Application.Writers
                 for (int j = 0; j < pieceData[i].Count; j++)
                 {
                     base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetSymbol();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].Symbol;
                     base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetNominalValue();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].NominalValue;
                     base.currentColumn += 2;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetTolPlus();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].TolerancePlus;
                     base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetTolMinus();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].ToleranceMinus;
                     base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].GetValue();
+                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].Value;
 
                     base.currentLine++;
                     linesWritten++;

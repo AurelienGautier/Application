@@ -125,7 +125,7 @@ namespace Application.Data
         {
             foreach (MeasureType measureType in this.measureTypes)
             {
-                if (measureType.GetName() == libelle) return measureType;
+                if (measureType.Name == libelle) return measureType;
             }
 
             return null;

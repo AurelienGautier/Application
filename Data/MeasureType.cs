@@ -20,25 +20,20 @@ namespace Application.Data
             Data data = new Data();
 
             if (this.NominalValueIndex != -1) 
-                data.SetNominalValue(values[this.NominalValueIndex]);
+                data.NominalValue = values[this.NominalValueIndex];
 
             if (this.TolPlusIndex != -1)
-                data.SetTolPlus(values[this.TolPlusIndex]);
+                data.TolerancePlus = values[this.TolPlusIndex];
 
             if (this.ValueIndex != -1)
-                data.SetValue(values[this.ValueIndex]);
+                data.Value = values[this.ValueIndex];
 
             if (this.TolMinusIndex != -1)
-                data.SetTolMinus(values[this.TolMinusIndex]);
+                data.ToleranceMinus = values[this.TolMinusIndex];
 
-            data.SetSymbol(this.Symbol);
+            data.Symbol = this.Symbol;
 
             return data;
-        }
-
-        public String GetName()
-        {
-            return this.Name;
         }
     }
 }

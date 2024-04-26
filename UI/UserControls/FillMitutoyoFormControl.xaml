@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Application"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="1200">
     <Grid Background="White">
         <StackPanel Grid.Column="1" Orientation="Vertical" Width="auto" Height="auto" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Label Content="Formulaire Mitutoyo" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" />
@@ -16,6 +16,8 @@
                 <Button x:Name="NewForm" Content="Nouveau" Click="FillAform" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
                 <Button x:Name="ModifyForm" Content="Modifier" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
             </StackPanel>
+            
+            <CheckBox x:Name="SignForm" Content="Signer" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </UserControl>

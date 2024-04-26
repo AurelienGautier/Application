@@ -9,13 +9,13 @@ namespace Application.UI.UserControls
 {
     internal class FormFillingManager
     {
-        public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser)
+        public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser, bool sign)
         {
-            String fileToParse = "";
-            String fileToSave = "";
-
             try
             {
+                String fileToParse = "";
+                String fileToSave = "";
+
                 fileToParse = this.getFileToOpen();
                 if (fileToParse == "") return;
 
@@ -27,7 +27,7 @@ namespace Application.UI.UserControls
 
                 OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
                 excelWriter.WriteHeader(header, designLine);
-                excelWriter.WriteData(data);
+                excelWriter.WriteData(data, sign);
             }
             catch (MeasureTypeNotFoundException e)
             {
@@ -41,9 +41,13 @@ namespace Application.UI.UserControls
             {
                 this.displayError(e.Message);
             }
+            catch (Exception e)
+            {
+                this.displayError(e.Message);
+            }
         }
 
-        public void FullFivePieesFile(Parser.Parser parser)
+        public void FullFivePieesFile(Parser.Parser parser, bool sign)
         {
             List<Data.Piece>? data;
             if (parser is TextFileParser)
@@ -66,39 +70,45 @@ namespace Application.UI.UserControls
             {
                 FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave);
                 excelWriter.WriteHeader(header, 25);
-                excelWriter.WriteData(data);
+                excelWriter.WriteData(data, sign);
             }
             catch (ExcelFileAlreadyInUseException)
             {
                 this.displayError("Le fichier excel est déjà en cours d'utilisation");
             }
+            catch (Exception e)
+            {
+                this.displayError(e.Message);
+            }
         }
 
         private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
         {
-            List<Data.Piece> data = new List<Data.Piece>();
-
             String folderName = this.getFolderToOpen();
             if (folderName == "") return null;
 
             DirectoryInfo directory = new DirectoryInfo(folderName);
 
-            // Parsing de tous les fichiers du répertoire
-            foreach (FileInfo file in directory.GetFiles())
-            {
-                try
+            List<Data.Piece> data = directory.GetFiles()
+                .Select(file => file.FullName)
+                .SelectMany(fileName =>
                 {
-                    data.AddRange(parser.ParseFile(file.FullName));
-                }
-                catch (IncorrectFormatException)
-                {
-                    this.displayError("Le format du fichier " + file.FullName + " est incorrect.");
-                }
-                catch (MeasureTypeNotFoundException)
-                {
-                    this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + file.FullName);
-                }
-            }
+                    try
+                    {
+                        return parser.ParseFile(fileName);
+                    }
+                    catch (IncorrectFormatException)
+                    {
+                        this.displayError("Le format du fichier " + fileName + " est incorrect.");
+                        return Enumerable.Empty<Data.Piece>();
+                    }
+                    catch (MeasureTypeNotFoundException)
+                    {
+                        this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + fileName);
+                        return Enumerable.Empty<Data.Piece>();
+                    }
+                })
+                .ToList();
 
             return data;
         }

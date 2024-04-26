@@ -15,5 +15,15 @@ namespace Application.UI.UserControls
 
             MeasureTypes.ItemsSource = myList; 
         }
+
+        private void modifyMeasureType(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // To do
+        }
+
+        private void deleteMeasureType(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // To do
+        }
     }
 }

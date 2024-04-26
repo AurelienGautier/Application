@@ -27,13 +27,15 @@ namespace Application.UI.UserControls
 
         private void FillAform(object sender, RoutedEventArgs e)
         {
+            bool signForm = true;
+
             switch (Forms.SelectedItem)
             {
                 case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new ExcelParser());
+                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new ExcelParser(), signForm);
                     break;
                 case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePieesFile(new ExcelParser());
+                    this.formFillingManager.FullFivePieesFile(new ExcelParser(), signForm);
                     break;
             }
         }

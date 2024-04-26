@@ -7,6 +7,8 @@ namespace Application.Parser
         protected Excel.Application excelApp;
         protected Excel.Workbook? workbook;
 
+        /*-------------------------------------------------------------------------*/
+
         public ExcelParser()
         {
             this.excelApp = new Excel.Application();
@@ -20,6 +22,8 @@ namespace Application.Parser
             base.header["Opérateurs"] = "";
             base.header["Observations"] = "";
         }
+
+        /*-------------------------------------------------------------------------*/
 
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
@@ -73,11 +77,11 @@ namespace Application.Parser
                     int valueRow = multiplePieces ? 118 : 37;
 
                     Data.Data data = new Data.Data();
-                    data.SetNominalValue(nominalValue);
-                    data.SetTolPlus(tolPlus);
-                    data.SetTolMinus(tolMinus);
-                    data.SetSymbol(symbol);
-                    data.SetValue(worksheet.Cells[valueRow + i, col].Value);
+                    data.NominalValue = nominalValue;
+                    data.TolerancePlus = tolPlus;
+                    data.ToleranceMinus = tolMinus;
+                    data.Symbol = symbol;
+                    data.Value =  worksheet.Cells[valueRow + i, col].Value;
 
                     base.dataParsed[i].AddData(data);
                 }
@@ -90,6 +94,8 @@ namespace Application.Parser
 
             return base.dataParsed;
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private int getPiecesNumber(Excel.Worksheet ws)
         {
@@ -104,5 +110,7 @@ namespace Application.Parser
 
             return nbPieces;
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

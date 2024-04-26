@@ -5,17 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Application"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="White">
-    <ListView x:Name="MeasureTypes" d:ItemsSource="{d:SampleData ItemCount=5}" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Verdana" FontSize="16">
-        <ListView.View>
-            <GridView>
-                <GridViewColumn Header="Nom de la mesure" DisplayMemberBinding="{Binding Name}" />
-                <GridViewColumn Header="Indice valeur nom." DisplayMemberBinding="{Binding NominalValueIndex}" />
-                <GridViewColumn Header="Indice tol+." DisplayMemberBinding="{Binding TolPlusIndex}" />
-                <GridViewColumn Header="Indice tol-." DisplayMemberBinding="{Binding TolMinusIndex}" />
-                <GridViewColumn Header="Indice valeur" DisplayMemberBinding="{Binding ValueIndex}" />
-                <GridViewColumn Header="Symbole" DisplayMemberBinding="{Binding Symbol}" />
-            </GridView>
-        </ListView.View>
-    </ListView>
+             d:DesignHeight="600" d:DesignWidth="1200" Background="White">
+    <Grid>
+        <ListView x:Name="MeasureTypes" d:ItemsSource="{d:SampleData ItemCount=5}" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Verdana" FontSize="16" Width="auto">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Nom de la mesure" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Indice valeur nom." DisplayMemberBinding="{Binding NominalValueIndex}" />
+                    <GridViewColumn Header="Indice tol+." DisplayMemberBinding="{Binding TolPlusIndex}" />
+                    <GridViewColumn Header="Indice tol-." DisplayMemberBinding="{Binding TolMinusIndex}" />
+                    <GridViewColumn Header="Indice valeur" DisplayMemberBinding="{Binding ValueIndex}" />
+                    <GridViewColumn Header="Symbole" DisplayMemberBinding="{Binding Symbol}" />
+                    <GridViewColumn Header="" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Modifier" Click="modifyMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Supprimer" Click="deleteMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+    
 </UserControl>

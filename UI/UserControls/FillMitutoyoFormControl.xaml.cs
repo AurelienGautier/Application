@@ -37,16 +37,18 @@ namespace Application.UI.UserControls
 
         private void FillAform(object sender, RoutedEventArgs e)
         {
+            bool sign = SignForm.IsChecked == true;
+
             switch (Forms.SelectedItem)
             {
                 case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new TextFileParser());
+                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new TextFileParser(), sign);
                     break;
                 case "Outillage de contrôle":
-                    this.formFillingManager.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, new TextFileParser());
+                    this.formFillingManager.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, new TextFileParser(), sign);
                     break;
                 case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePieesFile(new TextFileParser());
+                    this.formFillingManager.FullFivePieesFile(new TextFileParser(), sign);
                     break;
             }
         }

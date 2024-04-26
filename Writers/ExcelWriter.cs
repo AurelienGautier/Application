@@ -16,6 +16,8 @@ namespace Application.Writers
         protected int currentColumn;
         protected List<Data.Piece> pieces;
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * ExcelWriter
          * 
@@ -38,6 +40,8 @@ namespace Application.Writers
             this.pieces = new List<Data.Piece>();
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * WriteData
          * 
@@ -45,7 +49,7 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Data.Piece> data)
+        public void WriteData(List<Data.Piece> data, bool sign)
         {
             this.pieces = data;
 
@@ -53,12 +57,18 @@ namespace Application.Writers
 
             WritePiecesValues();
 
-            SignForm();
+            if (sign)
+            {
+                SignForm();
 
-            ExportFirstPageToPdf();
+                ExportFirstPageToPdf();
+            }
+
 
             SaveAndQuit();
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * CreateWorkSheets
@@ -68,6 +78,8 @@ namespace Application.Writers
          */
         public abstract void CreateWorkSheets();
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * WritePiecesValues
          * 
@@ -75,6 +87,8 @@ namespace Application.Writers
          * 
          */
         public abstract void WritePiecesValues();
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * SignForm
@@ -84,13 +98,25 @@ namespace Application.Writers
          */
         public void SignForm()
         {
-            Image image = Image.FromFile(ConfigSingleton.Instance.Signature);
+            Image image;
+
+            try
+            {
+                image = Image.FromFile(ConfigSingleton.Instance.Signature);
+            }
+            catch
+            {
+                throw new System.ArgumentException("Chemin vers la signature vide ou incorrect");
+            }
+
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
             Clipboard.SetDataObject(image, true);
             var cellRngImg = (Excel.Range)_xlSheet.Cells[55, 14];
             _xlSheet.Paste(cellRngImg, image);
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * ExportFirstPageToPdf
@@ -112,6 +138,8 @@ namespace Application.Writers
                 Type.Missing
             );
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * SaveAndQuit
@@ -135,5 +163,7 @@ namespace Application.Writers
             workbook.Close();
             excelApp.Quit();
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }
