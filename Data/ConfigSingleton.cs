@@ -183,6 +183,29 @@ namespace Application.Data
                 }
             }
 
+            this.serializeMeasureTypes();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void DeleteMeasureType(String libelle)
+        {
+            for (int i = 0; i < this.measureTypes.Count; i++)
+            {
+                if (this.measureTypes[i].Name == libelle)
+                {
+                    this.measureTypes.RemoveAt(i);
+                    break;
+                }
+            }
+
+            this.serializeMeasureTypes();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void serializeMeasureTypes()
+        {
             DataSet dataSet = new DataSet();
             DataTable dataTable = new DataTable("Measures");
             dataTable.Columns.Add("Name");
@@ -191,7 +214,7 @@ namespace Application.Data
             dataTable.Columns.Add("ValueIndex");
             dataTable.Columns.Add("TolMinusIndex");
             dataTable.Columns.Add("Symbol");
-            
+
             dataSet.Tables.Add(dataTable);
 
             foreach (MeasureType measure in this.measureTypes)

@@ -39,7 +39,16 @@ namespace Application.UI.UserControls
 
         private void deleteMeasureType(object sender, System.Windows.RoutedEventArgs e)
         {
-            // To do
+            Button button = (Button)sender;
+            String? libelle = button.Tag.ToString();
+            if (libelle == null) return;
+
+            MessageBoxResult result = MessageBox.Show("Êtes-vous sûr de vouloir supprimer le type de mesure " + libelle + " ?", "Avertissement", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.No) return;
+
+            Data.ConfigSingleton.Instance.DeleteMeasureType(libelle);
+            this.BindData();
         }
     }
 }
