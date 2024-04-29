@@ -63,6 +63,12 @@ namespace Application
             Data.ConfigSingleton.Instance.SetSignature(fileName);
         }
 
+        public void goToAddMeasureType(object sender, RoutedEventArgs e)
+        {
+            this.addMesureTypeControl.LoadMeasureType(null);
+            CurrentControl.Content = this.addMesureTypeControl;
+        }
+
         public void goToModifyMeasureType(Data.MeasureType measureType)
         {
             this.addMesureTypeControl.LoadMeasureType(measureType);

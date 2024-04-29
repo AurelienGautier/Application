@@ -27,9 +27,11 @@ namespace Application.UI.UserControls
             InitializeComponent();
         }
 
-        public void LoadMeasureType(Data.MeasureType measureType)
+        public void LoadMeasureType(Data.MeasureType? measureType)
         {
             this.measureType = measureType;
+
+            if (measureType == null) return;
 
             TextBox measureName = (TextBox)this.FindName("MeasureName");
             measureName.Text = measureType.Name;
@@ -72,8 +74,6 @@ namespace Application.UI.UserControls
 
         private void saveMeasureType(object sender, RoutedEventArgs e)
         {
-            if (this.measureType == null) return;
-
             Data.ConfigSingleton.Instance.UpdateMeasureType(this.measureType, this.GetMeasureType());
 
             MainWindow parentWindow = (MainWindow)Window.GetWindow(this);

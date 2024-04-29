@@ -255,14 +255,21 @@ namespace Application.Data
          * @param MeasureType measureType - Le type de mesure à modifier
          * 
          */
-        public void UpdateMeasureType(MeasureType measureType, MeasureType newMeasureType)
+        public void UpdateMeasureType(MeasureType? measureType, MeasureType newMeasureType)
         {
-            for (int i = 0; i < this.measureTypes.Count; i++)
+            if(measureType == null)
             {
-                if (this.measureTypes[i] == measureType)
+                this.measureTypes.Add(newMeasureType);
+            }
+            else
+            {
+                for (int i = 0; i < this.measureTypes.Count; i++)
                 {
-                    this.measureTypes[i] = newMeasureType;
-                    break;
+                    if (this.measureTypes[i] == measureType)
+                    {
+                        this.measureTypes[i] = newMeasureType;
+                        break;
+                    }
                 }
             }
 
