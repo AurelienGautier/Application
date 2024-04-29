@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Windows;
 using Application.Data;
+using Application.Exceptions;
+using Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -15,6 +17,9 @@ namespace Application.Writers
         protected int currentLine;
         protected int currentColumn;
         protected List<Data.Piece> pieces;
+
+        private int rowToSign;
+        private int colToSign;
 
         /*-------------------------------------------------------------------------*/
 
@@ -36,6 +41,9 @@ namespace Application.Writers
 
             this.currentLine = line;
             this.currentColumn = col;
+
+            this.rowToSign = 51;
+            this.colToSign = 14;
 
             this.pieces = new List<Data.Piece>();
         }
@@ -111,8 +119,10 @@ namespace Application.Writers
 
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
+            this.setRowAndColFromFromType(_xlSheet);
+
             Clipboard.SetDataObject(image, true);
-            var cellRngImg = (Excel.Range)_xlSheet.Cells[55, 14];
+            var cellRngImg = (Excel.Range)_xlSheet.Cells[this.rowToSign, this.colToSign];
             _xlSheet.Paste(cellRngImg, image);
         }
 
@@ -165,5 +175,25 @@ namespace Application.Writers
         }
 
         /*-------------------------------------------------------------------------*/
+
+        private void setRowAndColFromFromType(Excel.Worksheet worksheet)
+        {
+            String? formType = worksheet.Cells[200, 1].Value;
+            Console.WriteLine(formType);
+
+            if (formType == null)
+            {
+                throw new ConfigDataException("Le type de formulaire n'a pas été reconnu.");
+            }
+
+            if (formType == "Rapport 1 pièce")
+            {
+                this.rowToSign = 55; this.colToSign = 14;
+            }
+            else if (formType == "Bague lisse" || formType == "Calibre à machoire" || formType == "Etalon colonne mesure" || formType == "Tampon lisse")
+            {
+                rowToSign = 52;
+            }
+        }
     }
 }

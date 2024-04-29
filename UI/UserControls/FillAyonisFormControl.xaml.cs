@@ -27,7 +27,7 @@ namespace Application.UI.UserControls
 
         private void FillAform(object sender, RoutedEventArgs e)
         {
-            bool signForm = true;
+            bool signForm = SignForm.IsChecked == true;
 
             switch (Forms.SelectedItem)
             {

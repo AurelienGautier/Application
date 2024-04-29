@@ -17,6 +17,7 @@
                 <Button x:Name="ModifyForm" Content="Modifier" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
             </StackPanel>
 
+            <CheckBox x:Name="SignForm" Content="Signer" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </UserControl>
