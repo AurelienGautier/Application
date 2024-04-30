@@ -64,7 +64,7 @@ namespace Application.UI.UserControls
 
             try
             {
-                FivePiecesWriter excelWriter = new FivePiecesWriter(formToModify, fileToSave, modify);
+                FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave, formToModify, modify);
                 excelWriter.WriteHeader(header, 25);
                 excelWriter.WriteData(data, sign);
             }

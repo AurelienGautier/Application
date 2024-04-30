@@ -29,6 +29,11 @@ namespace Application.Writers
             this.ws = base.workbook.Sheets["Mesures"];
             this.min = 0;
             this.max = 5;
+
+            if(modify)
+            {
+                this.EraseData(17);
+            }
         }
 
         /**
@@ -41,18 +46,10 @@ namespace Application.Writers
         {
             int TotalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
 
-            Console.WriteLine("le nombre de pièces : " + base.pieces.Count);
-
             int iterations = base.pieces.Count / 5;
             if (base.pieces.Count % 5 != 0) iterations++;
 
-            Console.WriteLine("le nombre d'itérations : " + iterations);
-
             TotalPageNumber *= iterations;
-
-            Console.WriteLine("L'un x l'autre : " + TotalPageNumber);
-
-            Console.WriteLine(TotalPageNumber);
 
             for(int i = 2; i <= TotalPageNumber; i++)
             {
@@ -183,7 +180,46 @@ namespace Application.Writers
 
         public override void EraseData(int firstLine)
         {
-            // To do
+            this.excelApp.DisplayAlerts = false;
+
+            // Supprimer toutes les pages dont le nom contient Mesures sauf la page Mesures
+            for (int i = workbook.Sheets.Count; i >= 1; i--)
+            {
+                Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[i];
+
+                if (sheet.Name.Contains("Mesures") && sheet.Name != "Mesures")
+                {
+                    workbook.Sheets[i].Delete();
+                }
+            }
+
+            this.excelApp.DisplayAlerts = true;
+
+            // Supprimer les mesures de la première page de mesures
+            this.deleteRange("A", "G", firstLine);
+            this.deleteRange("J", "J", firstLine);
+            this.deleteRange("M", "M", firstLine);
+            this.deleteRange("P", "P", firstLine);
+            this.deleteRange("S", "S", firstLine);
+        }
+
+        /**
+         * deleteRange
+         * 
+         * Supprime les valeurs de mesure d'une plage de colonnes
+         * 
+         * startCol : string - Colonne de début de la plage
+         * endCol : string - Colonne de fin de la plage
+         * firstLine : int - Numéro de la première ligne de la plage
+         * 
+         */
+        private void deleteRange(String startCol, String endCol, int firstLine)
+        {
+            startCol += firstLine.ToString();
+            endCol += (firstLine + MAX_LINES).ToString();
+            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets["Mesures"];
+            Excel.Range rangeToDelete = measuresSheet.Range[startCol + ":" + endCol];
+            rangeToDelete.ClearContents();
         }
     }
 }

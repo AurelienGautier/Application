@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Windows;
 using Application.Data;
 using Application.Exceptions;
-using Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -29,7 +28,7 @@ namespace Application.Writers
          * ExcelWriter
          * 
          * Constructeur de la classe
-         * fileName : string - Nom du fichier à sauvegarder
+         * fileName : string - Chemin du fichier à sauvegarder
          * line : int - Ligne de la première cellule à remplir
          * col : int - Colonne de la première cellule à remplir
          * workBookPath : string - Chemin du formulaire vierge dans lequel écrire
