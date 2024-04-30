@@ -39,5 +39,23 @@ namespace Application.UI.UserControls
                     break;
             }
         }
+
+        private void ModifyAform(object sender, RoutedEventArgs e)
+        {
+            bool sign = SignForm.IsChecked == true;
+
+            String formToModify = this.formFillingManager.GetFileToOpen();
+            if (formToModify == "") return;
+
+            switch (Forms.SelectedItem)
+            {
+                case "Rapport 1 pièce":
+                    this.formFillingManager.FullOnePieceFile(30, formToModify, 26, new TextFileParser(), sign, true);
+                    break;
+                case "Rapport 5 pièces":
+                    this.formFillingManager.FullFivePiecesFile(formToModify, new TextFileParser(), sign, true);
+                    break;
+            }
+        }
     }
 }
