@@ -32,10 +32,10 @@ namespace Application.UI.UserControls
             switch (Forms.SelectedItem)
             {
                 case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new ExcelParser(), signForm);
+                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new ExcelParser(), signForm, false);
                     break;
                 case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePieesFile(new ExcelParser(), signForm);
+                    this.formFillingManager.FullFivePiecesFile(Environment.CurrentDirectory + "\\form\\rapport5pieces", new ExcelParser(), signForm, false);
                     break;
             }
         }

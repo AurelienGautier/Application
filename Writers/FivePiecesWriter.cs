@@ -20,7 +20,7 @@ namespace Application.Writers
          * fileName : string - Nom du fichier à sauvegarder
          * 
          */
-        public FivePiecesWriter(string fileName) : base(fileName, 17, 1, Environment.CurrentDirectory + "\\form\\rapport5pieces")
+        public FivePiecesWriter(string fileName, String workBookPath, bool modify) : base(fileName, 17, 1, workBookPath, modify)
         {
             this.pageNumber = 1;
             this.measurePlans = new List<List<String>>();
@@ -54,7 +54,7 @@ namespace Application.Writers
 
             Console.WriteLine(TotalPageNumber);
 
-            for(int i = 4; i <= TotalPageNumber; i++)
+            for(int i = 2; i <= TotalPageNumber; i++)
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
@@ -179,6 +179,11 @@ namespace Application.Writers
             worksheet.Cells[designLine, 4] = header["Designation"];
             worksheet.Cells[designLine + 2, 4] = header["N° de Plan"];
             worksheet.Cells[designLine + 4, 4] = header["Indice"];
+        }
+
+        public override void EraseData(int firstLine)
+        {
+            // To do
         }
     }
 }

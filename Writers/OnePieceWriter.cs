@@ -8,8 +8,12 @@ namespace Application.Writers
     {
         private const int MAX_LINES = 22;
 
-        public OnePieceWriter(string fileName, int firstLine, string formPath) : base(fileName, firstLine, 1, formPath)
+        public OnePieceWriter(string fileName, int firstLine, string formPath, bool modify) : base(fileName, firstLine, 1, formPath, modify)
         {
+            if(base.modify)
+            {
+                this.EraseData(firstLine);
+            }
         }
 
         /**
@@ -29,6 +33,8 @@ namespace Application.Writers
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
+
+            Console.WriteLine("Nombre de pages : " + pageNumber);
         }
 
         /**
@@ -115,6 +121,37 @@ namespace Application.Writers
             ws.Cells[designLine, 4] = header["Designation"];
             ws.Cells[designLine + 2, 4] = header["N° de Plan"];
             ws.Cells[designLine + 4, 4] = header["Indice"];
+        }
+
+        /**
+         * Efface les mesures des pages Excel.
+         * 
+         * Supprime toutes les pages dont le nom contient Mesures sauf la page Mesures.
+         * Supprime les mesures de la première page de mesures.
+         */
+        public override void EraseData(int firstLine)
+        {
+            this.excelApp.DisplayAlerts = false;
+
+            // Supprimer toutes les pages dont le nom contient Mesures sauf la page Mesures
+            for (int i = workbook.Sheets.Count; i >= 1; i--)
+            {
+                Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[i];
+
+                if (sheet.Name.Contains("Mesures") && sheet.Name != "Mesures")
+                {
+                    workbook.Sheets[i].Delete();
+                }
+            }
+
+            this.excelApp.DisplayAlerts = true;
+
+            // Supprimer les mesures de la première page de mesures
+            String start = "B" + firstLine.ToString();
+            String end = "I" + (firstLine + MAX_LINES).ToString();
+            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets["Mesures"];
+            Excel.Range rangeToDelete = measuresSheet.Range[start + ":" + end];
+            rangeToDelete.ClearContents();
         }
     }
 }

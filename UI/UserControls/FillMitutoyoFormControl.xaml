@@ -14,7 +14,7 @@
                 <ComboBox x:Name="Forms" Grid.Column="1" VerticalAlignment="Center" Width="271" IsEditable="True" Height="46" FontSize="16" FontFamily="Verdana" HorizontalAlignment="Center" VerticalContentAlignment="Center" />
 
                 <Button x:Name="NewForm" Content="Nouveau" Click="FillAform" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
-                <Button x:Name="ModifyForm" Content="Modifier" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
+                <Button x:Name="ModifyForm" Content="Modifier" Click="ModifyAform" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
             </StackPanel>
             
             <CheckBox x:Name="SignForm" Content="Signer" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>

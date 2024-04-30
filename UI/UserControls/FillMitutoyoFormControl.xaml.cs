@@ -42,13 +42,34 @@ namespace Application.UI.UserControls
             switch (Forms.SelectedItem)
             {
                 case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new TextFileParser(), sign);
+                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new TextFileParser(), sign, false);
                     break;
                 case "Outillage de contrôle":
-                    this.formFillingManager.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, new TextFileParser(), sign);
+                    this.formFillingManager.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, new TextFileParser(), sign, false);
                     break;
                 case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePieesFile(new TextFileParser(), sign);
+                    this.formFillingManager.FullFivePiecesFile(Environment.CurrentDirectory + "\\form\\rapport5pieces", new TextFileParser(), sign, false);
+                    break;
+            }
+        }
+
+        private void ModifyAform(object sender, RoutedEventArgs e)
+        {
+            bool sign = SignForm.IsChecked == true;
+
+            String formToModify = this.formFillingManager.GetFileToOpen();
+            if (formToModify == "") return;
+
+            switch (Forms.SelectedItem)
+            {
+                case "Rapport 1 pièce":
+                    this.formFillingManager.FullOnePieceFile(30, formToModify, 26, new TextFileParser(), sign, true);
+                    break;
+                case "Outillage de contrôle":
+                    this.formFillingManager.FullOnePieceFile(26, formToModify, 25, new TextFileParser(), sign, true);
+                    break;
+                case "Rapport 5 pièces":
+                    this.formFillingManager.FullFivePiecesFile(formToModify, new TextFileParser(), sign, true);
                     break;
             }
         }

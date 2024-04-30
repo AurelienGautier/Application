@@ -21,6 +21,8 @@ namespace Application.Writers
         private int rowToSign;
         private int colToSign;
 
+        protected bool modify;
+
         /*-------------------------------------------------------------------------*/
 
         /**
@@ -33,7 +35,7 @@ namespace Application.Writers
          * workBookPath : string - Chemin du formulaire vierge dans lequel écrire
          * 
          */
-        protected ExcelWriter(string fileName, int line, int col, string workBookPath)
+        protected ExcelWriter(string fileName, int line, int col, string workBookPath, bool modify)
         {
             this.fileToSaveName = fileName;
             this.excelApp = new Excel.Application();
@@ -46,6 +48,7 @@ namespace Application.Writers
             this.colToSign = 14;
 
             this.pieces = new List<Data.Piece>();
+            this.modify = modify;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -176,6 +179,13 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * setRowAndColFromFromType
+         * 
+         * Détermine la ligne et la colonne où signer en fonction du type de formulaire
+         * worksheet : Excel.Worksheet - Feuille de calculs du formulaire
+         * 
+         */
         private void setRowAndColFromFromType(Excel.Worksheet worksheet)
         {
             String? formType = worksheet.Cells[200, 1].Value;
@@ -195,6 +205,14 @@ namespace Application.Writers
                 rowToSign = 52;
             }
         }
+
+        /**
+         * EraseData
+         * 
+         * Efface les mesures présentes dans le fichier afin d'en écrire de nouvelles
+         * 
+         */
+        public abstract void EraseData(int firstLine);
 
         /*-------------------------------------------------------------------------*/
     }

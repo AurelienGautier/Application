@@ -9,23 +9,23 @@ namespace Application.UI.UserControls
 {
     internal class FormFillingManager
     {
-        public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser, bool sign)
+        public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser, bool sign, bool modify)
         {
             try
             {
                 String fileToParse = "";
                 String fileToSave = "";
 
-                fileToParse = this.getFileToOpen();
+                fileToParse = this.GetFileToOpen();
                 if (fileToParse == "") return;
 
                 List<Data.Piece> data = parser.ParseFile(fileToParse);
                 Dictionary<string, string> header = parser.GetHeader();
 
-                fileToSave = this.getFileToSave();
+                fileToSave = this.GetFileToSave();
                 if (fileToSave == "") return;
 
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath);
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath, modify);
                 excelWriter.WriteHeader(header, designLine);
                 excelWriter.WriteData(data, sign);
             }
@@ -41,13 +41,9 @@ namespace Application.UI.UserControls
             {
                 this.displayError(e.Message);
             }
-            catch (Exception e)
-            {
-                this.displayError(e.Message);
-            }
         }
 
-        public void FullFivePieesFile(Parser.Parser parser, bool sign)
+        public void FullFivePiecesFile(String formToModify, Parser.Parser parser, bool sign, bool modify)
         {
             List<Data.Piece>? data;
             if (parser is TextFileParser)
@@ -56,19 +52,19 @@ namespace Application.UI.UserControls
             }
             else
             {
-                data = parser.ParseFile(this.getFileToOpen());
+                data = parser.ParseFile(this.GetFileToOpen());
             }
 
             if (data == null) return;
 
             Dictionary<string, string> header = parser.GetHeader();
 
-            String fileToSave = this.getFileToSave();
+            String fileToSave = this.GetFileToSave();
             if (fileToSave == "") return;
 
             try
             {
-                FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave);
+                FivePiecesWriter excelWriter = new FivePiecesWriter(formToModify, fileToSave, modify);
                 excelWriter.WriteHeader(header, 25);
                 excelWriter.WriteData(data, sign);
             }
@@ -113,7 +109,7 @@ namespace Application.UI.UserControls
             return data;
         }
 
-        private String getFileToOpen()
+        public String GetFileToOpen()
         {
             var dialog = new OpenFileDialog();
 
@@ -135,7 +131,7 @@ namespace Application.UI.UserControls
             return folderName;
         }
 
-        private String getFileToSave()
+        public String GetFileToSave()
         {
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Fichiers Excel (*.xlsx)|*.xlsx";
