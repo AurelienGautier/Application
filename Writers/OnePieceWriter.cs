@@ -1,12 +1,12 @@
-﻿using Microsoft.Office.Interop.Excel;
-using System.Windows;
-using Excel = Microsoft.Office.Interop.Excel;
+﻿using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
     internal class OnePieceWriter : ExcelWriter
     {
         private const int MAX_LINES = 22;
+
+        /*-------------------------------------------------------------------------*/
 
         public OnePieceWriter(string fileName, int firstLine, string formPath, bool modify) : base(fileName, firstLine, 1, formPath, modify)
         {
@@ -15,6 +15,8 @@ namespace Application.Writers
                 this.EraseData(firstLine);
             }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * Crée suffisamment de pages Excel pour écrire les données de la pièce.
@@ -33,9 +35,9 @@ namespace Application.Writers
             {
                 workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
-
-            Console.WriteLine("Nombre de pages : " + pageNumber);
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * Écrit les valeurs de mesure des pièces dans les feuilles Excel.
@@ -105,6 +107,8 @@ namespace Application.Writers
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * WriteHeader
          * 
@@ -122,6 +126,8 @@ namespace Application.Writers
             ws.Cells[designLine + 2, 4] = header["N° de Plan"];
             ws.Cells[designLine + 4, 4] = header["Indice"];
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * Efface les mesures des pages Excel.

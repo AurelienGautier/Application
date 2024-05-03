@@ -1,5 +1,4 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
-using System.Drawing;
 using System.Windows;
 using Application.Data;
 using Application.Exceptions;
@@ -8,7 +7,7 @@ namespace Application.Writers
 {
     internal abstract class ExcelWriter
     {
-        private readonly string fileToSaveName;
+        private readonly string fileToSavePath;
 
         protected Excel.Application excelApp;
         protected Excel.Workbook workbook;
@@ -36,7 +35,7 @@ namespace Application.Writers
          */
         protected ExcelWriter(string fileName, int line, int col, string workBookPath, bool modify)
         {
-            this.fileToSaveName = fileName;
+            this.fileToSavePath = fileName;
             this.excelApp = new Excel.Application();
             this.workbook = excelApp.Workbooks.Open(workBookPath);
 
@@ -108,24 +107,13 @@ namespace Application.Writers
          */
         public void SignForm()
         {
-            Image image;
-
-            try
-            {
-                image = Image.FromFile(ConfigSingleton.Instance.Signature);
-            }
-            catch
-            {
-                throw new System.ArgumentException("Chemin vers la signature vide ou incorrect");
-            }
-
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
-            this.setRowAndColFromFromType(_xlSheet);
+            this.setRowAndColFromType(_xlSheet);
 
-            Clipboard.SetDataObject(image, true);
+            Clipboard.SetDataObject(ConfigSingleton.Instance.Signature, true);
             var cellRngImg = (Excel.Range)_xlSheet.Cells[this.rowToSign, this.colToSign];
-            _xlSheet.Paste(cellRngImg, image);
+            _xlSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -140,7 +128,7 @@ namespace Application.Writers
         {
             this.workbook.ExportAsFixedFormat(
                 Excel.XlFixedFormatType.xlTypePDF, 
-                this.fileToSaveName.Replace(".xlsx", ".pdf"),
+                this.fileToSavePath.Replace(".xlsx", ".pdf"),
                 Type.Missing,
                 Type.Missing,
                 Type.Missing,
@@ -165,11 +153,11 @@ namespace Application.Writers
 
             try
             {
-                workbook.SaveAs(fileToSaveName);
+                workbook.SaveAs(fileToSavePath);
             }
             catch
             {
-                throw new Exceptions.ExcelFileAlreadyInUseException(this.fileToSaveName);
+                throw new Exceptions.ExcelFileAlreadyInUseException(this.fileToSavePath);
             }
 
             workbook.Close();
@@ -179,16 +167,15 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /**
-         * setRowAndColFromFromType
+         * setRowAndColFromType
          * 
          * Détermine la ligne et la colonne où signer en fonction du type de formulaire
          * worksheet : Excel.Worksheet - Feuille de calculs du formulaire
          * 
          */
-        private void setRowAndColFromFromType(Excel.Worksheet worksheet)
+        private void setRowAndColFromType(Excel.Worksheet worksheet)
         {
             String? formType = worksheet.Cells[200, 1].Value;
-            Console.WriteLine(formType);
 
             if (formType == null)
             {
@@ -204,6 +191,8 @@ namespace Application.Writers
                 rowToSign = 52;
             }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * EraseData

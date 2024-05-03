@@ -1,8 +1,5 @@
-﻿using Application.Exceptions;
+﻿using Application.Data;
 using Application.Parser;
-using Application.Writers;
-using Microsoft.Win32;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,10 +7,14 @@ namespace Application.UI.UserControls
 {
     /// <summary>
     /// Logique d'interaction pour FillForm.xaml
+    /// Permet à l'utilisateur de remplir automatiquement un formulaire dont les données proviennent de la machine Mitutoyo
     /// </summary>
     public partial class FillMitutoyoFormControl : UserControl
     {
-        FormFillingManager formFillingManager;
+        private FormFillingManager formFillingManager;
+        List<Data.Form> forms;
+
+        /*-------------------------------------------------------------------------*/
 
         public FillMitutoyoFormControl()
         {
@@ -21,57 +22,68 @@ namespace Application.UI.UserControls
 
             this.formFillingManager = new FormFillingManager();
 
-            List<string> items = new List<string> {
-                "Rapport 1 pièce",
-                "Outillage de contrôle",
-                "Rapport 5 pièces",
-                "Bague lisse",
-                "Calibre à machoire",
-                "Capabilité",
-                "Étalon de colonne de mesure",
-                "Tampon lisse"
-            };
+            this.forms = ConfigSingleton.Instance.GetMitutoyoForms();
 
-            Forms.ItemsSource = items;
+            Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
         }
 
-        private void FillAform(object sender, RoutedEventArgs e)
-        {
-            bool sign = SignForm.IsChecked == true;
+        /*-------------------------------------------------------------------------*/
 
-            switch (Forms.SelectedItem)
-            {
-                case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, Environment.CurrentDirectory + "\\form\\rapport1piece", 26, new TextFileParser(), sign, false);
-                    break;
-                case "Outillage de contrôle":
-                    this.formFillingManager.FullOnePieceFile(26, Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, new TextFileParser(), sign, false);
-                    break;
-                case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePiecesFile(Environment.CurrentDirectory + "\\form\\rapport5pieces", new TextFileParser(), sign, false);
-                    break;
-            }
+        private void fillAform(object sender, RoutedEventArgs e)
+        {
+            this.callFormFilling(null, new TextFileParser(), SignForm.IsChecked == true, false);
         }
 
-        private void ModifyAform(object sender, RoutedEventArgs e)
-        {
-            bool sign = SignForm.IsChecked == true;
+        /*-------------------------------------------------------------------------*/
 
-            String formToModify = this.formFillingManager.GetFileToOpen();
+        private void modifyAform(object sender, RoutedEventArgs e)
+        {
+            String formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
             if (formToModify == "") return;
 
+            this.callFormFilling(formToModify, new TextFileParser(), SignForm.IsChecked == true, true);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void callFormFilling(String? formToOverwritePath, Parser.Parser parser, bool sign, bool modify)
+        {
+            // Vérification de la signature
+            if (sign && ConfigSingleton.Instance.Signature == null)
+            {
+                MainWindow.DisplayError("Il est impossible de signer ce document car la signature est incorrect ou non sélectionnée.");
+                return;
+            }
+
+            // Recherche du formulaire sélectionné dans la liste des formulaires
+            Form? form = this.forms.Find(f => f.Name == (String)Forms.SelectedItem);
+
+            if (form == null) 
+            {
+                MainWindow.DisplayError("Impossible de trouver le formulaire sélectionné.");
+                return;
+            }
+
+            form.Modify = modify;
+            form.Sign = sign;
+
+            if(formToOverwritePath != null) form.Path = formToOverwritePath;
+
+            // Remplissage du formulaire en utilisant le FormFillingManager
             switch (Forms.SelectedItem)
             {
                 case "Rapport 1 pièce":
-                    this.formFillingManager.FullOnePieceFile(30, formToModify, 26, new TextFileParser(), sign, true);
+                    this.formFillingManager.FillOnePieceFile(form, parser);
                     break;
                 case "Outillage de contrôle":
-                    this.formFillingManager.FullOnePieceFile(26, formToModify, 25, new TextFileParser(), sign, true);
+                    this.formFillingManager.FillOnePieceFile(form, parser);
                     break;
                 case "Rapport 5 pièces":
-                    this.formFillingManager.FullFivePiecesFile(formToModify, new TextFileParser(), sign, true);
+                    this.formFillingManager.FillFivePiecesFile(form.Path, parser, sign, modify);
                     break;
             }
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

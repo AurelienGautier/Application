@@ -9,13 +9,13 @@ namespace Application.UI.UserControls
     /// </summary>
     public partial class MeasureTypesControl : UserControl
     {
-        private ObservableCollection<Data.MeasureType> myItems { get; } = new ObservableCollection<Data.MeasureType>();
-
         public MeasureTypesControl()
         {
             InitializeComponent();
         }
-        
+
+        /*-------------------------------------------------------------------------*/
+
         public void BindData()
         {
             List<Data.MeasureType> list = Data.ConfigSingleton.Instance.GetMeasureTypes();
@@ -23,6 +23,8 @@ namespace Application.UI.UserControls
 
             MeasureTypes.ItemsSource = newItems;
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private void modifyMeasureType(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -37,6 +39,8 @@ namespace Application.UI.UserControls
             parentWindow.goToModifyMeasureType(measureType);
         }
 
+        /*-------------------------------------------------------------------------*/
+
         private void deleteMeasureType(object sender, System.Windows.RoutedEventArgs e)
         {
             Button button = (Button)sender;
@@ -50,5 +54,7 @@ namespace Application.UI.UserControls
             Data.ConfigSingleton.Instance.DeleteMeasureType(libelle);
             this.BindData();
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

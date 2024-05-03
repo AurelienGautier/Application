@@ -15,6 +15,8 @@ namespace Application.Data
         public int TolMinusIndex { get; set; }
         public required String Symbol { get; set; }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * CreateData
          * 
@@ -41,5 +43,7 @@ namespace Application.Data
 
             return data;
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

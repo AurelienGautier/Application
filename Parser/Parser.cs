@@ -11,7 +11,12 @@ namespace Application.Parser
         protected Dictionary<string, string>? header;
         protected List<Data.Piece>? dataParsed;
 
+        /*-------------------------------------------------------------------------*/
+
         public abstract List<Data.Piece> ParseFile(String fileToParse);
+
+        /*-------------------------------------------------------------------------*/
+
         public Dictionary<string, string> GetHeader()
         {
             if(this.header == null)
@@ -21,5 +26,11 @@ namespace Application.Parser
             
             return this.header;
         }
+
+        /*-------------------------------------------------------------------------*/
+    
+        public abstract String GetFileExtension();
+
+        /*-------------------------------------------------------------------------*/
     }
 }

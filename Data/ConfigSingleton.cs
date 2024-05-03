@@ -1,14 +1,7 @@
-﻿using Application.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using static System.Net.Mime.MediaTypeNames;
+﻿using Newtonsoft.Json;
 using System.IO;
 using System.Data;
+using System.Drawing;
 
 namespace Application.Data
 {
@@ -16,8 +9,7 @@ namespace Application.Data
     {
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
-
-        public String Signature { get; set; }
+        public Image? Signature { get; set; }
 
         /*-------------------------------------------------------------------------*/
 
@@ -31,7 +23,7 @@ namespace Application.Data
         {
             this.measureTypes = new List<MeasureType>();
 
-            this.Signature = this.getSignature();
+            this.Signature = this.getSignatureFromFile();
 
             this.getMeasureDataFromFile();
         }
@@ -60,23 +52,35 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * getSignature
+         * getSignatureFromFile
          * 
          * Récupère la signature dans le fichier de configuration
          * 
-         * @return String
+         * @return Image? - La signature ou null si elle n'est pas correcte
          * 
          */
-        private String getSignature()
+        private Image? getSignatureFromFile()
         {
             String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
 
             Dictionary<String, String>? data = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
 
             if (data == null)
-                throw new Exceptions.ConfigDataException("Une erreur s'est produite lors de la récupération de la signature.");
+                throw new Exceptions.ConfigDataException("Le fichier de configuration est incorrect ou a été déplacé.");
+            else if(!data.ContainsKey("Signature"))
+                throw new Exceptions.ConfigDataException("Le fichier de configuration ne contient pas le champ signature.");
+            
+            Image? signature;
+            try
+            {
+                signature = Image.FromFile(data["Signature"]);
+            }
+            catch
+            {
+                signature = null;
+            }
 
-            return data["Signature"];
+            return signature;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -168,6 +172,49 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
+         * serializeMeasureTypes
+         * 
+         * Convertir les types de mesure en JSON et les écrit dans le fichier de configuration
+         * 
+         */
+        private void serializeMeasureTypes()
+        {
+            DataSet dataSet = new DataSet();
+            DataTable dataTable = new DataTable("Measures");
+            dataTable.Columns.Add("Name");
+            dataTable.Columns.Add("NominalValueIndex");
+            dataTable.Columns.Add("TolPlusIndex");
+            dataTable.Columns.Add("ValueIndex");
+            dataTable.Columns.Add("TolMinusIndex");
+            dataTable.Columns.Add("Symbol");
+
+            dataSet.Tables.Add(dataTable);
+
+            foreach (MeasureType measure in this.measureTypes)
+            {
+                DataRow row = dataTable.NewRow();
+                row["Name"] = measure.Name;
+                row["NominalValueIndex"] = measure.NominalValueIndex;
+                row["TolPlusIndex"] = measure.TolPlusIndex;
+                row["ValueIndex"] = measure.ValueIndex;
+                row["TolMinusIndex"] = measure.TolMinusIndex;
+                row["Symbol"] = measure.Symbol;
+
+                dataTable.Rows.Add(row);
+            }
+
+            dataSet.AcceptChanges();
+
+            String json = JsonConvert.SerializeObject(dataSet, Formatting.Indented);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\measureTypes.json");
+            writer.Write(json);
+            writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /**
          * GetMeasureTypeFromLibelle
          * 
          * Retourne le type de mesure dont le libellé est passé en paramètre
@@ -226,16 +273,23 @@ namespace Application.Data
          * 
          * Modifie la signature dans le fichier de configuration et dans l'instance
          * 
-         * @param String signature
+         * @param String signaturePath - Chemin vers la nouvelle signature
          * 
          */
-        public void SetSignature(String signature)
+        public void SetSignature(String signaturePath)
         {
-            this.Signature = signature;
+            try
+            {
+                this.Signature = Image.FromFile(signaturePath);
+            }
+            catch
+            {
+                throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect.");
+            }
 
             Dictionary<String, String> data = new Dictionary<String, String>
             {
-                { "Signature", signature }
+                { "Signature", signaturePath }
             };
 
             String json = JsonConvert.SerializeObject(data);
@@ -302,45 +356,27 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * serializeMeasureTypes
-         * 
-         * Convertir les types de mesure en JSON et les écrit dans le fichier de configuration
-         * 
-         */
-        private void serializeMeasureTypes()
+        public List<Form> GetMitutoyoForms()
         {
-            DataSet dataSet = new DataSet();
-            DataTable dataTable = new DataTable("Measures");
-            dataTable.Columns.Add("Name");
-            dataTable.Columns.Add("NominalValueIndex");
-            dataTable.Columns.Add("TolPlusIndex");
-            dataTable.Columns.Add("ValueIndex");
-            dataTable.Columns.Add("TolMinusIndex");
-            dataTable.Columns.Add("Symbol");
+            List<Form> forms = new List<Form>();
 
-            dataSet.Tables.Add(dataTable);
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 55, 14));
+            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 26, 51, 14));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 30, 51, 14));
 
-            foreach (MeasureType measure in this.measureTypes)
-            {
-                DataRow row = dataTable.NewRow();
-                row["Name"] = measure.Name;
-                row["NominalValueIndex"] = measure.NominalValueIndex;
-                row["TolPlusIndex"] = measure.TolPlusIndex;
-                row["ValueIndex"] = measure.ValueIndex;
-                row["TolMinusIndex"] = measure.TolMinusIndex;
-                row["Symbol"] = measure.Symbol;
+            return forms;
+        }
 
-                dataTable.Rows.Add(row);
-            }
+        /*-------------------------------------------------------------------------*/
 
-            dataSet.AcceptChanges();
+        public List<Form> GetAyonisForms()
+        {
+            List<Form> forms = new List<Form>();
 
-            String json = JsonConvert.SerializeObject(dataSet, Formatting.Indented);
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 55, 14));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 30, 51, 14));
 
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\measureTypes.json");
-            writer.Write(json);
-            writer.Close();
+            return forms;
         }
 
         /*-------------------------------------------------------------------------*/

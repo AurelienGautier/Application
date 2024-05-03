@@ -13,6 +13,8 @@ namespace Application.Writers
         private int max;
         private const int MAX_LINES = 23;
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * FivePiecesWriter
          * 
@@ -36,6 +38,8 @@ namespace Application.Writers
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * CreateWorkSheets
          * 
@@ -57,6 +61,8 @@ namespace Application.Writers
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * WritePiecesValues
          * 
@@ -76,7 +82,7 @@ namespace Application.Writers
 
             for (int i = 0; i < iterations; i++)
             {
-                this.Write5pieces();
+                this.write5pieces();
 
                 this.min += 5;
 
@@ -87,13 +93,15 @@ namespace Application.Writers
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * Write5pieces
          * 
          * Écrit toutes les valeurs pour un groupe de 5 pièces dans le fichier Excel
          * 
          */
-        public void Write5pieces()
+        private void write5pieces()
         {
             // Pour chaque plan
             for (int i = 0; i < pieceData[0].Count; i++)
@@ -136,6 +144,8 @@ namespace Application.Writers
             }
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * ChangePage
          * 
@@ -159,6 +169,8 @@ namespace Application.Writers
                 col += 3;
             }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /**
          * WriteHeader
@@ -203,6 +215,8 @@ namespace Application.Writers
             this.deleteRange("S", "S", firstLine);
         }
 
+        /*-------------------------------------------------------------------------*/
+
         /**
          * deleteRange
          * 
@@ -221,5 +235,7 @@ namespace Application.Writers
             Excel.Range rangeToDelete = measuresSheet.Range[startCol + ":" + endCol];
             rangeToDelete.ClearContents();
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

@@ -3,20 +3,19 @@ using Application.Parser;
 using Application.Writers;
 using Microsoft.Win32;
 using System.IO;
-using System.Windows;
 
 namespace Application.UI.UserControls
 {
     internal class FormFillingManager
     {
-        public void FullOnePieceFile(int firstLine, String formPath, int designLine, Parser.Parser parser, bool sign, bool modify)
+        public void FillOnePieceFile(Data.Form form, Parser.Parser parser)
         {
             try
             {
                 String fileToParse = "";
                 String fileToSave = "";
 
-                fileToParse = this.GetFileToOpen();
+                fileToParse = this.GetFileToOpen("Choisir le fichier à convertir", parser.GetFileExtension());
                 if (fileToParse == "") return;
 
                 List<Data.Piece> data = parser.ParseFile(fileToParse);
@@ -25,25 +24,27 @@ namespace Application.UI.UserControls
                 fileToSave = this.GetFileToSave();
                 if (fileToSave == "") return;
 
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, firstLine, formPath, modify);
-                excelWriter.WriteHeader(header, designLine);
-                excelWriter.WriteData(data, sign);
+                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, form.FirstLine, form.Path, form.Modify);
+                excelWriter.WriteHeader(header, form.DesignLine);
+                excelWriter.WriteData(data, form.Sign);
             }
             catch (MeasureTypeNotFoundException e)
             {
-                this.displayError(e.Message);
+                MainWindow.DisplayError(e.Message);
             }
             catch (IncorrectFormatException e)
             {
-                this.displayError(e.Message);
+                MainWindow.DisplayError(e.Message);
             }
             catch (ExcelFileAlreadyInUseException e)
             {
-                this.displayError(e.Message);
+                MainWindow.DisplayError(e.Message);
             }
         }
 
-        public void FullFivePiecesFile(String formToModify, Parser.Parser parser, bool sign, bool modify)
+        /*-------------------------------------------------------------------------*/
+
+        public void FillFivePiecesFile(String formToModify, Parser.Parser parser, bool sign, bool modify)
         {
             List<Data.Piece>? data;
             if (parser is TextFileParser)
@@ -52,7 +53,10 @@ namespace Application.UI.UserControls
             }
             else
             {
-                data = parser.ParseFile(this.GetFileToOpen());
+                String fileToParse = this.GetFileToOpen("Sélectionner le fichier à convertir", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
+                if(fileToParse == "") return;
+
+                data = parser.ParseFile(fileToParse);
             }
 
             if (data == null) return;
@@ -70,13 +74,11 @@ namespace Application.UI.UserControls
             }
             catch (ExcelFileAlreadyInUseException)
             {
-                this.displayError("Le fichier excel est déjà en cours d'utilisation");
-            }
-            catch (Exception e)
-            {
-                this.displayError(e.Message);
+                MainWindow.DisplayError("Le fichier excel est déjà en cours d'utilisation");
             }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
         {
@@ -85,7 +87,9 @@ namespace Application.UI.UserControls
 
             DirectoryInfo directory = new DirectoryInfo(folderName);
 
-            List<Data.Piece> data = directory.GetFiles()
+            List<Data.Piece> data = directory
+                .GetFiles()
+                .Where(file => file.Extension == ".mit" || file.Extension == ".txt" || file.Extension == ".MIT")
                 .Select(file => file.FullName)
                 .SelectMany(fileName =>
                 {
@@ -95,12 +99,12 @@ namespace Application.UI.UserControls
                     }
                     catch (IncorrectFormatException)
                     {
-                        this.displayError("Le format du fichier " + fileName + " est incorrect.");
+                        MainWindow.DisplayError("Le format du fichier " + fileName + " est incorrect.");
                         return Enumerable.Empty<Data.Piece>();
                     }
                     catch (MeasureTypeNotFoundException)
                     {
-                        this.displayError("Un type de mesure n'a pas été trouvé dans le fichier " + fileName);
+                        MainWindow.DisplayError("Un type de mesure n'a pas été trouvé dans le fichier " + fileName);
                         return Enumerable.Empty<Data.Piece>();
                     }
                 })
@@ -109,9 +113,13 @@ namespace Application.UI.UserControls
             return data;
         }
 
-        public String GetFileToOpen()
+        /*-------------------------------------------------------------------------*/
+
+        public String GetFileToOpen(String title, String extensions)
         {
             var dialog = new OpenFileDialog();
+            dialog.Title = title;
+            dialog.Filter = extensions;
 
             String fileName = "";
 
@@ -119,6 +127,8 @@ namespace Application.UI.UserControls
 
             return fileName;
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private String getFolderToOpen()
         {
@@ -131,10 +141,13 @@ namespace Application.UI.UserControls
             return folderName;
         }
 
+        /*-------------------------------------------------------------------------*/
+
         public String GetFileToSave()
         {
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Fichiers Excel (*.xlsx)|*.xlsx";
+
             saveFileDialog.FileName = "rapport";
 
             String fileName = "";
@@ -148,15 +161,6 @@ namespace Application.UI.UserControls
                 fileName = fileName.Remove(fileName.Length - 5);
 
             return fileName;
-        }
-
-        private void displayError(String errorMessage)
-        {
-            String caption = "Erreur";
-            MessageBoxButton button = MessageBoxButton.OK;
-            MessageBoxImage icon = MessageBoxImage.Error;
-
-            MessageBox.Show(errorMessage, caption, button, icon, MessageBoxResult.Yes);
         }
     }
 }
