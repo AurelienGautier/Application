@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Application.Exceptions;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Application.UI.UserControls
@@ -12,11 +13,26 @@ namespace Application.UI.UserControls
         // Le type de mesure à modifier (dans le cas d'une modification). Il prend la valeur null dans le cas d'une création
         private Data.MeasureType? measureType;
 
+        // Les différents champs à remplir pour créer un type de mesure
+        private TextBox measureName;
+        private TextBox measureNominalValueIndex;
+        private TextBox measureTolerancePlusIndex;
+        private TextBox measureValueIndex;
+        private TextBox measureToleranceMinusIndex;
+        private TextBox measureSymbol;
+
         /*-------------------------------------------------------------------------*/
 
         public AddMeasureType()
         {
             InitializeComponent();
+
+            this.measureName = (TextBox)this.FindName("MeasureName");
+            this.measureNominalValueIndex = (TextBox)this.FindName("MeasureNominalValueIndex");
+            this.measureTolerancePlusIndex = (TextBox)this.FindName("MeasureTolerancePlusIndex");
+            this.measureValueIndex = (TextBox)this.FindName("MeasureValueIndex");
+            this.measureToleranceMinusIndex = (TextBox)this.FindName("MeasureToleranceMinusIndex");
+            this.measureSymbol = (TextBox)this.FindName("MeasureSymbol");
         }
 
         /*-------------------------------------------------------------------------*/
@@ -29,24 +45,22 @@ namespace Application.UI.UserControls
         {
             this.measureType = measureType;
 
-            if (measureType == null) return;
+            if (measureType == null)
+            {
+                measureName.Text = "";
+                measureNominalValueIndex.Text = "";
+                measureTolerancePlusIndex.Text = "";
+                measureValueIndex.Text = "";
+                measureToleranceMinusIndex.Text = "";
+                measureSymbol.Text = "";
+                return;
+            }
 
-            TextBox measureName = (TextBox)this.FindName("MeasureName");
             measureName.Text = measureType.Name;
-
-            TextBox measureNominalValueIndex = (TextBox)this.FindName("MeasureNominalValueIndex");
             measureNominalValueIndex.Text = measureType.NominalValueIndex.ToString();
-
-            TextBox measureTolerancePlusIndex = (TextBox)this.FindName("MeasureTolerancePlusIndex");
             measureTolerancePlusIndex.Text = measureType.TolPlusIndex.ToString();
-
-            TextBox measureValueIndex = (TextBox)this.FindName("MeasureValueIndex");
             measureValueIndex.Text = measureType.ValueIndex.ToString();
-
-            TextBox measureToleranceMinusIndex = (TextBox)this.FindName("MeasureToleranceMinusIndex");
             measureToleranceMinusIndex.Text = measureType.TolMinusIndex.ToString();
-
-            TextBox measureSymbol = (TextBox)this.FindName("MeasureSymbol");
             measureSymbol.Text = measureType.Symbol;
         }
 
@@ -58,12 +72,14 @@ namespace Application.UI.UserControls
          */
         public Data.MeasureType GetMeasureTypeFromPage()
         {
-            TextBox measureName = (TextBox)this.FindName("MeasureName");
-            TextBox measureNominalValueIndex = (TextBox)this.FindName("MeasureNominalValueIndex");
-            TextBox measureTolerancePlusIndex = (TextBox)this.FindName("MeasureTolerancePlusIndex");
-            TextBox measureValueIndex = (TextBox)this.FindName("MeasureValueIndex");
-            TextBox measureToleranceMinusIndex = (TextBox)this.FindName("MeasureToleranceMinusIndex");
-            TextBox measureSymbol = (TextBox)this.FindName("MeasureSymbol");
+            if (this.measureName.Text == "" 
+                || this.measureNominalValueIndex.Text == "" 
+                || this.measureTolerancePlusIndex.Text == "" 
+                || this.measureValueIndex.Text == "" 
+                || this.measureToleranceMinusIndex.Text == "" 
+                || this.measureSymbol.Text == ""
+            )
+                throw new ConfigDataException("Tous les champs doivent être remplis");
 
             return new Data.MeasureType()
             {
@@ -83,10 +99,17 @@ namespace Application.UI.UserControls
          */
         private void saveMeasureType(object sender, RoutedEventArgs e)
         {
-            Data.ConfigSingleton.Instance.UpdateMeasureType(this.measureType, this.GetMeasureTypeFromPage());
+            try
+            {
+                Data.ConfigSingleton.Instance.UpdateMeasureType(this.measureType, this.GetMeasureTypeFromPage());
 
-            MainWindow parentWindow = (MainWindow)Window.GetWindow(this);
-            parentWindow.goToMeasureTypes(sender, e);
+                MainWindow parentWindow = (MainWindow)Window.GetWindow(this);
+                parentWindow.goToMeasureTypes(sender, e);
+            }
+            catch(ConfigDataException ex)
+            {
+                MainWindow.DisplayError(ex.Message);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
