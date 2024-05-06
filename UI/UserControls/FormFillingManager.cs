@@ -90,6 +90,11 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Récupère les données de tous les fichiers d'un répertoire
+         * 
+         * parser: Parser - Le parser correspondant au type de fichier à parser
+         */
         private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
         {
             String folderName = this.getFolderToOpen();
@@ -125,6 +130,12 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Ouvre une fenêtre de dialogue pour sélectionner le chemin d'un fichier
+         * 
+         * title : String - Le titre de la fenêtre de dialogue
+         * extensions : String - Les extensions de fichiers autorisées
+         */
         public String GetFileToOpen(String title, String extensions)
         {
             var dialog = new OpenFileDialog();
@@ -140,6 +151,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Ouvre une fenêtre de dialogue pour sélectionner le chemin d'un répertoire
+         */
         private String getFolderToOpen()
         {
             var dialog = new OpenFolderDialog();
@@ -153,6 +167,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Ouvre une fenêtre de dialogue pour sélectionner le chemin où sauvegarder un fichier
+         */
         public String GetFileToSave()
         {
             var saveFileDialog = new SaveFileDialog();
@@ -163,10 +180,9 @@ namespace Application.UI.UserControls
             String fileName = "";
 
             if (saveFileDialog.ShowDialog() == true)
-            {
                 fileName = saveFileDialog.FileName;
-            }
 
+            // Supprime l'extension du fichier excel
             if (fileName.Length > 5)
                 fileName = fileName.Remove(fileName.Length - 5);
 
