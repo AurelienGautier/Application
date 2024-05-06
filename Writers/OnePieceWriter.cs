@@ -1,4 +1,5 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
+using Application.Data;
 
 namespace Application.Writers
 {
@@ -8,11 +9,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        public OnePieceWriter(string fileName, int firstLine, string formPath, bool modify) : base(fileName, firstLine, 1, formPath, modify)
+        public OnePieceWriter(string fileName, Form form) : base(fileName, form)
         {
-            if(base.modify)
+            if(form.Modify)
             {
-                this.EraseData(firstLine);
+                this.EraseData(form.FirstLine);
             }
         }
 
@@ -105,26 +106,6 @@ namespace Application.Writers
                     }
                 }
             }
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * WriteHeader
-         * 
-         * Remplit l'entête du rapport Excel
-         * 
-         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
-         * designLine : int - Numéro de la ligne où écrire la désignation
-         * 
-         */
-        public void WriteHeader(Dictionary<string, string> header, int designLine)
-        {
-            Excel.Worksheet ws = base.workbook.Sheets["Rapport d'essai dimensionnel"];
-
-            ws.Cells[designLine, 4] = header["Designation"];
-            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
-            ws.Cells[designLine + 4, 4] = header["Indice"];
         }
 
         /*-------------------------------------------------------------------------*/

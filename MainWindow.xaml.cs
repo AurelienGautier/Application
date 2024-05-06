@@ -12,8 +12,7 @@ namespace Application
     public partial class MainWindow : Window
     {
         // Les différents controls de l'application. Ils correspondent chacun à une fonctionnalité.
-        private readonly UI.UserControls.FillMitutoyoFormControl fillMitutoyoFormControl;
-        private readonly UI.UserControls.FillAyonisFormControl fillAyonisFormControl;
+        private readonly UI.UserControls.FillFormControl fillFormControl;
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
 
@@ -25,26 +24,20 @@ namespace Application
             AllocConsole();
             InitializeComponent();
 
-            this.fillMitutoyoFormControl = new UI.UserControls.FillMitutoyoFormControl();
-            this.fillAyonisFormControl = new UI.UserControls.FillAyonisFormControl();
+            this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
 
             // Par défaut, on affiche le control de remplissage de formulaire Mitutoyo.
-            CurrentControl.Content = this.fillMitutoyoFormControl;
+            CurrentControl.Content = this.fillFormControl;
         }
 
         /*-------------------------------------------------------------------------*/
         // Les méthodes suivantes servent à changer de control en fonction de l'action de l'utilisateur.
 
-        private void goToFillMitutoyoForm(object sender, RoutedEventArgs e)
+        private void goToFillForm(object sender, RoutedEventArgs e)
         {
-            CurrentControl.Content = this.fillMitutoyoFormControl;
-        }
-
-        private void goToFillAyonisForm(object sender, RoutedEventArgs e)
-        {
-            CurrentControl.Content = this.fillAyonisFormControl;
+            CurrentControl.Content = this.fillFormControl;
         }
 
         public void goToMeasureTypes(object sender, RoutedEventArgs e)
@@ -74,7 +67,7 @@ namespace Application
         {
             var dialog = new OpenFileDialog();
 
-            dialog.Filter = "(*.png)|*.png|(*.jpg)|*.jpg";
+            dialog.Filter = "(*.png;*.jpg)|*.png;*.jpg";
             dialog.Title = "Sélectionner une signature";
 
             String fileName = "";

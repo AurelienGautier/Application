@@ -20,8 +20,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* ParseFile
-         * 
+        /**
          * Parse un fichier texte et retourne une liste de pièces
          * fileToParse : String - Nom du fichier à parser
          * return : List<Data.Piece> - Liste de pièces
@@ -50,8 +49,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* manageLineType
-         * 
+        /**
          * Gère le type de ligne en fonction de son contenu
          * line : String - Ligne à analyser
          *                                 
@@ -71,8 +69,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* manageHeaderType
-         *
+        /**
          * Parse l'en-tête si une ligne de type header est détectée
          * line : String - Ligne à analyser
          *                                 
@@ -99,8 +96,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* manageMeasurePlan
-         *
+        /**
          * Récupère le nom du plan de mesure de la ligne
          * words : List<String> - Ligne à analyser sous forme de liste des mots
          *
@@ -121,8 +117,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* manageValueType
-         *
+        /**
          * Gère une ligne de type valeur
          * words : List<String> - Ligne à analyser sous forme de liste des mots
          *
@@ -167,8 +162,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* createHeader
-         *
+        /**
          * Crée l'en-tête à partir d'une chaîne de caractères
          * text : String - L'en-tête récupérée de manière brute depuis le fichier à analyser
          *
@@ -195,8 +189,7 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /* getData
-         *
+        /**
          * Retourne le type de mesure d'une ligne contenant une mesure
          * line : List<String> - Ligne contenant la mesure
          * return : Data - Type de mesure de la ligne

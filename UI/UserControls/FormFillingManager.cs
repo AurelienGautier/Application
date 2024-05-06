@@ -3,30 +3,39 @@ using Application.Parser;
 using Application.Writers;
 using Microsoft.Win32;
 using System.IO;
+using Application.Data;
 
 namespace Application.UI.UserControls
 {
     internal class FormFillingManager
     {
-        public void FillOnePieceFile(Data.Form form, Parser.Parser parser)
+        /*-------------------------------------------------------------------------*/
+
+        /**
+         * Appelle la méthode de remplissage du fichier excel correspondant au type de formulaire choisi par l'utilisateur
+         * 
+         * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
+         * parser: Parser - Le parser correspondant au type de fichier à parser
+         */
+        public void ManageFormFilling(Form form, Parser.Parser parser)
         {
+            List<Piece>? data = null;
+            
+            // Parsing des données
             try
             {
-                String fileToParse = "";
-                String fileToSave = "";
+                // Si c'est un formulaire 5 pièces mitutoyo, on récupère les données de tous les fichiers d'un répertoire
+                if(form.Type == FormType.FivePieces && parser is TextFileParser)
+                {
+                    data = this.getDataFromFolder(parser);
+                }
+                else
+                {
+                    String fileToParse = this.GetFileToOpen("Sélectionner le fichier à convertir", parser.GetFileExtension());
+                    if(fileToParse == "") return;
 
-                fileToParse = this.GetFileToOpen("Choisir le fichier à convertir", parser.GetFileExtension());
-                if (fileToParse == "") return;
-
-                List<Data.Piece> data = parser.ParseFile(fileToParse);
-                Dictionary<string, string> header = parser.GetHeader();
-
-                fileToSave = this.GetFileToSave();
-                if (fileToSave == "") return;
-
-                OnePieceWriter excelWriter = new OnePieceWriter(fileToSave, form.FirstLine, form.Path, form.Modify);
-                excelWriter.WriteHeader(header, form.DesignLine);
-                excelWriter.WriteData(data, form.Sign);
+                    data = parser.ParseFile(fileToParse);
+                }
             }
             catch (MeasureTypeNotFoundException e)
             {
@@ -36,45 +45,46 @@ namespace Application.UI.UserControls
             {
                 MainWindow.DisplayError(e.Message);
             }
-            catch (ExcelFileAlreadyInUseException e)
-            {
-                MainWindow.DisplayError(e.Message);
-            }
+
+            Dictionary<string, string> header = parser.GetHeader();
+
+            if (data == null) return; // à gérer plus tard
+
+            // Remplissage du formulaire
+            this.FillForm(form, data, header);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        public void FillFivePiecesFile(String formToModify, Parser.Parser parser, bool sign, bool modify)
+        /**
+         * Remplit le formulaire excel
+         * 
+         * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
+         * data : List<Piece> - Les données à insérer dans le formulaire
+         * header : Dictionary<String, String> - Les informations à insérer dans l'entête du formulaire
+         */
+        public void FillForm(Form form, List<Piece> data, Dictionary<String, String> header)
         {
-            List<Data.Piece>? data;
-            if (parser is TextFileParser)
-            {
-                data = this.getDataFromFolder(parser);
-            }
-            else
-            {
-                String fileToParse = this.GetFileToOpen("Sélectionner le fichier à convertir", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
-                if(fileToParse == "") return;
-
-                data = parser.ParseFile(fileToParse);
-            }
-
-            if (data == null) return;
-
-            Dictionary<string, string> header = parser.GetHeader();
-
-            String fileToSave = this.GetFileToSave();
-            if (fileToSave == "") return;
-
             try
             {
-                FivePiecesWriter excelWriter = new FivePiecesWriter(fileToSave, formToModify, modify);
-                excelWriter.WriteHeader(header, 25);
-                excelWriter.WriteData(data, sign);
+                String fileToSave = "";
+
+                // Récupération de l'emplacement du formulaire à créer
+                fileToSave = this.GetFileToSave();
+                if (fileToSave == "") return;
+
+                // Écriture du formulaire
+                ExcelWriter writer;
+
+                if(form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
+                else writer = new FivePiecesWriter(fileToSave, form);
+
+                writer.WriteHeader(header, form.DesignLine);
+                writer.WriteData(data);
             }
-            catch (ExcelFileAlreadyInUseException)
+            catch (ExcelFileAlreadyInUseException e)
             {
-                MainWindow.DisplayError("Le fichier excel est déjà en cours d'utilisation");
+                MainWindow.DisplayError(e.Message);
             }
         }
 
@@ -162,5 +172,7 @@ namespace Application.UI.UserControls
 
             return fileName;
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

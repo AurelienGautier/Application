@@ -16,10 +16,7 @@ namespace Application.Writers
         protected int currentColumn;
         protected List<Data.Piece> pieces;
 
-        private int rowToSign;
-        private int colToSign;
-
-        protected bool modify;
+        protected Form form;
 
         /*-------------------------------------------------------------------------*/
 
@@ -33,20 +30,17 @@ namespace Application.Writers
          * workBookPath : string - Chemin du formulaire vierge dans lequel écrire
          * 
          */
-        protected ExcelWriter(string fileName, int line, int col, string workBookPath, bool modify)
+        protected ExcelWriter(String fileName, Form form)
         {
             this.fileToSavePath = fileName;
+            this.currentLine = form.FirstLine;
+            this.currentColumn = form.FirstColumn;
+            this.form = form;
+
             this.excelApp = new Excel.Application();
-            this.workbook = excelApp.Workbooks.Open(workBookPath);
-
-            this.currentLine = line;
-            this.currentColumn = col;
-
-            this.rowToSign = 51;
-            this.colToSign = 14;
+            this.workbook = excelApp.Workbooks.Open(form.Path);
 
             this.pieces = new List<Data.Piece>();
-            this.modify = modify;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -58,7 +52,7 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Data.Piece> data, bool sign)
+        public void WriteData(List<Data.Piece> data)
         {
             this.pieces = data;
 
@@ -66,7 +60,7 @@ namespace Application.Writers
 
             WritePiecesValues();
 
-            if (sign)
+            if (this.form.Sign)
             {
                 SignForm();
 
@@ -75,6 +69,26 @@ namespace Application.Writers
 
 
             SaveAndQuit();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /**
+         * WriteHeader
+         * 
+         * Remplit l'entête du rapport Excel
+         * 
+         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
+         * designLine : int - Numéro de la ligne où écrire la désignation
+         * 
+         */
+        public void WriteHeader(Dictionary<string, string> header, int designLine)
+        {
+            Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
+
+            ws.Cells[designLine, 4] = header["Designation"];
+            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
+            ws.Cells[designLine + 4, 4] = header["Indice"];
         }
 
         /*-------------------------------------------------------------------------*/
@@ -109,10 +123,8 @@ namespace Application.Writers
         {
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
-            this.setRowAndColFromType(_xlSheet);
-
             Clipboard.SetDataObject(ConfigSingleton.Instance.Signature, true);
-            var cellRngImg = (Excel.Range)_xlSheet.Cells[this.rowToSign, this.colToSign];
+            var cellRngImg = (Excel.Range)_xlSheet.Cells[this.form.LineToSign, this.form.ColumnToSign];
             _xlSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
         }
 
@@ -162,34 +174,6 @@ namespace Application.Writers
 
             workbook.Close();
             excelApp.Quit();
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * setRowAndColFromType
-         * 
-         * Détermine la ligne et la colonne où signer en fonction du type de formulaire
-         * worksheet : Excel.Worksheet - Feuille de calculs du formulaire
-         * 
-         */
-        private void setRowAndColFromType(Excel.Worksheet worksheet)
-        {
-            String? formType = worksheet.Cells[200, 1].Value;
-
-            if (formType == null)
-            {
-                throw new ConfigDataException("Le type de formulaire n'a pas été reconnu.");
-            }
-
-            if (formType == "Rapport 1 pièce")
-            {
-                this.rowToSign = 55; this.colToSign = 14;
-            }
-            else if (formType == "Bague lisse" || formType == "Calibre à machoire" || formType == "Etalon colonne mesure" || formType == "Tampon lisse")
-            {
-                rowToSign = 52;
-            }
         }
 
         /*-------------------------------------------------------------------------*/

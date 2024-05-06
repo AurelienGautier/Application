@@ -1,4 +1,5 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
+using Application.Data;
 
 namespace Application.Writers
 {
@@ -22,7 +23,7 @@ namespace Application.Writers
          * fileName : string - Nom du fichier à sauvegarder
          * 
          */
-        public FivePiecesWriter(string fileName, String workBookPath, bool modify) : base(fileName, 17, 1, workBookPath, modify)
+        public FivePiecesWriter(string fileName, Form form) : base(fileName, form)
         {
             this.pageNumber = 1;
             this.measurePlans = new List<List<String>>();
@@ -32,7 +33,7 @@ namespace Application.Writers
             this.min = 0;
             this.max = 5;
 
-            if(modify)
+            if(base.form.Modify)
             {
                 this.EraseData(17);
             }
@@ -171,24 +172,6 @@ namespace Application.Writers
         }
 
         /*-------------------------------------------------------------------------*/
-
-        /**
-         * WriteHeader
-         * 
-         * Remplit l'entête du rapport Excel
-         * 
-         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
-         * designLine : int - Numéro de la ligne où écrire la désignation
-         * 
-         */
-        public void WriteHeader(Dictionary<string, string> header, int designLine)
-        {
-            Excel.Worksheet worksheet = base.workbook.Sheets["Rapport d'essai dimensionnel"];
-
-            worksheet.Cells[designLine, 4] = header["Designation"];
-            worksheet.Cells[designLine + 2, 4] = header["N° de Plan"];
-            worksheet.Cells[designLine + 4, 4] = header["Indice"];
-        }
 
         public override void EraseData(int firstLine)
         {

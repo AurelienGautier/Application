@@ -14,8 +14,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * ConfigSingleton
-         * 
          * Constructeur de la classe (privé car singleton donc doit être inaccessible de l'extérieur de la classe)
          * 
          */
@@ -31,8 +29,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * Singleton instance
-         * 
          * Retourne l'instance du singleton et la crée si elle n'existe pas
          * 
          */
@@ -52,8 +48,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * getSignatureFromFile
-         * 
          * Récupère la signature dans le fichier de configuration
          * 
          * @return Image? - La signature ou null si elle n'est pas correcte
@@ -86,8 +80,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * getMeasureDataFromFile
-         * 
          * Récupère les types de mesure depuis le fichier de configuration
          * 
          */
@@ -116,8 +108,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * addData
-         * 
          * Désérialise une ligne du fichier de configuration et l'ajoute dans la liste des types de mesure
          * 
          * @param DataRow row
@@ -151,8 +141,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * getFileContent
-         * 
          * Récupère le contenu entier d'un fichier
          * 
          * @param String filePath - Chemin du fichier dont le contenu est à récupérer
@@ -172,8 +160,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * serializeMeasureTypes
-         * 
          * Convertir les types de mesure en JSON et les écrit dans le fichier de configuration
          * 
          */
@@ -215,8 +201,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * GetMeasureTypeFromLibelle
-         * 
          * Retourne le type de mesure dont le libellé est passé en paramètre
          * 
          * @param String libelle
@@ -237,8 +221,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /**
-         * GetData
-         * 
          * Crée un objet Data à partir des valeurs passées en paramètre
          * 
          * @param List<String> line - Ligne du fichier de données
@@ -360,9 +342,9 @@ namespace Application.Data
         {
             List<Form> forms = new List<Form>();
 
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 55, 14));
-            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 26, 51, 14));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 30, 51, 14));
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece));
+            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 26, 1, 51, 14, FormType.OnePiece));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces));
 
             return forms;
         }
@@ -373,8 +355,8 @@ namespace Application.Data
         {
             List<Form> forms = new List<Form>();
 
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 55, 14));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 30, 51, 14));
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces));
 
             return forms;
         }
