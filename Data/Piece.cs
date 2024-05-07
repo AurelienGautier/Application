@@ -7,12 +7,23 @@
 
         private readonly List<String> measurePlans;
 
+        private readonly Dictionary<string, string> header;
+
         /*-------------------------------------------------------------------------*/
 
         public Piece() 
         {
             this.pieceData = new List<List<Data>>();
             this.measurePlans = new List<String>();
+
+            this.header = new Dictionary<string, string>();
+
+            this.header["Designation"] = "";
+            this.header["N° de Plan"] = "";
+            this.header["Client"] = "";
+            this.header["Indice"] = "";
+            this.header["Opérateurs"] = "";
+            this.header["Observations"] = "";
         }
 
         /*-------------------------------------------------------------------------*/
@@ -98,6 +109,38 @@
         public List<List<Data>> GetData()
         {
             return this.pieceData;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /**
+         * Crée l'en-tête à partir d'une chaîne de caractères
+         * text : String - L'en-tête récupérée de manière brute depuis le fichier à analyser
+         *
+         */
+        public void CreateHeader(string text)
+        {
+            string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            foreach (var line in lines)
+            {
+                string[] parts = line.Split(new[] { ':' }, 3);
+
+                string key = parts[0].Trim();
+                string value = parts[2].Trim();
+
+                this.header[key] = value;
+            }
+
+            string[] words = header["Opérateurs"].Split(' ');
+            this.header["Opérateurs"] = words[1] + " " + words[0];
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public Dictionary<string, string> GetHeader()
+        {
+            return this.header;
         }
 
         /*-------------------------------------------------------------------------*/

@@ -52,11 +52,11 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Data.Piece> data, Dictionary<string, string> header)
+        public void WriteData(List<Data.Piece> data)
         {
             this.pieces = data;
 
-            writeHeader(header);
+            writeHeader(data[0].GetHeader());
 
             CreateWorkSheets();
 

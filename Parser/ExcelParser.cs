@@ -12,15 +12,6 @@ namespace Application.Parser
         public ExcelParser()
         {
             this.excelApp = new Excel.Application();
-
-            base.header = new Dictionary<string, string>();
-
-            base.header["Designation"] = "";
-            base.header["N° de Plan"] = "";
-            base.header["Client"] = "";
-            base.header["Indice"] = "";
-            base.header["Opérateurs"] = "";
-            base.header["Observations"] = "";
         }
 
         /*-------------------------------------------------------------------------*/

@@ -22,11 +22,8 @@ namespace Application.UI.UserControls
             List<Piece>? data = this.getData(form.DataFrom, parser);
             if (data == null) return;
 
-            // Récupération des informations à insérer dans l'entête du formulaire
-            Dictionary<string, string> header = parser.GetHeader();
-
             // Remplissage du formulaire
-            this.FillForm(form, data, header);
+            this.FillForm(form, data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -77,7 +74,7 @@ namespace Application.UI.UserControls
          * data : List<Piece> - Les données à insérer dans le formulaire
          * header : Dictionary<String, String> - Les informations à insérer dans l'entête du formulaire
          */
-        public void FillForm(Form form, List<Piece> data, Dictionary<String, String> header)
+        public void FillForm(Form form, List<Piece> data)
         {
             try
             {
@@ -91,7 +88,7 @@ namespace Application.UI.UserControls
                 if(form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
                 else writer = new FivePiecesWriter(fileToSave, form);
 
-                writer.WriteData(data, header);
+                writer.WriteData(data);
             }
             catch (ExcelFileAlreadyInUseException e)
             {

@@ -8,24 +8,11 @@ namespace Application.Parser
 {
     internal abstract class Parser
     {
-        protected Dictionary<string, string>? header;
         protected List<Data.Piece>? dataParsed;
 
         /*-------------------------------------------------------------------------*/
 
         public abstract List<Data.Piece> ParseFile(String fileToParse);
-
-        /*-------------------------------------------------------------------------*/
-
-        public Dictionary<string, string> GetHeader()
-        {
-            if(this.header == null)
-            {
-                this.header = new Dictionary<string, string>();
-            }
-            
-            return this.header;
-        }
 
         /*-------------------------------------------------------------------------*/
     

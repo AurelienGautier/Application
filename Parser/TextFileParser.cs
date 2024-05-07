@@ -29,7 +29,6 @@ namespace Application.Parser
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
             this.fileToParse = fileToParse;
-            base.header = new Dictionary<string, string>();
             base.dataParsed = new List<Data.Piece>();
 
             sr = new StreamReader(fileToParse, Encoding.GetEncoding(ENCODING));
@@ -91,7 +90,7 @@ namespace Application.Parser
 
             this.lineIndex += 5;
 
-            createHeader(sb.ToString());
+            this.dataParsed[dataParsed.Count - 1].CreateHeader(sb.ToString());
         }
 
         /*-------------------------------------------------------------------------*/
@@ -158,33 +157,6 @@ namespace Application.Parser
             }
 
             return values;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * Crée l'en-tête à partir d'une chaîne de caractères
-         * text : String - L'en-tête récupérée de manière brute depuis le fichier à analyser
-         *
-         */
-        private void createHeader(string text)
-        {
-            header = new Dictionary<string, string>();
-
-            string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-
-            foreach (var line in lines)
-            {
-                string[] parts = line.Split(new[] { ':' }, 3);
-
-                string key = parts[0].Trim();
-                string value = parts[2].Trim();
-
-                header[key] = value;
-            }
-
-            string[] words = header["Opérateurs"].Split(' ');
-            header["Opérateurs"] = words[1] + " " + words[0];
         }
 
         /*-------------------------------------------------------------------------*/
