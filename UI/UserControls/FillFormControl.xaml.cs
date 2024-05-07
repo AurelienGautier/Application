@@ -13,7 +13,7 @@ namespace Application.UI.UserControls
     public partial class FillFormControl : UserControl
     {
         private FormFillingManager formFillingManager;
-        List<String> machines = new List<String> { "Mitutoyo", "Ayonis" };
+        List<String> machines;
         ObservableCollection<Form> forms;
 
         /*-------------------------------------------------------------------------*/
@@ -22,13 +22,15 @@ namespace Application.UI.UserControls
         {
             InitializeComponent();
 
+            // Initialisation de la liste des machines et binding avec le formulaire
+            this.machines = new List<String> { "Mitutoyo", "Ayonis" };
             Machines.ItemsSource = this.machines;
             Machines.SelectedIndex = 0;
 
             this.formFillingManager = new FormFillingManager();
 
+            // Récupération de la liste des formulaires existants
             this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
-
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
         }
 

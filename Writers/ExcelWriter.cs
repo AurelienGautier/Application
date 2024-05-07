@@ -52,9 +52,11 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Data.Piece> data)
+        public void WriteData(List<Data.Piece> data, Dictionary<string, string> header)
         {
             this.pieces = data;
+
+            writeHeader(header);
 
             CreateWorkSheets();
 
@@ -62,13 +64,13 @@ namespace Application.Writers
 
             if (this.form.Sign)
             {
-                SignForm();
+                signForm();
 
-                ExportFirstPageToPdf();
+                exportFirstPageToPdf();
             }
 
 
-            SaveAndQuit();
+            saveAndQuit();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -82,13 +84,13 @@ namespace Application.Writers
          * designLine : int - Numéro de la ligne où écrire la désignation
          * 
          */
-        public void WriteHeader(Dictionary<string, string> header, int designLine)
+        private void writeHeader(Dictionary<string, string> header)
         {
             Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
 
-            ws.Cells[designLine, 4] = header["Designation"];
-            ws.Cells[designLine + 2, 4] = header["N° de Plan"];
-            ws.Cells[designLine + 4, 4] = header["Indice"];
+            ws.Cells[form.DesignLine, 4] = header["Designation"];
+            ws.Cells[form.DesignLine + 2, 4] = header["N° de Plan"];
+            ws.Cells[form.DesignLine + 4, 4] = header["Indice"];
         }
 
         /*-------------------------------------------------------------------------*/
@@ -119,7 +121,7 @@ namespace Application.Writers
          * Signe le formulaire
          * 
          */
-        public void SignForm()
+        private void signForm()
         {
             var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
 
@@ -136,7 +138,7 @@ namespace Application.Writers
          * Exporte la première page du fichier excel en pdf (délégué aux classes filles)
          * 
          */
-        public void ExportFirstPageToPdf()
+        private void exportFirstPageToPdf()
         {
             this.workbook.ExportAsFixedFormat(
                 Excel.XlFixedFormatType.xlTypePDF, 
@@ -159,7 +161,7 @@ namespace Application.Writers
          * Sauvegarde le fichier et ferme l'application
          * 
          */
-        public void SaveAndQuit()
+        private void saveAndQuit()
         {
             this.workbook.Sheets[1].Activate();
 

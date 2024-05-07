@@ -15,7 +15,10 @@ namespace Application.UI.UserControls
         }
 
         /*-------------------------------------------------------------------------*/
-
+        
+        /**
+         * Récupère la liste des types de mesures et les affiche dans la liste
+         */
         public void BindData()
         {
             List<Data.MeasureType> list = Data.ConfigSingleton.Instance.GetMeasureTypes();
@@ -26,6 +29,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Redirige vers la page de modification du type de mesure
+         */
         private void modifyMeasureType(object sender, System.Windows.RoutedEventArgs e)
         {
             Button buttn = (Button)sender;
@@ -41,6 +47,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Supprime un type de mesure sélectionné par un utilisateur
+         */
         private void deleteMeasureType(object sender, System.Windows.RoutedEventArgs e)
         {
             Button button = (Button)sender;

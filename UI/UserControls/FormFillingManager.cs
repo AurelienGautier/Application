@@ -1,5 +1,4 @@
 ﻿using Application.Exceptions;
-using Application.Parser;
 using Application.Writers;
 using Microsoft.Win32;
 using System.IO;
@@ -19,20 +18,38 @@ namespace Application.UI.UserControls
          */
         public void ManageFormFilling(Form form, Parser.Parser parser)
         {
-            List<Piece>? data = null;
-            
+            // Parsing des données
+            List<Piece>? data = this.getData(form.DataFrom, parser);
+            if (data == null) return;
+
+            // Récupération des informations à insérer dans l'entête du formulaire
+            Dictionary<string, string> header = parser.GetHeader();
+
+            // Remplissage du formulaire
+            this.FillForm(form, data, header);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /**
+         * Récupère les données à insérer dans le formulaire en prenant en compte le type de provenance du formulaire
+         */
+        private List<Piece>? getData(DataFrom dataFrom, Parser.Parser parser)
+        {
+            List<Piece>? data;
+
             // Parsing des données
             try
             {
                 // Si c'est un formulaire 5 pièces mitutoyo, on récupère les données de tous les fichiers d'un répertoire
-                if(form.Type == FormType.FivePieces && parser is TextFileParser)
+                if (dataFrom == DataFrom.Folder)
                 {
                     data = this.getDataFromFolder(parser);
                 }
                 else
                 {
                     String fileToParse = this.GetFileToOpen("Sélectionner le fichier à convertir", parser.GetFileExtension());
-                    if(fileToParse == "") return;
+                    if (fileToParse == "") return null;
 
                     data = parser.ParseFile(fileToParse);
                 }
@@ -40,18 +57,15 @@ namespace Application.UI.UserControls
             catch (MeasureTypeNotFoundException e)
             {
                 MainWindow.DisplayError(e.Message);
+                return null;
             }
             catch (IncorrectFormatException e)
             {
                 MainWindow.DisplayError(e.Message);
+                return null;
             }
 
-            Dictionary<string, string> header = parser.GetHeader();
-
-            if (data == null) return; // à gérer plus tard
-
-            // Remplissage du formulaire
-            this.FillForm(form, data, header);
+            return data;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -67,10 +81,8 @@ namespace Application.UI.UserControls
         {
             try
             {
-                String fileToSave = "";
-
                 // Récupération de l'emplacement du formulaire à créer
-                fileToSave = this.GetFileToSave();
+                String fileToSave = this.GetFileToSave();
                 if (fileToSave == "") return;
 
                 // Écriture du formulaire
@@ -79,8 +91,7 @@ namespace Application.UI.UserControls
                 if(form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
                 else writer = new FivePiecesWriter(fileToSave, form);
 
-                writer.WriteHeader(header, form.DesignLine);
-                writer.WriteData(data);
+                writer.WriteData(data, header);
             }
             catch (ExcelFileAlreadyInUseException e)
             {
@@ -97,7 +108,7 @@ namespace Application.UI.UserControls
          */
         private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
         {
-            String folderName = this.getFolderToOpen();
+            String folderName = this.getFolderToOpen("Choisir le répertoire contenant les données des pièces à convertir");
             if (folderName == "") return null;
 
             DirectoryInfo directory = new DirectoryInfo(folderName);
@@ -153,10 +164,13 @@ namespace Application.UI.UserControls
 
         /**
          * Ouvre une fenêtre de dialogue pour sélectionner le chemin d'un répertoire
+         * 
+         * title : String - Le titre de la fenêtre de dialogue
          */
-        private String getFolderToOpen()
+        private String getFolderToOpen(String title)
         {
             var dialog = new OpenFolderDialog();
+            dialog.Title = title;
 
             String folderName = "";
 

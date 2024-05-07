@@ -27,6 +27,7 @@ namespace Application.UI.UserControls
         {
             InitializeComponent();
 
+            // Les différents champs à remplir pour créer un type de mesure
             this.measureName = (TextBox)this.FindName("MeasureName");
             this.measureNominalValueIndex = (TextBox)this.FindName("MeasureNominalValueIndex");
             this.measureTolerancePlusIndex = (TextBox)this.FindName("MeasureTolerancePlusIndex");
