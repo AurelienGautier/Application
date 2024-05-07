@@ -16,8 +16,8 @@
             this.pieceData = new List<List<Data>>();
             this.measurePlans = new List<String>();
 
+            // Création de l'en-tête vide
             this.header = new Dictionary<string, string>();
-
             this.header["Designation"] = "";
             this.header["N° de Plan"] = "";
             this.header["Client"] = "";

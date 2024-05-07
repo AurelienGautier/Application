@@ -16,12 +16,8 @@ namespace Application
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
 
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-
         public MainWindow()
         {
-            AllocConsole();
             InitializeComponent();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();

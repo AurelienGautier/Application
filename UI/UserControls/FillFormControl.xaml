@@ -8,16 +8,26 @@
              d:DesignHeight="600" d:DesignWidth="1200">
     <Grid Background="White">
         <StackPanel Grid.Column="1" Orientation="Vertical" Width="auto" Height="auto" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ComboBox x:Name="Machines" SelectionChanged="changeMachine" Width="271" IsEditable="True" Height="46" FontSize="16" FontFamily="Verdana" VerticalContentAlignment="Center" HorizontalAlignment="Left" />
             
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="Forms" Grid.Column="1" VerticalAlignment="Center" Width="271" IsEditable="True" Height="46" FontSize="16" FontFamily="Verdana" HorizontalAlignment="Center" VerticalContentAlignment="Center" />
+            <!--Choix de la machine-->
+            <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
+                <Label Style="{StaticResource BaseStyle}" Content="Machine" DockPanel.Dock="Left"/>
+                <ComboBox x:Name="Machines" SelectionChanged="changeMachine" Style="{StaticResource ComboBoxStyle}" DockPanel.Dock="Right"/>
+            </DockPanel>
 
-                <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
-                <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Background="White" FontFamily="Verdana" Width="80" FontSize="16"/>
-            </StackPanel>
+            <!--Choix du formulaire-->
+            <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
+                <Label Style="{StaticResource BaseStyle}" Content="Formulaire"/>
+                <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle}" Background="White" BorderBrush="White"/>
+            </DockPanel>
 
-            <CheckBox x:Name="SignForm" Content="Signer" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <!--Confirmation-->
+            <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
+                <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource ConfirmButtonStyle}"/>
+                <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource ConfirmButtonStyle}"/>
+                <CheckBox x:Name="SignForm" Content="Signer" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </DockPanel>
+            
         </StackPanel>
     </Grid>
 </UserControl>

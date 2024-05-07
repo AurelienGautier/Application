@@ -59,11 +59,9 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measurePlans[i] != "")
                 {
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = measurePlans[i];
+                    ws.Cells[base.currentLine, base.currentColumn + 1].Value = measurePlans[i];
                     base.currentLine++;
                     linesWritten++;
-                    base.currentColumn--;
                 }
 
                 // Changement de page si l'actuelle est complète
@@ -80,20 +78,14 @@ namespace Application.Writers
                 // Écriture des données ligne par ligne
                 for (int j = 0; j < pieceData[i].Count; j++)
                 {
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].Symbol;
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].NominalValue;
-                    base.currentColumn += 2;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].TolerancePlus;
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].ToleranceMinus;
-                    base.currentColumn++;
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[i][j].Value;
+                    ws.Cells[base.currentLine, base.currentColumn + 1].Value = pieceData[i][j].Symbol;
+                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[i][j].NominalValue;
+                    ws.Cells[base.currentLine, base.currentColumn + 4].Value = pieceData[i][j].TolerancePlus;
+                    ws.Cells[base.currentLine, base.currentColumn + 5].Value = pieceData[i][j].ToleranceMinus;
+                    ws.Cells[base.currentLine, base.currentColumn + 6].Value = pieceData[i][j].Value;
 
                     base.currentLine++;
                     linesWritten++;
-                    base.currentColumn -= 6;
 
                     if (linesWritten == MAX_LINES)
                     {
@@ -140,5 +132,7 @@ namespace Application.Writers
             Excel.Range rangeToDelete = measuresSheet.Range[start + ":" + end];
             rangeToDelete.ClearContents();
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

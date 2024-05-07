@@ -4,6 +4,53 @@
              xmlns:local="clr-namespace:Application"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="BackgroundColor" Color="#6E50FE" />
+        
+        <!--Style à appliquer sur chaque control de l'application-->
+        <Style x:Key="BaseStyle" TargetType="{x:Type Control}">
+            <Setter Property="FontFamily" Value="Verdana"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+
+        <!--Style pour un bouton de navbar-->
+        <Style x:Key="NavBarButton" TargetType="{x:Type Button}" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="Foreground" Value="#D0C3FE"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+
+            <!--Permet de changer la couleur du texte quand le curseur est passé sur le bouton (c'est du mistral c pa mwa kiléfé)-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <TextBlock x:Name="buttonText" Text="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="buttonText" Property="Foreground" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!--Style pour une comboBox-->
+        <Style x:Key="ComboBoxStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="Width" Value="271"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <!--Style pour un bouton de confirmation-->
+        <Style x:Key="ConfirmButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
     </Application.Resources>
 </Application>

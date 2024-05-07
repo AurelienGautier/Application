@@ -32,6 +32,7 @@ namespace Application.UI.UserControls
             // Récupération de la liste des formulaires existants
             this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
+            Forms.SelectedIndex = 0;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -113,6 +114,11 @@ namespace Application.UI.UserControls
         {
             if(selectedMachine == "Ayonis") return new ExcelParser();
             return new TextFileParser();
+        }
+
+        private void Forms_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
 
         /*-------------------------------------------------------------------------*/
