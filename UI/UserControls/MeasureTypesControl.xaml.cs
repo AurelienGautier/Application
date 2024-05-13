@@ -29,6 +29,14 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        private void addMeasureType(object sender, System.Windows.RoutedEventArgs e)
+        {
+            MainWindow parentWindow = (MainWindow)Window.GetWindow(this);
+            parentWindow.goToAddMeasureType(sender, e);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         /**
          * Redirige vers la page de modification du type de mesure
          */

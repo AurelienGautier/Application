@@ -3,36 +3,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:Application"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1200" Background="White">
-    <Grid>
-        <ListView x:Name="MeasureTypes" d:ItemsSource="{d:SampleData ItemCount=5}" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Verdana" FontSize="16" Width="auto">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Nom de la mesure" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="Indice valeur nom." DisplayMemberBinding="{Binding NominalValueIndex}" />
-                    <GridViewColumn Header="Indice tol+." DisplayMemberBinding="{Binding TolPlusIndex}" />
-                    <GridViewColumn Header="Indice tol-." DisplayMemberBinding="{Binding TolMinusIndex}" />
-                    <GridViewColumn Header="Indice valeur" DisplayMemberBinding="{Binding ValueIndex}" />
-                    <GridViewColumn Header="Symbole" DisplayMemberBinding="{Binding Symbol}" />
-                    <GridViewColumn Header="" Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Tag="{Binding Name}" Content="Modifier" Click="modifyMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="" Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Tag="{Binding Name}" Content="Supprimer" Click="deleteMeasureType" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+    <Grid Background="#eff2f7">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Button Grid.Row="0" Click="addMeasureType" Style="{StaticResource AddButtonStyle}" Content="Ajouter"/>
+
+        <DataGrid Grid.Row="1" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}" CellStyle="{DynamicResource DataGridCellStyle1}" RowStyle="{DynamicResource DataGridRowStyle1}" Style="{DynamicResource DataGridStyle1}" x:Name="MeasureTypes" ItemsSource="{Binding MeasureType}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Type de mesure" Binding="{Binding Name}" CanUserResize="False" />
+                <DataGridTextColumn Header="Indice valeur nom." Binding="{Binding NominalValueIndex}" CanUserResize="False" />
+                <DataGridTextColumn Header="Indice tol+" Binding="{Binding TolPlusIndex}" CanUserResize="False" />
+                <DataGridTextColumn Header="Indice tol-" Binding="{Binding TolMinusIndex}" CanUserResize="False" />
+                <DataGridTextColumn Header="Indice Valeur" Binding="{Binding ValueIndex}" CanUserResize="False" />
+                <DataGridTextColumn Header="Symbole" Binding="{Binding Symbol}" CanUserResize="False" />
+
+                <DataGridTemplateColumn Header="Operations" IsReadOnly="True" Width="auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Tag="{Binding Name}" Click="modifyMeasureType" Style="{StaticResource EditButtonStyle}">
+                                    <Icon:PackIconMaterial Kind="PencilOutline" Style="{StaticResource ButtonIconStyle}" />
+                                </Button>
+                                <Button Tag="{Binding Name}" Click="deleteMeasureType" Style="{StaticResource DeleteButtonStyle}" Margin="5, 0, 0, 0">
+                                    <Icon:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource ButtonIconStyle}" />
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
     
 </UserControl>

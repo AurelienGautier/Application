@@ -103,6 +103,8 @@ namespace Application.UI.UserControls
             else this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
 
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
+
+            if((String)Forms.SelectedItem == null) Forms.SelectedIndex = 0;
         }
 
         /*-------------------------------------------------------------------------*/

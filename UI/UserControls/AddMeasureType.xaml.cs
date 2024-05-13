@@ -78,9 +78,8 @@ namespace Application.UI.UserControls
                 || this.measureTolerancePlusIndex.Text == "" 
                 || this.measureValueIndex.Text == "" 
                 || this.measureToleranceMinusIndex.Text == "" 
-                || this.measureSymbol.Text == ""
             )
-                throw new ConfigDataException("Tous les champs doivent être remplis");
+                throw new ConfigDataException("Tous les champs obligatoires doivent être remplis");
 
             return new Data.MeasureType()
             {
