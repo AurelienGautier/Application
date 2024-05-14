@@ -113,11 +113,12 @@ namespace Application.Writers
             String postalCode = ws2.Cells[currentLineWs2, 5].Value;
             String city = ws2.Cells[currentLineWs2, 6].Value;
 
-
             ws.Cells[form.ClientLine, 4] = header["Client"];
             ws.Cells[form.ClientLine + 1, 4] = address;
             ws.Cells[form.ClientLine + 2, 4] = bp;
             ws.Cells[form.ClientLine + 3, 4] = postalCode + " " + city;
+
+            workbook2.Close();
         }
 
         /*-------------------------------------------------------------------------*/

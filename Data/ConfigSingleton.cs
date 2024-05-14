@@ -2,6 +2,7 @@
 using System.IO;
 using System.Data;
 using System.Drawing;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Data
 {
@@ -10,6 +11,7 @@ namespace Application.Data
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
+        private readonly List<MeasureMean> measureMeans;
 
         /*-------------------------------------------------------------------------*/
 
@@ -23,7 +25,11 @@ namespace Application.Data
 
             this.Signature = this.getSignatureFromFile();
 
+            this.measureMeans = new List<MeasureMean>();
+
             this.getMeasureDataFromFile();
+
+            this.getMeasureMeansFromExcelFile();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -359,6 +365,43 @@ namespace Application.Data
             forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces, DataFrom.File, 17));
 
             return forms;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void getMeasureMeansFromExcelFile()
+        {
+            Excel.Application excelApp = new Excel.Application();
+
+            Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\conf\\etalons");
+
+            Excel.Worksheet ws = workbook.Sheets["raccordements à jour "];
+
+            int currentLine = 9;
+
+            while (ws.Cells[currentLine, 1].Value != null)
+            {
+                Excel.Range range = ws.Range[ws.Cells[currentLine, 1], ws.Cells[currentLine, 2]];
+
+                if(range.MergeCells)
+                {
+                    currentLine++;
+                }
+                else
+                {
+                    String code = ws.Cells[currentLine, 1].Value.ToString();
+                    String name = ws.Cells[currentLine, 2].Value.ToString();
+                    String raccordement = ws.Cells[currentLine + 1, 2].Value.ToString();
+                    String validity = ws.Cells[currentLine + 2, 2].Value.ToString();
+
+                    this.measureMeans.Add(new MeasureMean(code, name, raccordement, validity));
+
+                    currentLine += 3;
+                }
+            }
+
+            workbook.Close();
+            excelApp.Quit();
         }
 
         /*-------------------------------------------------------------------------*/
