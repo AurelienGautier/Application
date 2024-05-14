@@ -61,6 +61,7 @@ namespace Application.Parser
             words = line.Split(' ').ToList();
             words = words.Where((item, index) => item != "" && item != " ").ToList();
 
+            if(words.Count == 0) return;
             if (words[0] == "Designation") manageHeaderType(line);
             else if (words[0][0] == '*') manageMeasurePlan(words);
             else manageValueType(words);

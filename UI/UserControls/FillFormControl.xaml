@@ -6,33 +6,32 @@
              xmlns:local="clr-namespace:Application.UI.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1200">
-    <Grid Background="White">
+    <Grid Background="{StaticResource BackgroundColor}">
         <StackPanel Grid.Column="1" Orientation="Vertical" Width="auto" Height="auto" HorizontalAlignment="Center" VerticalAlignment="Center">
             
             <!--Choix de la machine-->
             <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
                 <Label Style="{StaticResource BaseStyle}" Content="Machine" DockPanel.Dock="Left" Margin="0, 0, 40, 0"/>
-                <ComboBox x:Name="Machines" SelectionChanged="changeMachine" Style="{StaticResource ComboBoxStyle}" DockPanel.Dock="Right"/>
+                <ComboBox Style="{StaticResource ComboBoxStyle1}" x:Name="Machines" SelectionChanged="changeMachine" DockPanel.Dock="Right"/>
             </DockPanel>
 
             <!--Choix du formulaire-->
             <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
                 <Label Style="{StaticResource BaseStyle}" Content="Formulaire" DockPanel.Dock="Left" Margin="0, 0, 40, 0"/>
-                <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle}" Background="White" BorderBrush="White" DockPanel.Dock="Right"/>
+                <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" DockPanel.Dock="Right"/>
             </DockPanel>
 
             <!--Choix de signer ou non-->
             <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
                 <Label Style="{StaticResource BaseStyle}" Content="Signer" Margin="0, 0, 75, 0"/>
-                <CheckBox x:Name="SignForm" FontFamily="Verdana" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <CheckBox Style="{StaticResource CheckBoxStyle}" x:Name="SignForm"/>
             </DockPanel>
 
-            
             <!--Confirmation-->
             <DockPanel LastChildFill="False" Margin="0, 0, 0, 20" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource ConfirmButtonStyle}" Margin="0, 0, 20, 0"/>
-                    <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource ConfirmButtonStyle}"/>
+                    <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource AddButtonStyle}" Margin="0, 0, 20, 0"/>
+                    <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource AddButtonStyle}"/>
                 </StackPanel>
             </DockPanel>
             

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Application.UI.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="White">
+    <Grid Background="{StaticResource BackgroundColor}">
         <StackPanel>
             <Label Content="Nom de la mesure" FontFamily="Verdana" FontSize="16" />
             <TextBox x:Name="MeasureName" FontFamily="Verdana" FontSize="16" />
