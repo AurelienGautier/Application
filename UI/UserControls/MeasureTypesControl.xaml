@@ -17,14 +17,14 @@
 
         <DataGrid Grid.Row="1" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}" CellStyle="{DynamicResource DataGridCellStyle1}" RowStyle="{DynamicResource DataGridRowStyle1}" Style="{DynamicResource DataGridStyle1}" x:Name="MeasureTypes" ItemsSource="{Binding MeasureType}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Type de mesure" Binding="{Binding Name}" CanUserResize="False" />
-                <DataGridTextColumn Header="Indice valeur nom." Binding="{Binding NominalValueIndex}" CanUserResize="False" />
-                <DataGridTextColumn Header="Indice tol+" Binding="{Binding TolPlusIndex}" CanUserResize="False" />
-                <DataGridTextColumn Header="Indice tol-" Binding="{Binding TolMinusIndex}" CanUserResize="False" />
-                <DataGridTextColumn Header="Indice Valeur" Binding="{Binding ValueIndex}" CanUserResize="False" />
-                <DataGridTextColumn Header="Symbole" Binding="{Binding Symbol}" CanUserResize="False" />
+                <DataGridTextColumn Header="Type de mesure" Binding="{Binding Name}" CanUserResize="False" IsReadOnly="True" />
+                <DataGridTextColumn Header="Indice valeur nom." Binding="{Binding NominalValueIndex}" CanUserResize="False" IsReadOnly="True" />
+                <DataGridTextColumn Header="Indice tol+" Binding="{Binding TolPlusIndex}" CanUserResize="False" IsReadOnly="True" />
+                <DataGridTextColumn Header="Indice tol-" Binding="{Binding TolMinusIndex}" CanUserResize="False" IsReadOnly="True" />
+                <DataGridTextColumn Header="Indice Valeur" Binding="{Binding ValueIndex}" CanUserResize="False" IsReadOnly="True" />
+                <DataGridTextColumn Header="Symbole" Binding="{Binding Symbol}" CanUserResize="False" IsReadOnly="True" />
 
-                <DataGridTemplateColumn Header="Operations" IsReadOnly="True" Width="auto">
+                <DataGridTemplateColumn IsReadOnly="True" Width="auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

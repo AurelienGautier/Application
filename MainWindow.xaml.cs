@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
 namespace Application
@@ -15,7 +16,7 @@ namespace Application
         private readonly UI.UserControls.FillFormControl fillFormControl;
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
-
+        public ImageSource logo { get; set; }
         public MainWindow()
         {
             InitializeComponent();
@@ -23,6 +24,9 @@ namespace Application
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
+
+            logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
+            Logo.Source = logo;
 
             // Par défaut, on affiche le control de remplissage de formulaire Mitutoyo.
             CurrentControl.Content = this.fillFormControl;
