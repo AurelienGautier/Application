@@ -91,6 +91,33 @@ namespace Application.Writers
             ws.Cells[form.DesignLine, 4] = header["Designation"];
             ws.Cells[form.DesignLine + 2, 4] = header["N° de Plan"];
             ws.Cells[form.DesignLine + 4, 4] = header["Indice"];
+
+            Excel.Workbook workbook2 = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\res\\ADRESSE");
+            Excel.Worksheet ws2 = workbook2.Sheets["ADRESSE"];
+
+            int currentLineWs2 = 2;
+
+            // Tant que la ligne actuelle n'est pas vide et que le client n'a pas été trouvé
+            while (ws2.Cells[currentLineWs2, 2].Value != null && ws2.Cells[currentLineWs2, 2].Value != header["Client"])
+            {
+                currentLineWs2++;
+            }
+
+            if (ws2.Cells[currentLineWs2, 2].Value == null)
+            {
+                return;
+            }
+
+            String address = ws2.Cells[currentLineWs2, 3].Value;
+            String bp = ws2.Cells[currentLineWs2, 4].Value;
+            String postalCode = ws2.Cells[currentLineWs2, 5].Value;
+            String city = ws2.Cells[currentLineWs2, 6].Value;
+
+
+            ws.Cells[form.ClientLine, 4] = header["Client"];
+            ws.Cells[form.ClientLine + 1, 4] = address;
+            ws.Cells[form.ClientLine + 2, 4] = bp;
+            ws.Cells[form.ClientLine + 3, 4] = postalCode + " " + city;
         }
 
         /*-------------------------------------------------------------------------*/

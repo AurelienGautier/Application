@@ -26,8 +26,9 @@
         public bool Sign { get; set; }
         public FormType Type { get; set; }
         public DataFrom DataFrom { get; set; }
+        public int ClientLine { get; set; }
 
-        public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom)
+        public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine)
         {
             this.Name = name;
             this.Path = path;
@@ -40,6 +41,7 @@
             this.Sign = false;
             Type = type;
             DataFrom = dataFrom;
+            ClientLine = clientLine;
         }
     }
 }

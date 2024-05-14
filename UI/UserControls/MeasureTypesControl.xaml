@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <Button Grid.Row="0" Click="addMeasureType" Style="{StaticResource AddButtonStyle}" Content="Ajouter"/>
+        <Button Grid.Row="0" Click="addMeasureType" Style="{StaticResource AddButtonStyle}" Content="Ajouter" Margin="30" />
 
         <DataGrid Grid.Row="1" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}" CellStyle="{DynamicResource DataGridCellStyle1}" RowStyle="{DynamicResource DataGridRowStyle1}" Style="{DynamicResource DataGridStyle1}" x:Name="MeasureTypes" ItemsSource="{Binding MeasureType}">
             <DataGrid.Columns>

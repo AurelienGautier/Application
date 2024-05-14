@@ -28,10 +28,10 @@
             </DockPanel>
 
             <!--Confirmation-->
-            <DockPanel LastChildFill="False" Margin="0, 0, 0, 20" HorizontalAlignment="Center">
+            <DockPanel LastChildFill="False" Margin="0, 0, 0, 0" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource AddButtonStyle}" Margin="0, 0, 20, 0"/>
-                    <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource AddButtonStyle}"/>
+                    <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource AddButtonStyle}" Margin="0, 0, 30, 0"/>
+                    <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource AddButtonStyle}" Margin="30, 0, 0, 0"/>
                 </StackPanel>
             </DockPanel>
             

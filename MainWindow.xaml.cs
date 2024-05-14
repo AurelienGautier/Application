@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -17,9 +18,15 @@ namespace Application
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
         public ImageSource logo { get; set; }
+
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            AllocConsole();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
