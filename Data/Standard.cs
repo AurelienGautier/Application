@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Application.Data
 {
-    class MeasureMean
+    class Standard
     {
         public String Code { get; set; }
         public String Name { get; set; }
         public String Raccordement { get; set; }
         public String Validity { get; set; }
 
-        public MeasureMean(String code, String name, String raccordement, String validity)
+        public Standard(String code, String name, String raccordement, String validity)
         {
             this.Code = code;
             this.Name = name;

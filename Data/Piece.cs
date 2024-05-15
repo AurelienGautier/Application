@@ -18,12 +18,17 @@
 
             // Création de l'en-tête vide
             this.header = new Dictionary<string, string>();
+            this.header["Nom du Client"] = "";
+            this.header["N° constat"] = "";
             this.header["Designation"] = "";
             this.header["N° de Plan"] = "";
-            this.header["Client"] = "";
             this.header["Indice"] = "";
-            this.header["Opérateurs"] = "";
+            this.header["Date de réception pièce"] = "";
             this.header["Observations"] = "";
+            this.header["Constructeur"] = "";
+            this.header["Type d'appareil"] = "";
+            this.header["N° de série"] = "";
+            this.header["N° identification client"] = "";
         }
 
         /*-------------------------------------------------------------------------*/
@@ -131,9 +136,6 @@
 
                 this.header[key] = value;
             }
-
-            string[] words = header["Opérateurs"].Split(' ');
-            this.header["Opérateurs"] = words[1] + " " + words[0];
         }
 
         /*-------------------------------------------------------------------------*/

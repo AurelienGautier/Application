@@ -62,7 +62,7 @@ namespace Application.Parser
             words = words.Where((item, index) => item != "" && item != " ").ToList();
 
             if(words.Count == 0) return;
-            if (words[0] == "Designation") manageHeaderType(line);
+            if (words[0] == "Nom") manageHeaderType(line);
             else if (words[0][0] == '*') manageMeasurePlan(words);
             else manageValueType(words);
         }
@@ -83,7 +83,7 @@ namespace Application.Parser
             StringBuilder sb = new StringBuilder();
             sb.Append(line);
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 if (sr != null)
                     sb.Append('\n' + sr.ReadLine());

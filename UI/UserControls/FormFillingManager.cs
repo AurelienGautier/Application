@@ -16,14 +16,14 @@ namespace Application.UI.UserControls
          * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
          * parser: Parser - Le parser correspondant au type de fichier à parser
          */
-        public void ManageFormFilling(Form form, Parser.Parser parser)
+        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards)
         {
             // Parsing des données
             List<Piece>? data = this.getData(form.DataFrom, parser);
             if (data == null) return;
 
             // Remplissage du formulaire
-            this.FillForm(form, data);
+            this.FillForm(form, data, standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -74,7 +74,7 @@ namespace Application.UI.UserControls
          * data : List<Piece> - Les données à insérer dans le formulaire
          * header : Dictionary<String, String> - Les informations à insérer dans l'entête du formulaire
          */
-        public void FillForm(Form form, List<Piece> data)
+        public void FillForm(Form form, List<Piece> data, List<Standard> standards)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace Application.UI.UserControls
                 if(form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
                 else writer = new FivePiecesWriter(fileToSave, form);
 
-                writer.WriteData(data);
+                writer.WriteData(data, standards);
             }
             catch (ExcelFileAlreadyInUseException e)
             {

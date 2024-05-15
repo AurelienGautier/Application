@@ -11,7 +11,7 @@ namespace Application.Data
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
-        private readonly List<MeasureMean> measureMeans;
+        private readonly List<Standard> measureMeans;
 
         /*-------------------------------------------------------------------------*/
 
@@ -25,7 +25,7 @@ namespace Application.Data
 
             this.Signature = this.getSignatureFromFile();
 
-            this.measureMeans = new List<MeasureMean>();
+            this.measureMeans = new List<Standard>();
 
             this.getMeasureDataFromFile();
 
@@ -348,9 +348,9 @@ namespace Application.Data
         {
             List<Form> forms = new List<Form>();
 
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece, DataFrom.File, 18));
-            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 26, 1, 51, 14, FormType.OnePiece, DataFrom.File, 17));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Folder, 17));
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece, DataFrom.File, 18, 76));
+            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 25, 26, 1, 51, 14, FormType.OnePiece, DataFrom.File, 17, 72));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Folder, 17, 72));
 
             return forms;
         }
@@ -361,8 +361,8 @@ namespace Application.Data
         {
             List<Form> forms = new List<Form>();
 
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece, DataFrom.File, 18));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces, DataFrom.File, 17));
+            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 55, 14, FormType.OnePiece, DataFrom.File, 18, 76));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 25, 17, 1, 51, 14, FormType.FivePieces, DataFrom.File, 17, 72));
 
             return forms;
         }
@@ -371,6 +371,8 @@ namespace Application.Data
 
         private void getMeasureMeansFromExcelFile()
         {
+            this.measureMeans.Add(new Standard("", "", "", ""));
+
             Excel.Application excelApp = new Excel.Application();
 
             Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\conf\\etalons");
@@ -394,7 +396,7 @@ namespace Application.Data
                     String raccordement = ws.Cells[currentLine + 1, 2].Value.ToString();
                     String validity = ws.Cells[currentLine + 2, 2].Value.ToString();
 
-                    this.measureMeans.Add(new MeasureMean(code, name, raccordement, validity));
+                    this.measureMeans.Add(new Standard(code, name, raccordement, validity));
 
                     currentLine += 3;
                 }
@@ -406,9 +408,21 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        public List<MeasureMean> GetMeasureMeans()
+        public List<Standard> GetStandards()
         {
             return this.measureMeans;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public Standard? GetStandardFromCode(String code)
+        {
+            foreach (Standard standard in this.measureMeans)
+            {
+                if (standard.Code == code) return standard;
+            }
+
+            return null;
         }
 
         /*-------------------------------------------------------------------------*/

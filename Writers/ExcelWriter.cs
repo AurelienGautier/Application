@@ -52,11 +52,11 @@ namespace Application.Writers
          * data : List<Piece> - Liste des pièces à écrire
          * 
          */
-        public void WriteData(List<Data.Piece> data)
+        public void WriteData(List<Data.Piece> data, List<Standard> standards)
         {
             this.pieces = data;
 
-            writeHeader(data[0].GetHeader());
+            writeHeader(data[0].GetHeader(), standards);
 
             CreateWorkSheets();
 
@@ -84,41 +84,86 @@ namespace Application.Writers
          * designLine : int - Numéro de la ligne où écrire la désignation
          * 
          */
-        private void writeHeader(Dictionary<string, string> header)
+        private void writeHeader(Dictionary<string, string> header, List<Standard> standards)
         {
             Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
 
             ws.Cells[form.DesignLine, 4] = header["Designation"];
-            ws.Cells[form.DesignLine + 2, 4] = header["N° de Plan"];
+            ws.Cells[form.DesignLine + 2, 4] = header["N° de plan"];
             ws.Cells[form.DesignLine + 4, 4] = header["Indice"];
 
+
+            this.writeClient(ws, header["Nom du Client"]);
+            this.writeStandards(standards);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void writeClient(Excel.Worksheet ws, String client)
+        {
             Excel.Workbook workbook2 = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\res\\ADRESSE");
             Excel.Worksheet ws2 = workbook2.Sheets["ADRESSE"];
 
             int currentLineWs2 = 2;
 
             // Tant que la ligne actuelle n'est pas vide et que le client n'a pas été trouvé
-            while (ws2.Cells[currentLineWs2, 2].Value != null && ws2.Cells[currentLineWs2, 2].Value != header["Client"])
+            while (ws2.Cells[currentLineWs2, 2].Value != null && ws2.Cells[currentLineWs2, 2].Value != client)
             {
                 currentLineWs2++;
             }
 
-            if (ws2.Cells[currentLineWs2, 2].Value == null)
+            String address = "";
+            String bp = "";
+            String postalCode = "";
+            String city = "";
+
+            if (ws2.Cells[currentLineWs2, 2].Value != null)
             {
-                return;
+                address = ws2.Cells[currentLineWs2, 3].Value;
+                bp = ws2.Cells[currentLineWs2, 4].Value;
+                postalCode = ws2.Cells[currentLineWs2, 5].Value;
+                city = ws2.Cells[currentLineWs2, 6].Value;
             }
 
-            String address = ws2.Cells[currentLineWs2, 3].Value;
-            String bp = ws2.Cells[currentLineWs2, 4].Value;
-            String postalCode = ws2.Cells[currentLineWs2, 5].Value;
-            String city = ws2.Cells[currentLineWs2, 6].Value;
-
-            ws.Cells[form.ClientLine, 4] = header["Client"];
+            ws.Cells[form.ClientLine, 4] = client;
             ws.Cells[form.ClientLine + 1, 4] = address;
             ws.Cells[form.ClientLine + 2, 4] = bp;
-            ws.Cells[form.ClientLine + 3, 4] = postalCode + " " + city;
+            ws.Cells[form.ClientLine + 3, 4] = postalCode;
+            ws.Cells[form.ClientLine + 3, 5] = city;
 
             workbook2.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void writeStandards(List<Standard> standards)
+        {
+            Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
+
+            int linesToShift = standards.Count * 4;
+
+            // Décalage des valeurs vers le bas
+            for (int i = 0; i < linesToShift; i++)
+                ws.Range[
+                    ws.Cells[this.form.StandardLine, 1],
+                    ws.Cells[this.form.StandardLine, 15]]
+                    .Insert(Excel.XlInsertShiftDirection.xlShiftDown, 5);
+
+            int standardLine = form.StandardLine;
+
+            foreach (Standard standard in standards)
+            {
+                ws.Cells[standardLine, 1] = "Moyen:";
+                ws.Cells[standardLine, 4] = standard.Name;
+
+                ws.Cells[standardLine + 1, 1] = "Raccordement:";
+                ws.Cells[standardLine + 1, 4] = standard.Raccordement;
+
+                ws.Cells[standardLine + 2, 1] = "Validité:";
+                ws.Cells[standardLine + 2, 5] = standard.Validity;
+
+                standardLine += 4;
+            }
         }
 
         /*-------------------------------------------------------------------------*/

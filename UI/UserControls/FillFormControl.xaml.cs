@@ -15,7 +15,6 @@ namespace Application.UI.UserControls
         private FormFillingManager formFillingManager;
         List<String> machines;
         ObservableCollection<Form> forms;
-        ObservableCollection<MeasureMean> standards;
 
         public ObservableCollection<ComboBoxItem> ComboBoxItems { get; }
         public ObservableCollection<String> AvailableOptions { get; }
@@ -38,11 +37,8 @@ namespace Application.UI.UserControls
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
 
-            // Récupération de la liste des étalons existants
-            this.standards = new ObservableCollection<MeasureMean>(ConfigSingleton.Instance.GetMeasureMeans());
-
             // Ajout des attributs code de chaque élément de standards à AvailableOptions
-            AvailableOptions = new ObservableCollection<string>(standards.Select(standard => standard.Code));
+            AvailableOptions = new ObservableCollection<string>(ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code));
 
             ComboBoxItems = new ObservableCollection<ComboBoxItem>();
 
@@ -107,8 +103,24 @@ namespace Application.UI.UserControls
 
             if (formToOverwritePath != null) form.Path = formToOverwritePath;
 
+            List<Standard> standards = this.getStandardsFromComboBox();
+
             // Remplissage du formulaire en utilisant le FormFillingManager
-            this.formFillingManager.ManageFormFilling(form, this.getParser((String) Machines.SelectedItem));
+            this.formFillingManager.ManageFormFilling(form, this.getParser((String) Machines.SelectedItem), standards);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private List<Standard> getStandardsFromComboBox()
+        {
+            List<Standard> standards = new List<Standard>();
+
+            foreach(ComboBoxItem comboBoxItem in ComboBoxItems)
+            {
+                standards.Add(ConfigSingleton.Instance.GetStandardFromCode(comboBoxItem.SelectedOption));
+            }
+
+            return standards;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -141,7 +153,7 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        private void Add_Click(object sender, RoutedEventArgs e)
+        private void AddStandard_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxItem comboBoxItem = new ComboBoxItem { AvailableOptions = AvailableOptions };
             comboBoxItem.SelectedOption = AvailableOptions[0];
@@ -150,7 +162,7 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        private void Remove_Click(object sender, RoutedEventArgs e)
+        private void RemoveStandard_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             ComboBoxItem optionToRemove = (ComboBoxItem)button.DataContext;
