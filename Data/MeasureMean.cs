@@ -8,14 +8,14 @@ namespace Application.Data
 {
     class MeasureMean
     {
-        public String code { get; set; }
+        public String Code { get; set; }
         public String Name { get; set; }
         public String Raccordement { get; set; }
         public String Validity { get; set; }
 
         public MeasureMean(String code, String name, String raccordement, String validity)
         {
-            this.code = code;
+            this.Code = code;
             this.Name = name;
             this.Raccordement = raccordement;
             this.Validity = validity;

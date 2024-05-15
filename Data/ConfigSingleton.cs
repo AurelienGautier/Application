@@ -405,5 +405,12 @@ namespace Application.Data
         }
 
         /*-------------------------------------------------------------------------*/
+
+        public List<MeasureMean> GetMeasureMeans()
+        {
+            return this.measureMeans;
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

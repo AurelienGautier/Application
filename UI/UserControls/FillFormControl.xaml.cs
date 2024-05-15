@@ -15,6 +15,10 @@ namespace Application.UI.UserControls
         private FormFillingManager formFillingManager;
         List<String> machines;
         ObservableCollection<Form> forms;
+        ObservableCollection<MeasureMean> standards;
+
+        public ObservableCollection<ComboBoxItem> ComboBoxItems { get; }
+        public ObservableCollection<String> AvailableOptions { get; }
 
         /*-------------------------------------------------------------------------*/
 
@@ -33,6 +37,21 @@ namespace Application.UI.UserControls
             this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
+
+            // Récupération de la liste des étalons existants
+            this.standards = new ObservableCollection<MeasureMean>(ConfigSingleton.Instance.GetMeasureMeans());
+
+            // Ajout des attributs code de chaque élément de standards à AvailableOptions
+            AvailableOptions = new ObservableCollection<string>(standards.Select(standard => standard.Code));
+
+            ComboBoxItems = new ObservableCollection<ComboBoxItem>();
+
+            ComboBoxItem firstComboBox = new ComboBoxItem { AvailableOptions = AvailableOptions };
+            firstComboBox.SelectedOption = AvailableOptions[0];
+
+            ComboBoxItems.Add(firstComboBox);
+
+            Standards.ItemsSource = ComboBoxItems;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -65,6 +84,8 @@ namespace Application.UI.UserControls
          */
         private void callFormFilling(String? formToOverwritePath, bool sign, bool modify)
         {
+            // Ajouter la récupération des étalons
+
             // Vérification de la signature si l'utilisateur souhaite signer le document
             if (sign && ConfigSingleton.Instance.Signature == null)
             {
@@ -118,11 +139,30 @@ namespace Application.UI.UserControls
             return new TextFileParser();
         }
 
-        private void Forms_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
+        /*-------------------------------------------------------------------------*/
 
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            ComboBoxItem comboBoxItem = new ComboBoxItem { AvailableOptions = AvailableOptions };
+            comboBoxItem.SelectedOption = AvailableOptions[0];
+            ComboBoxItems.Add(comboBoxItem);
         }
 
         /*-------------------------------------------------------------------------*/
+
+        private void Remove_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = (Button)sender;
+            ComboBoxItem optionToRemove = (ComboBoxItem)button.DataContext;
+            ComboBoxItems.Remove(optionToRemove);
+        }
+
+        /*-------------------------------------------------------------------------*/
+    }
+
+    public class ComboBoxItem
+    {
+        public ObservableCollection<string>? AvailableOptions { get; set; }
+        public string? SelectedOption { get; set; }
     }
 }

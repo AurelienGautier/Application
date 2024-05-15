@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Application.UI.UserControls"
+             xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:local="clr-namespace:Application.UI.UserControls" 
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1200">
     <Grid Background="{StaticResource BackgroundColor}">
@@ -19,6 +20,30 @@
             <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
                 <Label Style="{StaticResource BaseStyle}" Content="Formulaire" DockPanel.Dock="Left" Margin="0, 0, 40, 0"/>
                 <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" DockPanel.Dock="Right"/>
+            </DockPanel>
+            
+            <!--Choix des étalons-->
+            <DockPanel LastChildFill="False" Margin="0, 0, 0, 20">
+                <Label Style="{StaticResource BaseStyle}" Content="Étalons" DockPanel.Dock="Left" Margin="0, 0, 40, 0" />
+
+                <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
+                    <ItemsControl x:Name="Standards">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <ComboBox Style="{StaticResource ComboBoxStyle1}" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}" Width="238" />
+                                    <Button Style="{StaticResource DeleteButtonStyle}" Click="Remove_Click" Margin="5, 0, 0, 0">
+                                        <Icon:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Style="{StaticResource DeleteButtonStyle}" Click="Add_Click" Margin="0, 10, 0, 0" HorizontalAlignment="Center" Background="{StaticResource NavBarBackgroundColor}" BorderBrush="{StaticResource NavBarBackgroundColor}">
+                        <Icon:PackIconMaterial Kind="Plus" Style="{StaticResource ButtonIconStyle}" Width="100" Height="16" />
+                    </Button>
+                </StackPanel>
             </DockPanel>
 
             <!--Choix de signer ou non-->
