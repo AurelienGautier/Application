@@ -7,7 +7,7 @@
 
         private readonly List<String> measurePlans;
 
-        private readonly Dictionary<string, string> header;
+        private readonly Header header;
 
         /*-------------------------------------------------------------------------*/
 
@@ -17,18 +17,7 @@
             this.measurePlans = new List<String>();
 
             // Création de l'en-tête vide
-            this.header = new Dictionary<string, string>();
-            this.header["Nom du Client"] = "";
-            this.header["N° constat"] = "";
-            this.header["Designation"] = "";
-            this.header["N° de Plan"] = "";
-            this.header["Indice"] = "";
-            this.header["Date de réception pièce"] = "";
-            this.header["Observations"] = "";
-            this.header["Constructeur"] = "";
-            this.header["Type d'appareil"] = "";
-            this.header["N° de série"] = "";
-            this.header["N° identification client"] = "";
+            this.header = new Header();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -126,6 +115,7 @@
         public void CreateHeader(string text)
         {
             string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            Dictionary<string, string> rawHeader = new Dictionary<string, string>();
 
             foreach (var line in lines)
             {
@@ -134,13 +124,15 @@
                 string key = parts[0].Trim();
                 string value = parts[2].Trim();
 
-                this.header[key] = value;
+                rawHeader[key] = value;
             }
+
+            this.header.FillHeader(rawHeader);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        public Dictionary<string, string> GetHeader()
+        public Header GetHeader()
         {
             return this.header;
         }

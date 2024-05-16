@@ -84,16 +84,16 @@ namespace Application.Writers
          * designLine : int - Numéro de la ligne où écrire la désignation
          * 
          */
-        private void writeHeader(Dictionary<string, string> header, List<Standard> standards)
+        private void writeHeader(Header header, List<Standard> standards)
         {
             Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
 
-            ws.Cells[form.DesignLine, 4] = header["Designation"];
-            ws.Cells[form.DesignLine + 2, 4] = header["N° de plan"];
-            ws.Cells[form.DesignLine + 4, 4] = header["Indice"];
+            ws.Cells[form.DesignLine, 4] = header.Designation;
+            ws.Cells[form.DesignLine + 2, 4] = header.PlanNb;
+            ws.Cells[form.DesignLine + 4, 4] = header.Index;
 
 
-            this.writeClient(ws, header["Nom du Client"]);
+            this.writeClient(ws, header.ClientName);
             this.writeStandards(standards);
         }
 

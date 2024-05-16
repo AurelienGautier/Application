@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.IO;
-using System.Globalization;
 
 namespace Application.Parser
 {
@@ -10,6 +9,7 @@ namespace Application.Parser
         private StreamReader? sr;
         private String fileToParse;
         int lineIndex = 1;
+        bool addPieceWhenHeaderMet = true;
 
         /*-------------------------------------------------------------------------*/
 
@@ -38,7 +38,7 @@ namespace Application.Parser
             while ((line = sr.ReadLine()) != null)
             {
                 manageLineType(line);
-                lineIndex++;
+                lineIndex++; 
             }
 
             sr.Close();
@@ -61,10 +61,13 @@ namespace Application.Parser
             words = line.Split(' ').ToList();
             words = words.Where((item, index) => item != "" && item != " ").ToList();
 
-            if(words.Count == 0) return;
-            if (words[0] == "Nom") manageHeaderType(line);
-            else if (words[0][0] == '*') manageMeasurePlan(words);
-            else manageValueType(words);
+            int testInt;
+
+            if (words.Count == 0) return;
+
+            if (words[0][0] == '*') manageMeasurePlan(words);
+            else if (int.TryParse(words[0], out testInt)) manageValueType(words);
+            else manageHeaderType(line);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -78,18 +81,16 @@ namespace Application.Parser
         {
             if (dataParsed == null) return;
 
-            dataParsed.Add(new Data.Piece());
+            if (this.addPieceWhenHeaderMet)
+            {
+                dataParsed.Add(new Data.Piece());
+                this.addPieceWhenHeaderMet = false;
+            }
 
             StringBuilder sb = new StringBuilder();
             sb.Append(line);
 
-            for (int i = 0; i < 10; i++)
-            {
-                if (sr != null)
-                    sb.Append('\n' + sr.ReadLine());
-            }
-
-            this.lineIndex += 5;
+            this.lineIndex++;
 
             this.dataParsed[dataParsed.Count - 1].CreateHeader(sb.ToString());
         }
@@ -103,6 +104,8 @@ namespace Application.Parser
          */
         private void manageMeasurePlan(List<string> words)
         {
+            if (!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
+
             StringBuilder sb = new StringBuilder();
             sb.Append(words[0].Substring(5));
 
@@ -124,6 +127,8 @@ namespace Application.Parser
          */
         private void manageValueType(List<string> words)
         {
+            if(!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
+
             // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
             int testInt;
             if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);

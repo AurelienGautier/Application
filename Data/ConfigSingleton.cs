@@ -12,6 +12,7 @@ namespace Application.Data
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
         private readonly List<Standard> measureMeans;
+        private readonly Dictionary<String, String> headerFieldsMatch;
 
         /*-------------------------------------------------------------------------*/
 
@@ -30,6 +31,10 @@ namespace Application.Data
             this.getMeasureDataFromFile();
 
             this.getMeasureMeansFromExcelFile();
+
+            this.headerFieldsMatch = new Dictionary<string, string>();
+
+            this.getHeaderFieldsFromFile();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -423,6 +428,23 @@ namespace Application.Data
             }
 
             return null;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void getHeaderFieldsFromFile()
+        {
+            this.headerFieldsMatch["Designation"] = "Designation";
+            this.headerFieldsMatch["PlanNb"] = "N° de plan";
+            this.headerFieldsMatch["Index"] = "Indice";
+            this.headerFieldsMatch["ClientName"] = "Nom du client";
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public Dictionary<String, String> GetHeaderFieldsMatch()
+        {
+            return this.headerFieldsMatch;
         }
 
         /*-------------------------------------------------------------------------*/
