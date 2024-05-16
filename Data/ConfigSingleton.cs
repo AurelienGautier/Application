@@ -12,7 +12,7 @@ namespace Application.Data
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
         private readonly List<Standard> measureMeans;
-        private readonly Dictionary<String, String> headerFieldsMatch;
+        private Dictionary<String, String>? headerFieldsMatch;
 
         /*-------------------------------------------------------------------------*/
 
@@ -434,15 +434,13 @@ namespace Application.Data
 
         private void getHeaderFieldsFromFile()
         {
-            this.headerFieldsMatch["Designation"] = "Designation";
-            this.headerFieldsMatch["PlanNb"] = "N° de plan";
-            this.headerFieldsMatch["Index"] = "Indice";
-            this.headerFieldsMatch["ClientName"] = "Nom du client";
+            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
+            this.headerFieldsMatch = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
         }
 
-        /*-------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------*/
 
-        public Dictionary<String, String> GetHeaderFieldsMatch()
+    public Dictionary<String, String>? GetHeaderFieldsMatch()
         {
             return this.headerFieldsMatch;
         }
