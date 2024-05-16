@@ -399,7 +399,7 @@ namespace Application.Data
                     String code = ws.Cells[currentLine, 1].Value.ToString();
                     String name = ws.Cells[currentLine, 2].Value.ToString();
                     String raccordement = ws.Cells[currentLine + 1, 2].Value.ToString();
-                    String validity = ws.Cells[currentLine + 2, 2].Value.ToString();
+                    String validity = ws.Cells[currentLine + 2, 2].Value.ToString().Substring(0, 10);
 
                     this.measureMeans.Add(new Standard(code, name, raccordement, validity));
 

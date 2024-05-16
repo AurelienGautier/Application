@@ -159,8 +159,11 @@ namespace Application.Writers
                 ws.Cells[standardLine + 1, 1] = "Raccordement:";
                 ws.Cells[standardLine + 1, 4] = standard.Raccordement;
 
+                Excel.Range dateEmplacement = ws.Range[ws.Cells[standardLine + 2, 4], ws.Cells[standardLine + 2, 5]];
+                dateEmplacement.Merge();
+
                 ws.Cells[standardLine + 2, 1] = "Validité:";
-                ws.Cells[standardLine + 2, 5] = standard.Validity;
+                ws.Cells[standardLine + 2, 4] = standard.Validity;
 
                 standardLine += 4;
             }
