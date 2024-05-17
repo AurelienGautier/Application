@@ -622,6 +622,11 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0, 20, 0, 0"/>
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style x:Key="LabelStyle" TargetType="Label" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
     </Application.Resources>
 </Application>
