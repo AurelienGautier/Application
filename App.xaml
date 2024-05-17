@@ -605,5 +605,15 @@
             </Style.Triggers>
         </Style>
         <!--#endregion-->
+        
+        <!--#region TextBox style-->
+        <Style x:Key="TextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="Width" Value="271" />
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Margin" Value="0, 10, 0, 10"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <!--#endregion-->
     </Application.Resources>
 </Application>

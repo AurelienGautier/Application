@@ -17,6 +17,7 @@ namespace Application
         private readonly UI.UserControls.FillFormControl fillFormControl;
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
+        private readonly UI.UserControls.Settings settingsControl;
         public ImageSource logo { get; set; }
 
         [DllImport("Kernel32")]
@@ -31,6 +32,7 @@ namespace Application
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
+            this.settingsControl = new UI.UserControls.Settings();
 
             logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
             Logo.Source = logo;
@@ -63,6 +65,11 @@ namespace Application
         {
             this.addMesureTypeControl.LoadMeasureType(measureType);
             CurrentControl.Content = this.addMesureTypeControl;
+        }
+
+        public void goToSettings(object sender, RoutedEventArgs e)
+        {
+            CurrentControl.Content = this.settingsControl;
         }
 
         /*-------------------------------------------------------------------------*/

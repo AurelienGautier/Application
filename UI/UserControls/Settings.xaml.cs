@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Application.UI.UserControls
 {
@@ -20,9 +9,48 @@ namespace Application.UI.UserControls
     /// </summary>
     public partial class Settings : UserControl
     {
+        String designation;
+        String planNb;
+        String index;
+        String clientName;
+
         public Settings()
         {
             InitializeComponent();
+
+            Dictionary<string, string> headerFields = ConfigSingleton.Instance.GetHeaderFieldsMatch();
+            this.designation = headerFields["Designation"];
+            this.planNb = headerFields["PlanNb"];
+            this.index = headerFields["Index"];
+            this.clientName = headerFields["ClientName"];
+
+            Designation.Text = this.designation;
+            PlanNb.Text = this.planNb;
+            Index.Text = this.index;
+            ClientName.Text = this.clientName;
+        }
+
+        private void saveSettingsClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "")
+            {
+                this.displayError("Tous les champs doivent être remplis");
+                return;
+            }
+
+            ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text);
+
+            this.displaySuccess("Les champs d'en-tête ont été modifiées avec succès");
+        }
+
+        private void displaySuccess(String sucessMessage)
+        {
+            MessageBox.Show(sucessMessage, "Succès", MessageBoxButton.OK, MessageBoxImage.None);
+        }
+
+        private void displayError(String errorMessage)
+        {
+            MessageBox.Show(errorMessage, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Data;
+using Application.Exceptions;
 using Application.Parser;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -115,9 +116,17 @@ namespace Application.UI.UserControls
         {
             List<Standard> standards = new List<Standard>();
 
-            foreach(ComboBoxItem comboBoxItem in ComboBoxItems)
+            var selectedOptions = ComboBoxItems.Select(comboBoxItem => comboBoxItem.SelectedOption);
+
+            foreach (var selectedOption in selectedOptions)
             {
-                standards.Add(ConfigSingleton.Instance.GetStandardFromCode(comboBoxItem.SelectedOption));
+                if (selectedOption == null)
+                    throw new ConfigDataException("Nan mé watzeufeuk ct pa sencé spacé ssa !!!");
+
+                Standard? standard = ConfigSingleton.Instance.GetStandardFromCode(selectedOption);
+                if (standard == null) throw new ConfigDataException("L'étalon sélectionné n'existe pas.");
+
+                standards.Add(standard);
             }
 
             return standards;

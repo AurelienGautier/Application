@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,10 @@ namespace Application.Data
 
         public void FillHeader(Dictionary<String, String> rawHeader)
         {
-            Dictionary<String, String> matchWithFileFields = ConfigSingleton.Instance.GetHeaderFieldsMatch();
+            Dictionary<String, String>? matchWithFileFields = ConfigSingleton.Instance.GetHeaderFieldsMatch();
+
+            if (matchWithFileFields == null)
+                throw new ConfigDataException("Le fichier de configuration contenant les paramètres de l'en-tête est incorrect ou introuvable");
 
             if (rawHeader.ContainsKey(matchWithFileFields["Designation"]))
                 this.Designation = rawHeader[matchWithFileFields["Designation"]];

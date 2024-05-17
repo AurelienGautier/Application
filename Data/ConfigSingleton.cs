@@ -12,7 +12,7 @@ namespace Application.Data
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
         private readonly List<Standard> measureMeans;
-        private Dictionary<String, String>? headerFieldsMatch;
+        private Dictionary<String, String> headerFieldsMatch;
 
         /*-------------------------------------------------------------------------*/
 
@@ -435,14 +435,36 @@ namespace Application.Data
         private void getHeaderFieldsFromFile()
         {
             String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
-            this.headerFieldsMatch = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+
+            Dictionary<String, String>? headerFields = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+
+            if (headerFields == null)
+                throw new Exceptions.ConfigDataException("Le fichier de configuration des champs d'en-tête est incorrect ou a été déplacé.");
+
+            this.headerFieldsMatch = headerFields;
         }
 
-    /*-------------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------------*/
 
-    public Dictionary<String, String>? GetHeaderFieldsMatch()
+        public Dictionary<String, String> GetHeaderFieldsMatch()
         {
             return this.headerFieldsMatch;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void SetHeaderFieldsMatch(String designation, String planNb, String index, String clientName)
+        {
+            this.headerFieldsMatch["Designation"] = designation;
+            this.headerFieldsMatch["PlanNb"] = planNb;
+            this.headerFieldsMatch["Index"] = index;
+            this.headerFieldsMatch["ClientName"] = clientName;
+
+            String json = JsonConvert.SerializeObject(headerFieldsMatch);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\headerFields.json");
+            writer.Write(json);
+            writer.Close();
         }
 
         /*-------------------------------------------------------------------------*/

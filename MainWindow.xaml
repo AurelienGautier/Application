@@ -19,6 +19,7 @@
             <Image x:Name="Logo" Margin="20, 0, 20, 20" Width="240" />
             <Button Click="goToFillForm" Content="Remplir un formulaire" Style="{StaticResource NavBarButton}"/>
             <Button Click="goToMeasureTypes" Content="Types de mesure" Style="{StaticResource NavBarButton}"/>
+            <Button Click="goToSettings" Content="Paramètres" Style="{StaticResource NavBarButton}"/>
             <Button Click="chooseSignature" Content="Choisir une signature" Style="{StaticResource NavBarButton}"/>
         </StackPanel>
 
