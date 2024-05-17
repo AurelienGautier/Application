@@ -86,7 +86,7 @@ namespace Application.Writers
          */
         private void writeHeader(Header header, List<Standard> standards)
         {
-            Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
+            Excel.Worksheet ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["HeaderPage"]];
 
             ws.Cells[form.DesignLine, 4] = header.Designation;
             ws.Cells[form.DesignLine + 2, 4] = header.PlanNb;
@@ -94,7 +94,7 @@ namespace Application.Writers
 
 
             this.writeClient(ws, header.ClientName);
-            this.writeStandards(standards);
+            this.writeStandards(ws, standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -136,10 +136,8 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        private void writeStandards(List<Standard> standards)
+        private void writeStandards(Excel.Worksheet ws, List<Standard> standards)
         {
-            Excel.Worksheet ws = this.workbook.Sheets["Rapport d'essai dimensionnel"];
-
             int linesToShift = standards.Count * 4;
 
             // Décalage des valeurs vers le bas
@@ -199,7 +197,7 @@ namespace Application.Writers
          */
         private void signForm()
         {
-            var _xlSheet = (Excel.Worksheet)workbook.Sheets["Rapport d'essai dimensionnel"];
+            var _xlSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["HeaderPage"]];
 
             Clipboard.SetDataObject(ConfigSingleton.Instance.Signature, true);
             var cellRngImg = (Excel.Range)_xlSheet.Cells[this.form.LineToSign, this.form.ColumnToSign];

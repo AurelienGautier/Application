@@ -9,38 +9,51 @@ namespace Application.UI.UserControls
     /// </summary>
     public partial class Settings : UserControl
     {
-        String designation;
-        String planNb;
-        String index;
-        String clientName;
-
         public Settings()
         {
             InitializeComponent();
 
             Dictionary<string, string> headerFields = ConfigSingleton.Instance.GetHeaderFieldsMatch();
-            this.designation = headerFields["Designation"];
-            this.planNb = headerFields["PlanNb"];
-            this.index = headerFields["Index"];
-            this.clientName = headerFields["ClientName"];
 
-            Designation.Text = this.designation;
-            PlanNb.Text = this.planNb;
-            Index.Text = this.index;
-            ClientName.Text = this.clientName;
+            Designation.Text = headerFields["Designation"];
+            PlanNb.Text = headerFields["PlanNb"];
+            Index.Text = headerFields["Index"];
+            ClientName.Text = headerFields["ClientName"];
+
+            Dictionary<string, string> pageNames = ConfigSingleton.Instance.GetPageNames();
+            HeaderPage.Text = pageNames["HeaderPage"];
+            MeasurePage.Text = pageNames["MeasurePage"];
         }
 
         private void saveSettingsClick(object sender, System.Windows.RoutedEventArgs e)
         {
+            this.saveHeaderFields();
+
+            this.savePageNames();
+
+            this.displaySuccess("Les paramètres ont été sauvegardés avec succès");
+        }
+
+        private void saveHeaderFields()
+        {
             if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "")
             {
-                this.displayError("Tous les champs doivent être remplis");
+                this.displayError("Tous les champs d'en-tête doivent être remplis");
                 return;
             }
 
             ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text);
+        }
 
-            this.displaySuccess("Les champs d'en-tête ont été modifiées avec succès");
+        private void savePageNames()
+        {
+            if(HeaderPage.Text == "" || MeasurePage.Text == "")
+            {
+                this.displayError("Tous les noms de page doivent être remplis");
+                return;
+            }
+
+            ConfigSingleton.Instance.SetPageNames(HeaderPage.Text, MeasurePage.Text);
         }
 
         private void displaySuccess(String sucessMessage)

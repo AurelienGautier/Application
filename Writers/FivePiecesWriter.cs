@@ -29,7 +29,7 @@ namespace Application.Writers
             this.measurePlans = new List<List<String>>();
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
-            this.ws = base.workbook.Sheets["Mesures"];
+            this.ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
             this.min = 0;
             this.max = 5;
 
@@ -58,7 +58,7 @@ namespace Application.Writers
 
             for(int i = 2; i <= TotalPageNumber; i++)
             {
-                workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+                workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
         }
 
@@ -157,7 +157,7 @@ namespace Application.Writers
         {
             this.pageNumber++;
 
-            ws = base.workbook.Sheets["Mesures (" + this.pageNumber.ToString() + ")"];
+            ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")"];
 
             base.currentLine = 17;
             this.linesWritten = 0;
@@ -182,7 +182,7 @@ namespace Application.Writers
             {
                 Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[i];
 
-                if (sheet.Name.Contains("Mesures") && sheet.Name != "Mesures")
+                if (sheet.Name.Contains(ConfigSingleton.Instance.GetPageNames()["MeasurePage"]) && sheet.Name != ConfigSingleton.Instance.GetPageNames()["MeasurePage"])
                 {
                     workbook.Sheets[i].Delete();
                 }
@@ -214,7 +214,7 @@ namespace Application.Writers
         {
             startCol += firstLine.ToString();
             endCol += (firstLine + MAX_LINES).ToString();
-            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets["Mesures"];
+            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
             Excel.Range rangeToDelete = measuresSheet.Range[startCol + ":" + endCol];
             rangeToDelete.ClearContents();
         }

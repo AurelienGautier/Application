@@ -13,6 +13,7 @@ namespace Application.Data
         public Image? Signature { get; set; }
         private readonly List<Standard> measureMeans;
         private Dictionary<String, String> headerFieldsMatch;
+        private Dictionary<String, String> pageNames;
 
         /*-------------------------------------------------------------------------*/
 
@@ -35,6 +36,10 @@ namespace Application.Data
             this.headerFieldsMatch = new Dictionary<string, string>();
 
             this.getHeaderFieldsFromFile();
+
+            this.pageNames = new Dictionary<string, string>();
+
+            this.getPageNamesFromFile();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -465,6 +470,41 @@ namespace Application.Data
             StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\headerFields.json");
             writer.Write(json);
             writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void getPageNamesFromFile()
+        {
+            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
+
+            Dictionary<String, String>? pageNamesFromFile = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+
+            if (pageNamesFromFile == null)
+                throw new Exceptions.ConfigDataException("Le fichier de configuration des noms de pages est incorrect ou a été déplacé.");
+
+            this.pageNames = pageNamesFromFile;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void SetPageNames(String headerPage, String measurePage)
+        {
+            this.pageNames["HeaderPage"] = headerPage;
+            this.pageNames["MeasurePage"] = measurePage;
+
+            String json = JsonConvert.SerializeObject(pageNames);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\pageNames.json");
+            writer.Write(json);
+            writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public Dictionary<String, String> GetPageNames()
+        {
+            return this.pageNames;
         }
 
         /*-------------------------------------------------------------------------*/

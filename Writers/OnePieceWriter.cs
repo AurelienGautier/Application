@@ -34,7 +34,7 @@ namespace Application.Writers
 
             for (int i = 2; i <= pageNumber; i++)
             {
-                workbook.Sheets["Mesures"].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+                workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
             }
         }
 
@@ -46,7 +46,7 @@ namespace Application.Writers
          */
         public override void WritePiecesValues()
         {
-            Excel.Worksheet ws = base.workbook.Sheets["Mesures"];
+            Excel.Worksheet ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
 
             List<String> measurePlans = pieces[0].GetMeasurePlans();
             List<List<Data.Data>> pieceData = pieces[0].GetData();
@@ -69,7 +69,7 @@ namespace Application.Writers
                 {
                     pageNumber++;
 
-                    ws = this.workbook.Sheets["Mesures (" + pageNumber.ToString() + ")"];
+                    ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")"];
 
                     base.currentLine -= linesWritten;
                     linesWritten = 0;
@@ -91,7 +91,7 @@ namespace Application.Writers
                     {
                         pageNumber++;
 
-                        ws = this.workbook.Sheets["Mesures (" + pageNumber.ToString() + ")"];
+                        ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")"];
 
                         base.currentLine -= linesWritten;
                         linesWritten = 0;
@@ -117,7 +117,7 @@ namespace Application.Writers
             {
                 Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[i];
 
-                if (sheet.Name.Contains("Mesures") && sheet.Name != "Mesures")
+                if (sheet.Name.Contains(ConfigSingleton.Instance.GetPageNames()["MeasurePage"]) && sheet.Name != ConfigSingleton.Instance.GetPageNames()["MeasurePage"])
                 {
                     workbook.Sheets[i].Delete();
                 }
@@ -128,7 +128,7 @@ namespace Application.Writers
             // Supprimer les mesures de la première page de mesures
             String start = "B" + firstLine.ToString();
             String end = "I" + (firstLine + MAX_LINES).ToString();
-            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets["Mesures"];
+            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
             Excel.Range rangeToDelete = measuresSheet.Range[start + ":" + end];
             rangeToDelete.ClearContents();
         }
