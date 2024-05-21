@@ -116,9 +116,12 @@ namespace Application.Writers
                 // Pour chaque mesure du plan
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
-                    ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].NominalValue;
-                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].TolerancePlus;
-                    ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].ToleranceMinus;
+                    if(!base.form.Modify)
+                    {
+                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].NominalValue;
+                        ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].TolerancePlus;
+                        ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].ToleranceMinus;
+                    }
 
                     base.currentColumn += 3;
 

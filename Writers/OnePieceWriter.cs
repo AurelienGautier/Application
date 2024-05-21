@@ -74,10 +74,14 @@ namespace Application.Writers
                 // Écriture des données ligne par ligne
                 for (int j = 0; j < pieceData[i].Count; j++)
                 {
-                    ws.Cells[base.currentLine, base.currentColumn + 1].Value = pieceData[i][j].Symbol;
-                    ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[i][j].NominalValue;
-                    ws.Cells[base.currentLine, base.currentColumn + 4].Value = pieceData[i][j].TolerancePlus;
-                    ws.Cells[base.currentLine, base.currentColumn + 5].Value = pieceData[i][j].ToleranceMinus;
+                    if(!base.form.Modify)
+                    {
+                        ws.Cells[base.currentLine, base.currentColumn + 1].Value = pieceData[i][j].Symbol;
+                        ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[i][j].NominalValue;
+                        ws.Cells[base.currentLine, base.currentColumn + 4].Value = pieceData[i][j].TolerancePlus;
+                        ws.Cells[base.currentLine, base.currentColumn + 5].Value = pieceData[i][j].ToleranceMinus;
+                    }
+
                     ws.Cells[base.currentLine, base.currentColumn + 6].Value = pieceData[i][j].Value;
 
                     base.currentLine++;
