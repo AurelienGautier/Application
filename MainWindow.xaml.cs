@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -20,14 +19,12 @@ namespace Application
         private readonly UI.UserControls.Settings settingsControl;
         public ImageSource logo { get; set; }
 
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
+        private bool measureTypesWarning = false;
+        private bool settingsWarning = false;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            AllocConsole();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
@@ -51,6 +48,12 @@ namespace Application
 
         public void goToMeasureTypes(object sender, RoutedEventArgs e)
         {
+            if(!this.measureTypesWarning)
+            {
+                DisplayWarning("Attention, la modification des types de mesures peut entraîner des erreurs dans des fichiers corrects. Ne modifiez les types de mesures que si vous savez ce que vous faites.");
+                this.measureTypesWarning = true;
+            }
+
             this.measureTypesControl.BindData();
             CurrentControl.Content = this.measureTypesControl;
         }
@@ -69,6 +72,12 @@ namespace Application
 
         public void goToSettings(object sender, RoutedEventArgs e)
         {
+            if(!this.settingsWarning)
+            {
+                DisplayWarning("Attention, la modification des paramètres peut entraîner des erreurs dans les formulaires remplis. Ne modifiez les paramètres que si vous savez ce que vous faites.");
+                this.settingsWarning = true;
+            }
+
             CurrentControl.Content = this.settingsControl;
         }
 
@@ -114,6 +123,20 @@ namespace Application
             MessageBox.Show(errorMessage, caption, button, icon, MessageBoxResult.Yes);
         }
 
+        /*-------------------------------------------------------------------------*/
+        
+        /**
+         * DisplayWarning permet d'afficher une fenêtre d'avertissement avec un message d'avertissement donné.
+         */
+        public static void DisplayWarning(String warningMessage)
+        {
+            String caption = "Avertissement";
+            MessageBoxButton button = MessageBoxButton.OK;
+            MessageBoxImage icon = MessageBoxImage.Warning;
+
+            MessageBox.Show(warningMessage, caption, button, icon, MessageBoxResult.Yes);
+        }
+        
         /*-------------------------------------------------------------------------*/
     }
 }
