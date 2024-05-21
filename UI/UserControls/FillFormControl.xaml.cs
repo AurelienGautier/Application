@@ -2,6 +2,7 @@
 using Application.Exceptions;
 using Application.Parser;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,8 +18,8 @@ namespace Application.UI.UserControls
         List<String> machines;
         ObservableCollection<Form> forms;
 
-        public ObservableCollection<ComboBoxItem> ComboBoxItems { get; }
-        public ObservableCollection<String> AvailableOptions { get; }
+        private BindingList<ComboBoxItem> ComboBoxItems;
+        private BindingList<String> AvailableOptions;
 
         /*-------------------------------------------------------------------------*/
 
@@ -39,9 +40,10 @@ namespace Application.UI.UserControls
             Forms.SelectedIndex = 0;
 
             // Ajout des attributs code de chaque élément de standards à AvailableOptions
-            AvailableOptions = new ObservableCollection<string>(ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code));
+            List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
+            AvailableOptions = new BindingList<string>(standards);
 
-            ComboBoxItems = new ObservableCollection<ComboBoxItem>();
+            ComboBoxItems = new BindingList<ComboBoxItem>();
 
             ComboBoxItem firstComboBox = new ComboBoxItem { AvailableOptions = AvailableOptions };
             firstComboBox.SelectedOption = AvailableOptions[0];
@@ -49,6 +51,21 @@ namespace Application.UI.UserControls
             ComboBoxItems.Add(firstComboBox);
 
             Standards.ItemsSource = ComboBoxItems;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void BindData()
+        {
+            List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
+            AvailableOptions = new BindingList<string>(standards);
+
+            for (int i = 0; i < this.ComboBoxItems.Count; i++)
+            {
+                this.ComboBoxItems[i].AvailableOptions = this.AvailableOptions;
+            }
+
+            Standards.ItemsSource = this.ComboBoxItems;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -183,7 +200,7 @@ namespace Application.UI.UserControls
 
     public class ComboBoxItem
     {
-        public ObservableCollection<string>? AvailableOptions { get; set; }
+        public BindingList<string>? AvailableOptions { get; set; }
         public string? SelectedOption { get; set; }
     }
 }

@@ -127,7 +127,7 @@ namespace Application.Writers
 
             // Supprimer les mesures de la première page de mesures
             String start = "B" + firstLine.ToString();
-            String end = "I" + (firstLine + MAX_LINES).ToString();
+            String end = "G" + (firstLine + MAX_LINES).ToString();
             Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
             Excel.Range rangeToDelete = measuresSheet.Range[start + ":" + end];
             rangeToDelete.ClearContents();

@@ -613,6 +613,7 @@
             <Setter Property="Margin" Value="0, 10, 0, 10"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
         </Style>
         <!--#endregion-->
 

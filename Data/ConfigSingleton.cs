@@ -11,7 +11,7 @@ namespace Application.Data
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
-        private readonly List<Standard> measureMeans;
+        private List<Standard> standards;
         private Dictionary<String, String> headerFieldsMatch;
         private Dictionary<String, String> pageNames;
 
@@ -27,11 +27,11 @@ namespace Application.Data
 
             this.Signature = this.getSignatureFromFile();
 
-            this.measureMeans = new List<Standard>();
+            this.standards = new List<Standard>();
 
             this.getMeasureDataFromFile();
 
-            this.getMeasureMeansFromExcelFile();
+            this.getStandardsFromJsonFile();
 
             this.headerFieldsMatch = new Dictionary<string, string>();
 
@@ -379,10 +379,8 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        private void getMeasureMeansFromExcelFile()
+        private void getStandardsFromExcelFile()
         {
-            this.measureMeans.Add(new Standard("", "", "", ""));
-
             Excel.Application excelApp = new Excel.Application();
 
             Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\conf\\etalons");
@@ -406,7 +404,7 @@ namespace Application.Data
                     String raccordement = ws.Cells[currentLine + 1, 2].Value.ToString();
                     String validity = ws.Cells[currentLine + 2, 2].Value.ToString().Substring(0, 10);
 
-                    this.measureMeans.Add(new Standard(code, name, raccordement, validity));
+                    this.standards.Add(new Standard(code, name, raccordement, validity));
 
                     currentLine += 3;
                 }
@@ -418,19 +416,46 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        private void getStandardsFromJsonFile()
+        {
+            this.standards.Add(new Standard("", "", "", ""));
+
+            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
+
+            List<Standard>? standardsFromFile = JsonConvert.DeserializeObject<List<Standard>>(json);
+
+            if(standardsFromFile != null) this.standards = standardsFromFile;
+        }   
+
+        /*-------------------------------------------------------------------------*/
+
+        public void UpdateStandards()
+        {
+            this.getStandardsFromExcelFile();
+
+            String json = JsonConvert.SerializeObject(this.standards);
+
+            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\standards.json");
+            writer.Write(json);
+            writer.Close();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         public List<Standard> GetStandards()
         {
-            return this.measureMeans;
+            return this.standards;
         }
 
         /*-------------------------------------------------------------------------*/
 
         public Standard? GetStandardFromCode(String code)
         {
-            foreach (Standard standard in this.measureMeans)
-            {
-                if (standard.Code == code) return standard;
-            }
+            if(this.standards != null)
+                foreach (Standard standard in this.standards)
+                {
+                    if (standard.Code == code) return standard;
+                }
 
             return null;
         }

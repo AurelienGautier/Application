@@ -121,7 +121,7 @@ namespace Application.Writers
             {
                 address = ws2.Cells[currentLineWs2, 3].Value;
                 bp = ws2.Cells[currentLineWs2, 4].Value;
-                postalCode = ws2.Cells[currentLineWs2, 5].Value;
+                postalCode = ws2.Cells[currentLineWs2, 5].Value.ToString();
                 city = ws2.Cells[currentLineWs2, 6].Value;
             }
 

@@ -25,6 +25,8 @@ namespace Application.UI.UserControls
             MeasurePage.Text = pageNames["MeasurePage"];
         }
 
+        /*-------------------------------------------------------------------------*/
+
         private void saveSettingsClick(object sender, System.Windows.RoutedEventArgs e)
         {
             this.saveHeaderFields();
@@ -33,6 +35,8 @@ namespace Application.UI.UserControls
 
             this.displaySuccess("Les paramètres ont été sauvegardés avec succès");
         }
+
+        /*-------------------------------------------------------------------------*/
 
         private void saveHeaderFields()
         {
@@ -45,6 +49,8 @@ namespace Application.UI.UserControls
             ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text);
         }
 
+        /*-------------------------------------------------------------------------*/
+
         private void savePageNames()
         {
             if(HeaderPage.Text == "" || MeasurePage.Text == "")
@@ -56,14 +62,29 @@ namespace Application.UI.UserControls
             ConfigSingleton.Instance.SetPageNames(HeaderPage.Text, MeasurePage.Text);
         }
 
+        /*-------------------------------------------------------------------------*/
+
+        private void updateStandards(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ConfigSingleton.Instance.UpdateStandards();
+
+            this.displaySuccess("Les standards ont été mis à jour avec succès");
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         private void displaySuccess(String sucessMessage)
         {
             MessageBox.Show(sucessMessage, "Succès", MessageBoxButton.OK, MessageBoxImage.None);
         }
 
+        /*-------------------------------------------------------------------------*/
+
         private void displayError(String errorMessage)
         {
             MessageBox.Show(errorMessage, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

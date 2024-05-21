@@ -43,6 +43,7 @@ namespace Application
 
         private void goToFillForm(object sender, RoutedEventArgs e)
         {
+            this.fillFormControl.BindData();
             CurrentControl.Content = this.fillFormControl;
         }
 
