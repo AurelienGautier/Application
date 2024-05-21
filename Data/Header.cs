@@ -13,6 +13,9 @@ namespace Application.Data
         public String PlanNb { get; set; }
         public String Index { get; set; }
         public String ClientName { get; set; }
+        public String ObservationNum { get; set; }
+        public String PieceReceptionDate { get; set; }
+        public String Observations { get; set; }
 
         public Header()
         {
@@ -20,6 +23,9 @@ namespace Application.Data
             this.PlanNb = "";
             this.Index = "";
             this.ClientName = "";
+            this.ObservationNum = "";
+            this.PieceReceptionDate = "";
+            this.Observations = "";
         }
 
         public void FillHeader(Dictionary<String, String> rawHeader)
@@ -40,6 +46,15 @@ namespace Application.Data
             
             if (rawHeader.ContainsKey(matchWithFileFields["ClientName"]))
                 this.ClientName = rawHeader[matchWithFileFields["ClientName"]];
+
+            if (rawHeader.ContainsKey(matchWithFileFields["ObservationNum"]))
+                this.ObservationNum = rawHeader[matchWithFileFields["ObservationNum"]];
+
+            if (rawHeader.ContainsKey(matchWithFileFields["PieceReceptionDate"]))
+                this.PieceReceptionDate = rawHeader[matchWithFileFields["PieceReceptionDate"]];
+
+            if (rawHeader.ContainsKey(matchWithFileFields["Observations"]))
+                this.Observations = rawHeader[matchWithFileFields["Observations"]];
         }   
     }
 }

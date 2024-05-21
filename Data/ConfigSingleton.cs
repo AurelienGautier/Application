@@ -483,12 +483,15 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        public void SetHeaderFieldsMatch(String designation, String planNb, String index, String clientName)
+        public void SetHeaderFieldsMatch(String designation, String planNb, String index, String clientName, String observationNum, String pieceReceptionDate, String observations)
         {
             this.headerFieldsMatch["Designation"] = designation;
             this.headerFieldsMatch["PlanNb"] = planNb;
             this.headerFieldsMatch["Index"] = index;
             this.headerFieldsMatch["ClientName"] = clientName;
+            this.headerFieldsMatch["ObservationNum"] = observationNum;
+            this.headerFieldsMatch["PieceReceptionDate"] = pieceReceptionDate;
+            this.headerFieldsMatch["Observations"] = observations;
 
             String json = JsonConvert.SerializeObject(headerFieldsMatch);
 

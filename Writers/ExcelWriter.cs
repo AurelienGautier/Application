@@ -91,7 +91,9 @@ namespace Application.Writers
             ws.Cells[form.DesignLine, 4] = header.Designation;
             ws.Cells[form.DesignLine + 2, 4] = header.PlanNb;
             ws.Cells[form.DesignLine + 4, 4] = header.Index;
-
+            ws.Cells[14, 1] = "N° " + header.PlanNb;
+            ws.Cells[38, 8] = header.PieceReceptionDate;
+            ws.Cells[40, 4] = header.Observations;
 
             this.writeClient(ws, header.ClientName);
             this.writeStandards(ws, standards);

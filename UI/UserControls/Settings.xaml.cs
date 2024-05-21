@@ -19,6 +19,9 @@ namespace Application.UI.UserControls
             PlanNb.Text = headerFields["PlanNb"];
             Index.Text = headerFields["Index"];
             ClientName.Text = headerFields["ClientName"];
+            ObservationNum.Text = headerFields["ObservationNum"];
+            PieceReceptionDate.Text = headerFields["PieceReceptionDate"];
+            Observations.Text = headerFields["Observations"];
 
             Dictionary<string, string> pageNames = ConfigSingleton.Instance.GetPageNames();
             HeaderPage.Text = pageNames["HeaderPage"];
@@ -40,13 +43,13 @@ namespace Application.UI.UserControls
 
         private void saveHeaderFields()
         {
-            if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "")
+            if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "" || ObservationNum.Text == "" || PieceReceptionDate.Text == "" || Observations.Text == "")
             {
                 this.displayError("Tous les champs d'en-tête doivent être remplis");
                 return;
             }
 
-            ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text);
+            ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text, ObservationNum.Text, PieceReceptionDate.Text, Observations.Text);
         }
 
         /*-------------------------------------------------------------------------*/

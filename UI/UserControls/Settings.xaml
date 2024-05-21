@@ -33,17 +33,26 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Content="Désignation" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
                 <Label Grid.Row="1" Grid.Column="0" Content="Numéro de plan" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
                 <Label Grid.Row="2" Grid.Column="0" Content="Indice" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
                 <Label Grid.Row="3" Grid.Column="0" Content="Nom du client" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
+                <Label Grid.Row="4" Grid.Column="0" Content="Numéro de constat" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
+                <Label Grid.Row="5" Grid.Column="0" Content="Date de réception pièce" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
+                <Label Grid.Row="6" Grid.Column="0" Content="Observations" Style="{StaticResource LabelStyle}" VerticalAlignment="Center" />
 
                 <TextBox x:Name="Designation" Grid.Row="0" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
                 <TextBox x:Name="PlanNb" Grid.Row="1" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
                 <TextBox x:Name="Index" Grid.Row="2" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
                 <TextBox x:Name="ClientName" Grid.Row="3" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
+                <TextBox x:Name="ObservationNum" Grid.Row="4" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
+                <TextBox x:Name="PieceReceptionDate" Grid.Row="5" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
+                <TextBox x:Name="Observations" Grid.Row="6" Grid.Column="1" Style="{StaticResource TextBoxStyle}" />
             </Grid>
 
             <TextBlock Grid.Row="2" Text="Noms des pages dans le rapport" Style="{StaticResource TextBlockStyle}" />
