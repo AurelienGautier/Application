@@ -11,10 +11,6 @@ namespace Application.Writers
 
         public OnePieceWriter(string fileName, Form form) : base(fileName, form)
         {
-            if(form.Modify)
-            {
-                this.EraseData(form.FirstLine);
-            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -98,39 +94,6 @@ namespace Application.Writers
                     }
                 }
             }
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * Efface les mesures des pages Excel.
-         * 
-         * Supprime toutes les pages dont le nom contient Mesures sauf la page Mesures.
-         * Supprime les mesures de la première page de mesures.
-         */
-        public override void EraseData(int firstLine)
-        {
-            this.excelApp.DisplayAlerts = false;
-
-            // Supprimer toutes les pages dont le nom contient Mesures sauf la page Mesures
-            for (int i = workbook.Sheets.Count; i >= 1; i--)
-            {
-                Excel.Worksheet sheet = (Excel.Worksheet)workbook.Sheets[i];
-
-                if (sheet.Name.Contains(ConfigSingleton.Instance.GetPageNames()["MeasurePage"]) && sheet.Name != ConfigSingleton.Instance.GetPageNames()["MeasurePage"])
-                {
-                    workbook.Sheets[i].Delete();
-                }
-            }
-
-            this.excelApp.DisplayAlerts = true;
-
-            // Supprimer les mesures de la première page de mesures
-            String start = "B" + firstLine.ToString();
-            String end = "G" + (firstLine + MAX_LINES).ToString();
-            Excel.Worksheet measuresSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
-            Excel.Range rangeToDelete = measuresSheet.Range[start + ":" + end];
-            rangeToDelete.ClearContents();
         }
 
         /*-------------------------------------------------------------------------*/

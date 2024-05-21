@@ -58,7 +58,7 @@ namespace Application.Writers
 
             writeHeader(data[0].GetHeader(), standards);
 
-            CreateWorkSheets();
+            if(!form.Modify) CreateWorkSheets();
 
             WritePiecesValues();
 
@@ -251,16 +251,6 @@ namespace Application.Writers
             workbook.Close();
             excelApp.Quit();
         }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * EraseData
-         * 
-         * Efface les mesures présentes dans le fichier afin d'en écrire de nouvelles
-         * 
-         */
-        public abstract void EraseData(int firstLine);
 
         /*-------------------------------------------------------------------------*/
     }
