@@ -60,12 +60,13 @@ namespace Application.UI.UserControls
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
             AvailableOptions = new BindingList<string>(standards);
 
-            for (int i = 0; i < this.ComboBoxItems.Count; i++)
+            foreach (var comboBoxItem in ComboBoxItems)
             {
-                this.ComboBoxItems[i].AvailableOptions = this.AvailableOptions;
+                comboBoxItem.AvailableOptions = AvailableOptions;
             }
 
-            Standards.ItemsSource = this.ComboBoxItems;
+            Standards.ItemsSource = ComboBoxItems;
+            Standards.Items.Refresh();
         }
 
         /*-------------------------------------------------------------------------*/
