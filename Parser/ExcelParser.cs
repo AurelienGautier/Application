@@ -1,17 +1,12 @@
-﻿using Excel = Microsoft.Office.Interop.Excel;
+﻿using Application.Writers;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Parser
 {
     internal class ExcelParser : Parser
     {
-        protected Excel.Application excelApp;
-        protected Excel.Workbook? workbook;
-
-        /*-------------------------------------------------------------------------*/
-
         public ExcelParser()
         {
-            this.excelApp = new Excel.Application();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -19,21 +14,22 @@ namespace Application.Parser
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
             base.dataParsed = new List<Data.Piece>();
-            this.workbook = excelApp.Workbooks.Open(fileToParse);
+            ExcelApiLinkSingleton excelApiLink = ExcelApiLinkSingleton.Instance;
 
-            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Sheets[1];
+            excelApiLink.OpenWorkBook(fileToParse);
+            excelApiLink.ChangeWorkSheet(fileToParse, 1);
 
             int row = 6;
             int col = 4;
 
-            bool multiplePieces = worksheet.Cells[35, 1].Value == "Calcul";
+            bool multiplePieces = excelApiLink.ReadCell(fileToParse, 35, 1) == "Calcul";
             int nbPieces = 1;
             base.dataParsed.Add(new Data.Piece());
 
             // Vérifie s'il y a une ou plusieurs pièces
             if(multiplePieces)
             {
-                nbPieces = this.getPiecesNumber(worksheet);
+                nbPieces = this.getPiecesNumber(fileToParse);
 
                 for(int i = 1; i < nbPieces; i++)
                 {
@@ -43,20 +39,19 @@ namespace Application.Parser
 
             String libelle = "";
 
-            while (worksheet.Cells[row, col].Value != null)
+            while(excelApiLink.ReadCell(fileToParse, row, col) != null)
             {
-                libelle = worksheet.Cells[row + 7, col].Value;
+                libelle = excelApiLink.ReadCell(fileToParse, row + 7, col);
 
-                double nominalValue = worksheet.Cells[row, col].Value;
-                double tolPlus = worksheet.Cells[row + 2, col].Value;
-                double tolMinus = worksheet.Cells[row + 1, col].Value;
+                double nominalValue = Convert.ToDouble(excelApiLink.ReadCell(fileToParse, row, col));
+                double tolPlus = Convert.ToDouble(excelApiLink.ReadCell(fileToParse, row + 2, col));
+                double tolMinus = Convert.ToDouble(excelApiLink.ReadCell(fileToParse, row + 1, col));
 
                 Data.MeasureType? measureType = Data.ConfigSingleton.Instance.GetMeasureTypeFromLibelle(libelle);
                 if(measureType == null)
                 {
-                    String cellName = worksheet.Cells[row + 7, col].Address;
-                    this.workbook.Close();
-                    this.excelApp.Quit();
+                    String cellName = excelApiLink.GetCellAddress(row + 7, col);
+                    excelApiLink.CloseWorkBook(fileToParse);
                     throw new Exceptions.MeasureTypeNotFoundException(libelle, fileToParse, cellName);
                 }
 
@@ -72,7 +67,7 @@ namespace Application.Parser
                     data.TolerancePlus = tolPlus;
                     data.ToleranceMinus = tolMinus;
                     data.Symbol = symbol;
-                    data.Value =  worksheet.Cells[valueRow + i, col].Value;
+                    data.Value = Convert.ToDouble(excelApiLink.ReadCell(fileToParse, valueRow + i, col));
 
                     base.dataParsed[i].AddData(data);
                 }
@@ -80,22 +75,21 @@ namespace Application.Parser
                 col++;
             }
 
-            this.workbook.Close();
-            this.excelApp.Quit();
+            excelApiLink.CloseWorkBook(fileToParse);
 
             return base.dataParsed;
         }
 
         /*-------------------------------------------------------------------------*/
 
-        private int getPiecesNumber(Excel.Worksheet ws)
+        private int getPiecesNumber(String fileToParse)
         {
             int row = 118;
             int nbPieces = 0;
 
-            while (ws.Cells[row, 1].Value != null)
+            while (ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != null)
             {
-                nbPieces = (int)ws.Cells[row, 1].Value;
+                nbPieces = Convert.ToInt32(ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1));
                 row++;
             }
 
