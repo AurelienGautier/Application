@@ -55,6 +55,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /**
+         * Permet de mettre à jour les données concernant les étalons
+         */
         public void BindData()
         {
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();

@@ -24,31 +24,41 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="Machine" Style="{StaticResource BaseStyle}" />
-            <Label Grid.Row="1" Content="Formulaire" Style="{StaticResource BaseStyle}" />
-            <Label Grid.Row="2" Content="Étalons" Style="{StaticResource BaseStyle}" />
+            <Label Grid.Row="0" Content="Machine" Margin="0, 0, 0, 20" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 20" Style="{StaticResource ComboBoxStyle1}" x:Name="Machines" SelectionChanged="changeMachine"/>
+
+            <Label Grid.Row="1" Content="Formulaire" Margin="0, 0, 0, 20" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 20" x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White"/>
+
+            <Label Grid.Row="2" Content="Étalons" Style="{StaticResource BaseStyle}" VerticalAlignment="Top" Margin="0, 10, 0, 0"/>
+            <StackPanel Grid.Row="2" Grid.Column="1" Margin="0, 0, 0, 20">
+                <ItemsControl Grid.Row="2" Grid.Column="1" x:Name="Standards">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                <ComboBox x:Name="TextBox" Grid.Column="0" Style="{StaticResource ComboBoxStyle1}" Width="248" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}"/>
+
+                                    <Button Grid.Column="1" Style="{StaticResource DeleteButtonStyle}" Click="RemoveStandard_Click" Content="X" Height="46" />
+                                </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource EditButtonStyle}" Click="AddStandard_Click" Width="100" Margin="0, 20, 0, 0">
+                    <Icon:PackIconMaterial Kind="Plus" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
+                </Button>
+            </StackPanel>
+
             <Label Grid.Row="3" Content="Signer" Style="{StaticResource BaseStyle}" />
-
-            <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ComboBoxStyle1}" x:Name="Machines" SelectionChanged="changeMachine"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White"/>
-
-            <ItemsControl Grid.Row="2" Grid.Column="1" x:Name="Standards">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <ComboBox Style="{StaticResource ComboBoxStyle1}" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}" />
-                            <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource DeleteButtonStyle}" Click="RemoveStandard_Click" Margin="5, 0, 0, 0">
-                                <Icon:PackIconMaterial Kind="DeleteOutline" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
-                            </Button>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
-            <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource EditButtonStyle}" Click="AddStandard_Click">
-                <Icon:PackIconMaterial Kind="Plus" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
-            </Button>
-
             <CheckBox Grid.Row="3" Grid.Column="1" Style="{StaticResource CheckBoxStyle}" x:Name="SignForm"/>
 
             <DockPanel Grid.Row="4" Grid.Column="1" LastChildFill="False" Margin="0, 0, 0, 0" HorizontalAlignment="Center">
