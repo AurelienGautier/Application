@@ -9,7 +9,6 @@ namespace Application.Writers
         private readonly List<List<String>> measurePlans;
         private readonly List<List<List<Data.Data>>> pieceData;
         private int linesWritten;
-        private Excel.Worksheet ws;
         private int min;
         private int max;
         private const int MAX_LINES = 23;
@@ -29,7 +28,7 @@ namespace Application.Writers
             this.measurePlans = new List<List<String>>();
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
-            this.ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
             this.min = 0;
             this.max = 5;
         }
@@ -53,7 +52,7 @@ namespace Application.Writers
 
             for(int i = 2; i <= TotalPageNumber; i++)
             {
-                workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
         }
 
@@ -105,7 +104,7 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measurePlans[0][i] != "")
                 {
-                    ws.Cells[base.currentLine, base.currentColumn].Value = measurePlans[0][i];
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
                     base.currentLine++;
                     this.linesWritten++;
                 }
@@ -118,9 +117,9 @@ namespace Application.Writers
                 {
                     if(!base.form.Modify)
                     {
-                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[0][i][j].NominalValue;
-                        ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[0][i][j].TolerancePlus;
-                        ws.Cells[base.currentLine, base.currentColumn + 3].Value = pieceData[0][i][j].ToleranceMinus;
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].NominalValue.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus.ToString());
                     }
 
                     base.currentColumn += 3;
@@ -129,7 +128,7 @@ namespace Application.Writers
                     for(int k = this.min; k < this.max; k++)
                     {
                         base.currentColumn += 3;
-                        ws.Cells[base.currentLine, base.currentColumn].Value = pieceData[k][i][j].Value;
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[k][i][j].Value.ToString());
                     }
 
                     base.currentColumn -= (3 + 3 * (this.max - this.min));
@@ -154,8 +153,7 @@ namespace Application.Writers
         public void ChangePage()
         {
             this.pageNumber++;
-
-            ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")"];
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
 
             base.currentLine = 17;
             this.linesWritten = 0;
@@ -164,7 +162,7 @@ namespace Application.Writers
 
             for (int i = this.min; i < this.min + 5; i++)
             {
-                ws.Cells[15, col].Value = i + 1;
+                excelApiLink.WriteCell(form.Path, 15, col, (i + 1).ToString());
                 col += 3;
             }
         }

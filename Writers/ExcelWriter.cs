@@ -1,6 +1,4 @@
-﻿using Excel = Microsoft.Office.Interop.Excel;
-using System.Windows;
-using Application.Data;
+﻿using Application.Data;
 using Application.Exceptions;
 
 namespace Application.Writers
@@ -8,21 +6,15 @@ namespace Application.Writers
     internal abstract class ExcelWriter
     {
         private readonly string fileToSavePath;
-
-        protected Excel.Application excelApp;
-        protected Excel.Workbook workbook;
-
         protected int currentLine;
         protected int currentColumn;
         protected List<Data.Piece> pieces;
-
         protected Form form;
+        protected ExcelApiLinkSingleton excelApiLink;
 
         /*-------------------------------------------------------------------------*/
 
         /**
-         * ExcelWriter
-         * 
          * Constructeur de la classe
          * fileName : string - Chemin du fichier à sauvegarder
          * line : int - Ligne de la première cellule à remplir
@@ -37,17 +29,16 @@ namespace Application.Writers
             this.currentColumn = form.FirstColumn;
             this.form = form;
 
-            this.excelApp = new Excel.Application();
-            this.workbook = excelApp.Workbooks.Open(form.Path);
+            ExcelApiLinkSingleton.Instance.OpenWorkBook(form.Path);
 
             this.pieces = new List<Data.Piece>();
+
+            this.excelApiLink = ExcelApiLinkSingleton.Instance;
         }
 
         /*-------------------------------------------------------------------------*/
 
         /**
-         * WriteData
-         * 
          * Ecrit les données des pièces dans le fichier excel
          * data : List<Piece> - Liste des pièces à écrire
          * 
@@ -58,7 +49,7 @@ namespace Application.Writers
 
             writeHeader(data[0].GetHeader(), standards);
 
-            if(!form.Modify) CreateWorkSheets();
+            if (!form.Modify) CreateWorkSheets();
 
             WritePiecesValues();
 
@@ -69,16 +60,13 @@ namespace Application.Writers
                 exportFirstPageToPdf();
             }
 
-
             saveAndQuit();
         }
 
         /*-------------------------------------------------------------------------*/
 
         /**
-         * WriteHeader
-         * 
-         * Remplit l'entête du rapport Excel
+         * Remplit l'en-tête du rapport Excel
          * 
          * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
          * designLine : int - Numéro de la ligne où écrire la désignation
@@ -86,30 +74,38 @@ namespace Application.Writers
          */
         private void writeHeader(Header header, List<Standard> standards)
         {
-            Excel.Worksheet ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["HeaderPage"]];
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
 
-            ws.Cells[form.DesignLine, 4] = header.Designation;
-            ws.Cells[form.DesignLine + 2, 4] = header.PlanNb;
-            ws.Cells[form.DesignLine + 4, 4] = header.Index;
-            ws.Cells[14, 1] = "N° " + header.PlanNb;
-            ws.Cells[38, 8] = header.PieceReceptionDate;
-            ws.Cells[40, 4] = header.Observations;
+            excelApiLink.WriteCell(form.Path, form.DesignLine, 4, header.Designation);
+            excelApiLink.WriteCell(form.Path, form.DesignLine + 2, 4, header.PlanNb);
+            excelApiLink.WriteCell(form.Path, form.DesignLine + 4, 4, header.Index);
+            excelApiLink.WriteCell(form.Path, 14, 1, header.PlanNb);
+            excelApiLink.WriteCell(form.Path, 38, 8, header.PieceReceptionDate);
+            excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
 
-            this.writeClient(ws, header.ClientName);
-            this.writeStandards(ws, standards);
+            this.writeClient(header.ClientName);
+            this.writeStandards(standards);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        private void writeClient(Excel.Worksheet ws, String client)
+        /**
+         * Remplit les informations du client dans l'en-tête du formulaire en allant les chercher dans le fichier des clients
+         * 
+         * client : String - Nom du client
+         * 
+         */
+        private void writeClient(String client)
         {
-            Excel.Workbook workbook2 = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\res\\ADRESSE");
-            Excel.Worksheet ws2 = workbook2.Sheets["ADRESSE"];
+            String clientWorkbookPath = Environment.CurrentDirectory + "\\res\\ADRESSE";
+            excelApiLink.OpenWorkBook(clientWorkbookPath);
+            excelApiLink.ChangeWorkSheet(clientWorkbookPath, "ADRESSE");
 
             int currentLineWs2 = 2;
 
             // Tant que la ligne actuelle n'est pas vide et que le client n'a pas été trouvé
-            while (ws2.Cells[currentLineWs2, 2].Value != null && ws2.Cells[currentLineWs2, 2].Value != client)
+            while (excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != ""
+                && excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != client)
             {
                 currentLineWs2++;
             }
@@ -119,51 +115,50 @@ namespace Application.Writers
             String postalCode = "";
             String city = "";
 
-            if (ws2.Cells[currentLineWs2, 2].Value != null)
+            if (excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != "")
             {
-                address = ws2.Cells[currentLineWs2, 3].Value;
-                bp = ws2.Cells[currentLineWs2, 4].Value;
-                postalCode = ws2.Cells[currentLineWs2, 5].Value.ToString();
-                city = ws2.Cells[currentLineWs2, 6].Value;
+                address = excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 3);
+                bp = excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 4);
+                postalCode = excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 5);
+                city = excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 6);
             }
 
-            ws.Cells[form.ClientLine, 4] = client;
-            ws.Cells[form.ClientLine + 1, 4] = address;
-            ws.Cells[form.ClientLine + 2, 4] = bp;
-            ws.Cells[form.ClientLine + 3, 4] = postalCode;
-            ws.Cells[form.ClientLine + 3, 5] = city;
+            excelApiLink.CloseWorkBook(clientWorkbookPath);
 
-            workbook2.Close();
+            excelApiLink.WriteCell(form.Path, form.ClientLine, 4, client);
+            excelApiLink.WriteCell(form.Path, form.ClientLine + 1, 4, address);
+            excelApiLink.WriteCell(form.Path, form.ClientLine + 2, 4, bp);
+            excelApiLink.WriteCell(form.Path, form.ClientLine + 3, 4, postalCode);
+            excelApiLink.WriteCell(form.Path, form.ClientLine + 3, 5, city);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        private void writeStandards(Excel.Worksheet ws, List<Standard> standards)
+        /**
+         * Remplit les informations des étalons dans la page d'en-tête du formulaire
+         * 
+         */
+        private void writeStandards(List<Standard> standards)
         {
             int linesToShift = standards.Count * 4;
 
             // Décalage des valeurs vers le bas
-            for (int i = 0; i < linesToShift; i++)
-                ws.Range[
-                    ws.Cells[this.form.StandardLine, 1],
-                    ws.Cells[this.form.StandardLine, 15]]
-                    .Insert(Excel.XlInsertShiftDirection.xlShiftDown, 5);
+            excelApiLink.ShiftLines(form.Path, form.StandardLine, 1, 15, linesToShift);
 
             int standardLine = form.StandardLine;
 
             foreach (Standard standard in standards)
             {
-                ws.Cells[standardLine, 1] = "Moyen:";
-                ws.Cells[standardLine, 4] = standard.Name;
+                excelApiLink.WriteCell(form.Path, standardLine, 1, "Moyen:");
+                excelApiLink.WriteCell(form.Path, standardLine, 4, standard.Name);
 
-                ws.Cells[standardLine + 1, 1] = "Raccordement:";
-                ws.Cells[standardLine + 1, 4] = standard.Raccordement;
+                excelApiLink.WriteCell(form.Path, standardLine + 1, 1, "Raccordement:");
+                excelApiLink.WriteCell(form.Path, standardLine + 1, 4, standard.Raccordement);
 
-                Excel.Range dateEmplacement = ws.Range[ws.Cells[standardLine + 2, 4], ws.Cells[standardLine + 2, 5]];
-                dateEmplacement.Merge();
+                excelApiLink.MergeCells(form.Path, standardLine + 2, 4, standardLine + 2, 5);
 
-                ws.Cells[standardLine + 2, 1] = "Validité:";
-                ws.Cells[standardLine + 2, 4] = standard.Validity;
+                excelApiLink.WriteCell(form.Path, standardLine + 2, 1, "Validité:");
+                excelApiLink.WriteCell(form.Path, standardLine + 4, 4, standard.Validity);
 
                 standardLine += 4;
             }
@@ -172,8 +167,6 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /**
-         * CreateWorkSheets
-         * 
          * Crée les feuilles de calculs nécessaires (délégué aux classes filles)
          * 
          */
@@ -182,8 +175,6 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /**
-         * WritePiecesValues
-         * 
          * Ecrit les valeurs des pièces dans le fichier excel (délégué aux classes filles)
          * 
          */
@@ -192,41 +183,28 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /**
-         * SignForm
-         * 
-         * Signe le formulaire
+         * Colle l'image de la signature sur le formulaire
          * 
          */
         private void signForm()
         {
-            var _xlSheet = (Excel.Worksheet)workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["HeaderPage"]];
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
 
-            Clipboard.SetDataObject(ConfigSingleton.Instance.Signature, true);
-            var cellRngImg = (Excel.Range)_xlSheet.Cells[this.form.LineToSign, this.form.ColumnToSign];
-            _xlSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
+            if (ConfigSingleton.Instance.Signature == null)
+                throw new ConfigDataException("Il est impossible de signer le formulaire, la signature n'a pas été trouvée ou son format est incorrect");
+
+            excelApiLink.PasteImage(form.Path, form.LineToSign, form.ColumnToSign, ConfigSingleton.Instance.Signature);
         }
 
         /*-------------------------------------------------------------------------*/
 
         /**
-         * ExportFirstPageToPdf
-         * 
-         * Exporte la première page du fichier excel en pdf (délégué aux classes filles)
+         * Exporte la première page du fichier excel en pdf
          * 
          */
         private void exportFirstPageToPdf()
         {
-            this.workbook.ExportAsFixedFormat(
-                Excel.XlFixedFormatType.xlTypePDF, 
-                this.fileToSavePath.Replace(".xlsx", ".pdf"),
-                Type.Missing,
-                Type.Missing,
-                Type.Missing,
-                1,
-                1,
-                false,
-                Type.Missing
-            );
+            excelApiLink.ExportFirstPageToPdf(form.Path, fileToSavePath.Replace(".xlsx", ".pdf"));
         }
 
         /*-------------------------------------------------------------------------*/
@@ -239,19 +217,8 @@ namespace Application.Writers
          */
         private void saveAndQuit()
         {
-            this.workbook.Sheets[1].Activate();
-
-            try
-            {
-                workbook.SaveAs(fileToSavePath);
-            }
-            catch
-            {
-                throw new Exceptions.ExcelFileAlreadyInUseException(this.fileToSavePath);
-            }
-
-            workbook.Close();
-            excelApp.Quit();
+            excelApiLink.SaveWorkBook(form.Path, fileToSavePath);
+            excelApiLink.CloseWorkBook(form.Path);
         }
 
         /*-------------------------------------------------------------------------*/

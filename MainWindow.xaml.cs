@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -10,6 +11,10 @@ namespace Application
     /// La fenêtre est composée d'une barre de navigation et d'un control.
     /// Chaque control correspond à une fonctionnalité différente de l'application.
     /// </summary>
+    /// 
+
+
+
     public partial class MainWindow : Window
     {
         // Les différents controls de l'application. Ils correspondent chacun à une fonctionnalité.
@@ -22,9 +27,14 @@ namespace Application
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
 
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            AllocConsole();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();

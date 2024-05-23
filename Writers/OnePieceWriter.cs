@@ -21,6 +21,7 @@ namespace Application.Writers
          * La première feuille est la feuille "Mesures" qui contient les données de la pièce.
          * 
          * Si le nombre de lignes à écrire est supérieur à MAX_LINES, des copies de la feuille "Mesures" sont créées.
+         * 
          */
         public override void CreateWorkSheets()
         {
@@ -30,7 +31,7 @@ namespace Application.Writers
 
             for (int i = 2; i <= pageNumber; i++)
             {
-                workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]].Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
         }
 
@@ -42,7 +43,7 @@ namespace Application.Writers
          */
         public override void WritePiecesValues()
         {
-            Excel.Worksheet ws = base.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"]];
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
             List<String> measurePlans = pieces[0].GetMeasurePlans();
             List<List<Data.Data>> pieceData = pieces[0].GetData();
@@ -55,7 +56,7 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measurePlans[i] != "")
                 {
-                    ws.Cells[base.currentLine, base.currentColumn + 1].Value = measurePlans[i];
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
                     base.currentLine++;
                     linesWritten++;
                 }
@@ -64,8 +65,7 @@ namespace Application.Writers
                 if (linesWritten == MAX_LINES)
                 {
                     pageNumber++;
-
-                    ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")"];
+                    excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
 
                     base.currentLine -= linesWritten;
                     linesWritten = 0;
@@ -76,13 +76,13 @@ namespace Application.Writers
                 {
                     if(!base.form.Modify)
                     {
-                        ws.Cells[base.currentLine, base.currentColumn + 1].Value = pieceData[i][j].Symbol;
-                        ws.Cells[base.currentLine, base.currentColumn + 2].Value = pieceData[i][j].NominalValue;
-                        ws.Cells[base.currentLine, base.currentColumn + 4].Value = pieceData[i][j].TolerancePlus;
-                        ws.Cells[base.currentLine, base.currentColumn + 5].Value = pieceData[i][j].ToleranceMinus;
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[i][j].Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[i][j].NominalValue.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus.ToString());
                     }
 
-                    ws.Cells[base.currentLine, base.currentColumn + 6].Value = pieceData[i][j].Value;
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value.ToString());
 
                     base.currentLine++;
                     linesWritten++;
@@ -91,7 +91,7 @@ namespace Application.Writers
                     {
                         pageNumber++;
 
-                        ws = this.workbook.Sheets[ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")"];
+                        excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
 
                         base.currentLine -= linesWritten;
                         linesWritten = 0;
