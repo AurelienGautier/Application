@@ -1,5 +1,4 @@
 ﻿using Application.Writers;
-using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Parser
 {
@@ -15,7 +14,6 @@ namespace Application.Parser
         {
             base.dataParsed = new List<Data.Piece>();
             ExcelApiLinkSingleton excelApiLink = ExcelApiLinkSingleton.Instance;
-
             excelApiLink.OpenWorkBook(fileToParse);
             excelApiLink.ChangeWorkSheet(fileToParse, 1);
 
@@ -39,7 +37,7 @@ namespace Application.Parser
 
             String libelle = "";
 
-            while(excelApiLink.ReadCell(fileToParse, row, col) != null)
+            while(excelApiLink.ReadCell(fileToParse, row, col) != "")
             {
                 libelle = excelApiLink.ReadCell(fileToParse, row + 7, col);
 
@@ -87,7 +85,7 @@ namespace Application.Parser
             int row = 118;
             int nbPieces = 0;
 
-            while (ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != null)
+            while (ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != "")
             {
                 nbPieces = Convert.ToInt32(ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1));
                 row++;

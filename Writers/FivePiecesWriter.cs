@@ -28,7 +28,6 @@ namespace Application.Writers
             this.measurePlans = new List<List<String>>();
             this.pieceData = new List<List<List<Data.Data>>>();
             this.linesWritten = 0;
-            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
             this.min = 0;
             this.max = 5;
         }
@@ -66,6 +65,8 @@ namespace Application.Writers
          */
         public override void WritePiecesValues()
         {
+            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
+
             for(int i = 0; i < base.pieces.Count; i++)
             {
                 this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
