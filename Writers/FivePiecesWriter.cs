@@ -118,9 +118,9 @@ namespace Application.Writers
                 {
                     if(!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].NominalValue.ToString());
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus.ToString());
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].NominalValue);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
                     }
 
                     base.currentColumn += 3;
@@ -129,7 +129,7 @@ namespace Application.Writers
                     for(int k = this.min; k < this.max; k++)
                     {
                         base.currentColumn += 3;
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[k][i][j].Value.ToString());
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[k][i][j].Value);
                     }
 
                     base.currentColumn -= (3 + 3 * (this.max - this.min));

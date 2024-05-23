@@ -2,7 +2,6 @@
 using System.IO;
 using System.Data;
 using System.Drawing;
-using Excel = Microsoft.Office.Interop.Excel;
 using Application.Writers;
 
 namespace Application.Data
@@ -384,7 +383,7 @@ namespace Application.Data
 
             while(excelApiLink.ReadCell(workbookPath, currentLine, 1) != "")
             {
-                if(!excelApiLink.MergeCells(workbookPath, currentLine, 1, currentLine, 2))
+                if(excelApiLink.MergedCells(workbookPath, currentLine, 1, currentLine, 2))
                 {
                     currentLine++;
                 }

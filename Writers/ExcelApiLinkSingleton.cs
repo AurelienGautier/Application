@@ -173,6 +173,23 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
+        /// Writes a value to a cell in a worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line">Line number.</param>
+        /// <param name="column">Column number.</param>
+        /// <param name="value">Value to write to the cell.</param>
+        public void WriteCell(String path, int line, int column, double value)
+        {
+            if (workbooks.ContainsKey(path))
+            {
+                workbooks[path].ActiveSheet.Cells[line, column] = value;
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
         /// Reads the value of a cell in a worksheet.
         /// </summary>
         /// <param name="path">Path of the file.</param>
@@ -199,21 +216,39 @@ namespace Application.Writers
         /// <param name="column1">Column number of the first cell.</param>
         /// <param name="line2">Line number of the second cell.</param>
         /// <param name="column2">Column number of the second cell.</param>
-        public bool MergeCells(String path, int line1, int column1, int line2, int column2)
+        public void MergeCells(String path, int line1, int column1, int line2, int column2)
         {
-            if(!workbooks.ContainsKey(path)) return false;
+            if (!workbooks.ContainsKey(path)) return;
             
             Excel.Range range = workbooks[path].ActiveSheet.Range[
                 workbooks[path].ActiveSheet.Cells[line1, column1],
                 workbooks[path].ActiveSheet.Cells[line2, column2]];
-            
-            if (range.MergeCells) return false;
 
             range.Merge();
-
-            return true;
         }
 
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Returns whether the specified range of cells is merged or not.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line1">Line number of the first cell.</param>
+        /// <param name="column1">Column number of the first cell.</param>
+        /// <param name="line2">Line number of the second cell.</param>
+        /// <param name="column2">Column number of the second cell.</param>
+        /// <returns>True if the cells are merged, false otherwise.</returns>
+        public bool MergedCells(String path, int line1, int column1, int line2, int column2)
+        {
+            if(!workbooks.ContainsKey(path)) return false;
+
+            Excel.Range range = workbooks[path].ActiveSheet.Range[
+                workbooks[path].ActiveSheet.Cells[line1, column1],
+                workbooks[path].ActiveSheet.Cells[line2, column2]];
+
+            return range.MergeCells;
+        }
+        
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
