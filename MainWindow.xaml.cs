@@ -13,8 +13,6 @@ namespace Application
     /// </summary>
     /// 
 
-
-
     public partial class MainWindow : Window
     {
         // Les différents controls de l'application. Ils correspondent chacun à une fonctionnalité.
@@ -22,29 +20,29 @@ namespace Application
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
         private readonly UI.UserControls.Settings settingsControl;
+
+        // L'image du logo de l'application affiché dans la navbar
         public ImageSource logo { get; set; }
 
+        // Un avertissement est affiché la première fois que l'utilisateur accède aux paramètres ou aux types de mesures
+        // Une fois l'avertissement affiché une fois, le booléen correspondant est mis à true pour ne plus l'afficher.
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
-
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
 
         public MainWindow()
         {
             InitializeComponent();
-
-            AllocConsole();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
             this.settingsControl = new UI.UserControls.Settings();
 
+            // Le logo de l'application est chargé puis affiché dans le contrôle associé
             logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
             Logo.Source = logo;
 
-            // Par défaut, on affiche le control de remplissage de formulaire Mitutoyo.
+            // Par défaut, on affiche le control de remplissage de formulaire
             CurrentControl.Content = this.fillFormControl;
         }
 
@@ -53,18 +51,21 @@ namespace Application
 
         private void goToFillForm(object sender, RoutedEventArgs e)
         {
+            // Actualisation des changements dans les données avant d'afficher le control
             this.fillFormControl.BindData();
             CurrentControl.Content = this.fillFormControl;
         }
 
         public void goToMeasureTypes(object sender, RoutedEventArgs e)
         {
+            // Affiche l'avertissement la première fois que l'utilisateur clique sur le bouton des types de mesures
             if(!this.measureTypesWarning)
             {
                 DisplayWarning("Attention, la modification des types de mesures peut entraîner des erreurs dans des fichiers corrects. Ne modifiez les types de mesures que si vous savez ce que vous faites.");
                 this.measureTypesWarning = true;
             }
 
+            // Actualisation des changements dans les données avant d'afficher le control
             this.measureTypesControl.BindData();
             CurrentControl.Content = this.measureTypesControl;
         }
@@ -83,6 +84,7 @@ namespace Application
 
         public void goToSettings(object sender, RoutedEventArgs e)
         {
+            // Affiche l'avertissement la première fois que l'utilisateur clique sur le bouton des paramètres
             if(!this.settingsWarning)
             {
                 DisplayWarning("Attention, la modification des paramètres peut entraîner des erreurs dans les formulaires remplis. Ne modifiez les paramètres que si vous savez ce que vous faites.");
@@ -104,15 +106,15 @@ namespace Application
             dialog.Filter = "(*.png;*.jpg)|*.png;*.jpg";
             dialog.Title = "Sélectionner une signature";
 
-            String fileName = "";
+            String filePath = "";
 
-            if (dialog.ShowDialog() == true) fileName = dialog.FileName;
+            if (dialog.ShowDialog() == true) filePath = dialog.FileName;
 
-            if(fileName == "") return;
+            if(filePath == "") return;
 
             try
             {
-                Data.ConfigSingleton.Instance.SetSignature(fileName);
+                Data.ConfigSingleton.Instance.SetSignature(filePath);
             }
             catch (Exceptions.ConfigDataException ex)
             {

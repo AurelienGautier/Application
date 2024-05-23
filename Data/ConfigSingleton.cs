@@ -383,7 +383,7 @@ namespace Application.Data
         {
             Excel.Application excelApp = new Excel.Application();
 
-            Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\conf\\etalons");
+            Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\res\\etalons");
 
             Excel.Worksheet ws = workbook.Sheets["raccordements à jour "];
 
@@ -431,6 +431,8 @@ namespace Application.Data
 
         public void UpdateStandards()
         {
+            this.standards.Clear();
+
             this.getStandardsFromExcelFile();
 
             String json = JsonConvert.SerializeObject(this.standards);
