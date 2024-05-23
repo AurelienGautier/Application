@@ -22,7 +22,7 @@ namespace Application
 
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
-
+        
         [DllImport("Kernel32")]
         public static extern void AllocConsole();
 
@@ -31,9 +31,9 @@ namespace Application
         /// </summary>
         public MainWindow()
         {
-            InitializeComponent();
-
             AllocConsole();
+
+            InitializeComponent();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();

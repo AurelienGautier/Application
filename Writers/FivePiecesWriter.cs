@@ -1,5 +1,4 @@
-﻿using Excel = Microsoft.Office.Interop.Excel;
-using Application.Data;
+﻿using Application.Data;
 
 namespace Application.Writers
 {

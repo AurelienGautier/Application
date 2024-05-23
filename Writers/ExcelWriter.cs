@@ -79,7 +79,7 @@ namespace Application.Writers
             excelApiLink.WriteCell(form.Path, form.DesignLine, 4, header.Designation);
             excelApiLink.WriteCell(form.Path, form.DesignLine + 2, 4, header.PlanNb);
             excelApiLink.WriteCell(form.Path, form.DesignLine + 4, 4, header.Index);
-            excelApiLink.WriteCell(form.Path, 14, 1, header.ObservationNum);
+            excelApiLink.WriteCell(form.Path, 14, 1, "N° " + header.ObservationNum);
             excelApiLink.WriteCell(form.Path, 38, 8, header.PieceReceptionDate);
             excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
 
@@ -159,7 +159,9 @@ namespace Application.Writers
                 excelApiLink.MergeCells(form.Path, standardLine + 2, 4, standardLine + 2, 5);
 
                 excelApiLink.WriteCell(form.Path, standardLine + 2, 1, "Validité:");
-                excelApiLink.WriteCell(form.Path, standardLine + 4, 4, standard.Validity);
+                excelApiLink.WriteCell(form.Path, standardLine + 2, 4, standard.Validity);
+
+                Console.WriteLine(standard.Validity);
 
                 standardLine += 4;
             }

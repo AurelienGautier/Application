@@ -393,6 +393,8 @@ namespace Application.Data
                     String name = excelApiLink.ReadCell(workbookPath, currentLine, 2);
                     String raccordement = excelApiLink.ReadCell(workbookPath, currentLine + 1, 2);
                     String validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2).Substring(0, 10);
+                    validity = validity.Substring(3);
+                    validity = validity.Insert(0, "\'");
 
                     this.standards.Add(new Standard(code, name, raccordement, validity));
 
