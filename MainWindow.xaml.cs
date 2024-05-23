@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -8,27 +7,24 @@ namespace Application
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
-    /// La fenêtre est composée d'une barre de navigation et d'un control.
-    /// Chaque control correspond à une fonctionnalité différente de l'application.
+    /// The window is composed of 2 parts: a navbar and a main control. 
+    /// Each control contains a page corresponding to a different functionality of the application.
     /// </summary>
-    /// 
-
     public partial class MainWindow : Window
     {
-        // Les différents controls de l'application. Ils correspondent chacun à une fonctionnalité.
         private readonly UI.UserControls.FillFormControl fillFormControl;
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
         private readonly UI.UserControls.Settings settingsControl;
 
-        // L'image du logo de l'application affiché dans la navbar
         public ImageSource logo { get; set; }
 
-        // Un avertissement est affiché la première fois que l'utilisateur accède aux paramètres ou aux types de mesures
-        // Une fois l'avertissement affiché une fois, le booléen correspondant est mis à true pour ne plus l'afficher.
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
 
+        /// <summary>
+        /// Initializes a new instance of the MainWindow class.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -38,54 +34,72 @@ namespace Application
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
             this.settingsControl = new UI.UserControls.Settings();
 
-            // Le logo de l'application est chargé puis affiché dans le contrôle associé
             logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
             Logo.Source = logo;
 
-            // Par défaut, on affiche le control de remplissage de formulaire
             CurrentControl.Content = this.fillFormControl;
         }
 
         /*-------------------------------------------------------------------------*/
-        // Les méthodes suivantes servent à changer de control en fonction de l'action de l'utilisateur.
 
+        /// <summary>
+        /// Change the control to display the fill form control.
+        /// </summary>
+        /// <param name="sender">The object that triggered the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void goToFillForm(object sender, RoutedEventArgs e)
         {
-            // Actualisation des changements dans les données avant d'afficher le control
             this.fillFormControl.BindData();
             CurrentControl.Content = this.fillFormControl;
         }
 
+        /// <summary>
+        /// Change the control to display the measure types control.
+        /// </summary>
+        /// <param name="sender">The object that triggered the event.</param>
+        /// <param name="e">The event arguments.</param>
         public void goToMeasureTypes(object sender, RoutedEventArgs e)
         {
-            // Affiche l'avertissement la première fois que l'utilisateur clique sur le bouton des types de mesures
-            if(!this.measureTypesWarning)
+            if (!this.measureTypesWarning)
             {
                 DisplayWarning("Attention, la modification des types de mesures peut entraîner des erreurs dans des fichiers corrects. Ne modifiez les types de mesures que si vous savez ce que vous faites.");
                 this.measureTypesWarning = true;
             }
 
-            // Actualisation des changements dans les données avant d'afficher le control
             this.measureTypesControl.BindData();
             CurrentControl.Content = this.measureTypesControl;
         }
 
+        /// <summary>
+        /// Change the control to display the add measure type control.
+        /// </summary>
+        /// <param name="sender">The object that triggered the event.</param>
+        /// <param name="e">The event arguments.</param>
         public void goToAddMeasureType(object sender, RoutedEventArgs e)
         {
             this.addMesureTypeControl.LoadMeasureType(null);
             CurrentControl.Content = this.addMesureTypeControl;
         }
 
+        /// <summary>
+        /// Change the control to display the modify measure type control.
+        /// The control is the same as the add measure type control, but the fields are pre-filled with the data of the measure type to modify (passed as a parameter).
+        /// </summary>
+        /// <param name="measureType">The measure type to modify.</param>
         public void goToModifyMeasureType(Data.MeasureType measureType)
         {
             this.addMesureTypeControl.LoadMeasureType(measureType);
             CurrentControl.Content = this.addMesureTypeControl;
         }
 
+        /// <summary>
+        /// Change the control to display the settings control.
+        /// </summary>
+        /// <param name="sender">The object that triggered the event.</param>
+        /// <param name="e">The event arguments.</param>
         public void goToSettings(object sender, RoutedEventArgs e)
         {
-            // Affiche l'avertissement la première fois que l'utilisateur clique sur le bouton des paramètres
-            if(!this.settingsWarning)
+            if (!this.settingsWarning)
             {
                 DisplayWarning("Attention, la modification des paramètres peut entraîner des erreurs dans les formulaires remplis. Ne modifiez les paramètres que si vous savez ce que vous faites.");
                 this.settingsWarning = true;
@@ -96,9 +110,11 @@ namespace Application
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de sélectionner un fichier d'image correspondant à la signature de l'utilisateur pour signer le formulaire.
-         */
+        /// <summary>
+        /// Allows the user to select an image file corresponding to the user's signature to sign the form.
+        /// </summary>
+        /// <param name="sender">The object that triggered the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void chooseSignature(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -110,7 +126,7 @@ namespace Application
 
             if (dialog.ShowDialog() == true) filePath = dialog.FileName;
 
-            if(filePath == "") return;
+            if (filePath == "") return;
 
             try
             {
@@ -124,9 +140,10 @@ namespace Application
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * DisplayError permet d'afficher une fenêtre d'erreur avec un message d'erreur donné.
-         */
+        /// <summary>
+        /// Displays an error window with the given error message.
+        /// </summary>
+        /// <param name="errorMessage">The error message to display.</param>
         public static void DisplayError(String errorMessage)
         {
             String caption = "Erreur";
@@ -137,10 +154,11 @@ namespace Application
         }
 
         /*-------------------------------------------------------------------------*/
-        
-        /**
-         * DisplayWarning permet d'afficher une fenêtre d'avertissement avec un message d'avertissement donné.
-         */
+
+        /// <summary>
+        /// Displays a warning window with the given warning message.
+        /// </summary>
+        /// <param name="warningMessage">The warning message to display.</param>
         public static void DisplayWarning(String warningMessage)
         {
             String caption = "Avertissement";
@@ -149,7 +167,7 @@ namespace Application
 
             MessageBox.Show(warningMessage, caption, button, icon, MessageBoxResult.Yes);
         }
-        
+
         /*-------------------------------------------------------------------------*/
     }
 }

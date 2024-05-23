@@ -1,4 +1,5 @@
 ﻿using Application.Data;
+using Application.Exceptions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -69,7 +70,15 @@ namespace Application.UI.UserControls
 
         private void updateStandards(object sender, System.Windows.RoutedEventArgs e)
         {
-            ConfigSingleton.Instance.UpdateStandards();
+            try
+            {
+                ConfigSingleton.Instance.UpdateStandards();
+            }
+            catch(ConfigDataException ex)
+            {
+                this.displayError(ex.Message);
+                return;
+            }
 
             this.displaySuccess("Les standards ont été mis à jour avec succès");
         }

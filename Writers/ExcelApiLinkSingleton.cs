@@ -1,11 +1,16 @@
 ﻿using Application.Data;
+using Application.Exceptions;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
+    /// <summary>
+    /// Singleton class for managing the Excel API.
+    /// </summary>
     internal class ExcelApiLinkSingleton
     {
         private static ExcelApiLinkSingleton? instance = null;
@@ -14,10 +19,9 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne l'instance de la classe en la créant si elle est à null
-         * 
-         */
+        /// <summary>
+        /// Returns the instance of the class, creating it if it is null.
+        /// </summary>
         public static ExcelApiLinkSingleton Instance
         {
             get
@@ -33,10 +37,9 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Constructeur de la classe         
-         * 
-         */
+        /// <summary>
+        /// Constructor of the class.
+        /// </summary>
         private ExcelApiLinkSingleton()
         {
             this.excelApp = new Excel.Application();
@@ -45,12 +48,9 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Destructeur de la classe
-         * 
-         * Libère tous les workbooks ouverts et ferme l'application Excel
-         * 
-         */
+        /// <summary>
+        /// Destructor of the class.
+        /// </summary>
         ~ExcelApiLinkSingleton()
         {
             foreach (var workbook in workbooks)
@@ -63,30 +63,33 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet d'ouvrir un fichier excel et de le sauvegarder dans la liste des fichiers ouverts
-         * Le fichier est identifiable par son chemin
-         * 
-         * path : String - Chemin du fichier à ouvrir
-         * 
-         */
+        /// <summary>
+        /// Opens an Excel file and saves it in the list of open files.
+        /// The file is identified by its path.
+        /// </summary>
+        /// <param name="path">Path of the file to open.</param>
         public void OpenWorkBook(String path)
         {
             if (!workbooks.ContainsKey(path))
             {
-                workbooks.Add(path, excelApp.Workbooks.Open(path));
+                try
+                {
+                    workbooks.Add(path, excelApp.Workbooks.Open(path));
+                }
+                catch
+                {
+                    throw new ConfigDataException("Le fichier " + path + " n'a pas été trouvé. Peut-être a-t-il été déplacé ou supprimé.");
+                }
             }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de fermer un fichier excel ouvert
-         * Le fichier est identifiable par son chemin
-         * 
-         * path : String - Chemin du fichier à fermer
-         * 
-         */
+        /// <summary>
+        /// Closes an open Excel file.
+        /// The file is identified by its path.
+        /// </summary>
+        /// <param name="path">Path of the file to close.</param>
         public void CloseWorkBook(String path)
         {
             if (workbooks.ContainsKey(path))
@@ -98,13 +101,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Sélectionne une feuille de calcul dans un fichier excel ouvert
-         * 
-         * path : String - Chemin du fichier
-         * sheet : int - Numéro de la feuille à sélectionner
-         * 
-         */
+        /// <summary>
+        /// Selects a worksheet in an open Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="sheet">Number of the sheet to select.</param>
         public void ChangeWorkSheet(String path, int sheet)
         {
             if (workbooks.ContainsKey(path))
@@ -115,13 +116,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Sélectionne une feuille de calcul dans un fichier excel ouvert
-         * 
-         * path : String - Chemin du fichier
-         * sheet : String - Nom de la feuille à sélectionner
-         * 
-         */
+        /// <summary>
+        /// Selects a worksheet in an open Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="sheet">Name of the sheet to select.</param>
         public void ChangeWorkSheet(String path, String sheet)
         {
             if (workbooks.ContainsKey(path))
@@ -132,18 +131,16 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Créer une nouvelle feuille de calcul qui est une copie d'une autre
-         * 
-         * path : String - Chemin du fichier
-         * sheetName : String - Nom de la feuille à copier
-         * newSheetName : String - Nom de la nouvelle feuille
-         * 
-         */
+        /// <summary>
+        /// Creates a new worksheet that is a copy of another worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="sheetName">Name of the sheet to copy.</param>
+        /// <param name="newSheetName">Name of the new sheet.</param>
         public void CopyWorkSheet(String path, String sheetName, String newSheetName)
         {
             if (!workbooks.ContainsKey(path)) return;
-            
+
             workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);
 
             try
@@ -152,21 +149,19 @@ namespace Application.Writers
             }
             catch
             {
-                // Dans le cas où une exception est levée si la feuille existe déjà, on souhaite simplement ne rien faire
+                // In case an exception is thrown if the sheet already exists, we simply want to do nothing
             }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Écrit une valeur dans une cellule d'une feuille de calcul
-         * 
-         * path : String - Chemin du fichier
-         * line : int - Numéro de la ligne
-         * column : int - Numéro de la colonne
-         * value : String - Valeur à écrire dans la cellule
-         * 
-         */
+        /// <summary>
+        /// Writes a value to a cell in a worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line">Line number.</param>
+        /// <param name="column">Column number.</param>
+        /// <param name="value">Value to write to the cell.</param>
         public void WriteCell(String path, int line, int column, String value)
         {
             if (workbooks.ContainsKey(path))
@@ -177,16 +172,13 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Lit la valeur d'une cellule d'une feuille de calcul
-         * 
-         * path : String - Chemin du fichier
-         * line : int - Numéro de la ligne
-         * column : int - Numéro de la colonne
-         * 
-         * return : String - Valeur de la cellule
-         * 
-         */
+        /// <summary>
+        /// Reads the value of a cell in a worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line">Line number.</param>
+        /// <param name="column">Column number.</param>
+        /// <returns>Value of the cell.</returns>
         public String ReadCell(String path, int line, int column)
         {
             if (workbooks.ContainsKey(path) && workbooks[path].ActiveSheet.Cells[line, column].Value != null)
@@ -199,39 +191,39 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Fusionne des cellules d'une feuille de calcul
-         * 
-         * path : String - Chemin du fichier
-         * line1 : int - Numéro de ligne de la première cellule
-         * column1 : int - Numéro de colonne de la première cellule
-         * line2 : int - Numéro de ligne de la deuxième cellule
-         * column2 : int - Numéro de colonne de la deuxième cellule
-         * 
-         */
-        public void MergeCells(String path, int line1, int column1, int line2, int column2)
+        /// <summary>
+        /// Merges cells in a worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line1">Line number of the first cell.</param>
+        /// <param name="column1">Column number of the first cell.</param>
+        /// <param name="line2">Line number of the second cell.</param>
+        /// <param name="column2">Column number of the second cell.</param>
+        public bool MergeCells(String path, int line1, int column1, int line2, int column2)
         {
-            if (workbooks.ContainsKey(path))
-            {
-                workbooks[path].ActiveSheet.Range[
-                    workbooks[path].ActiveSheet.Cells[line1, column1],
-                    workbooks[path].ActiveSheet.Cells[line2, column2]]
-                    .Merge();
-            }
+            if(!workbooks.ContainsKey(path)) return false;
+            
+            Excel.Range range = workbooks[path].ActiveSheet.Range[
+                workbooks[path].ActiveSheet.Cells[line1, column1],
+                workbooks[path].ActiveSheet.Cells[line2, column2]];
+            
+            if (range.MergeCells) return false;
+
+            range.Merge();
+
+            return true;
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Déplace des lignes d'une feuille de calcul
-         * 
-         * path : String - Chemin du fichier
-         * line : int - Numéro de la ligne à déplacer
-         * startColumn : int - Numéro de la première colonne à déplacer
-         * endColumn : int - Numéro de la dernière colonne à déplacer
-         * linesToShift : int - Nombre de lignes à déplacer
-         * 
-         */
+        /// <summary>
+        /// Moves rows in a worksheet.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="line">Line number to move.</param>
+        /// <param name="startColumn">Number of the first column to move.</param>
+        /// <param name="endColumn">Number of the last column to move.</param>
+        /// <param name="linesToShift">Number of lines to move.</param>
         public void ShiftLines(String path, int line, int startColumn, int endColumn, int linesToShift)
         {
             if (!workbooks.ContainsKey(path)) return;
@@ -247,20 +239,17 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne l'adresse d'une cellule
-         * 
-         * row : int - Numéro de la ligne
-         * col : int - Numéro de la colonne
-         * 
-         * return : String - Adresse de la cellule
-         * 
-         */
+        /// <summary>
+        /// Returns the address of a cell.
+        /// </summary>
+        /// <param name="row">Row number.</param>
+        /// <param name="col">Column number.</param>
+        /// <returns>Address of the cell.</returns>
         public String GetCellAddress(int row, int col)
         {
             if (col <= 0 || row <= 0)
             {
-                throw new ArgumentException("quoi toi passer en paramètre être merde");
+                throw new ArgumentException("what you pass as parameter is shit");
             }
 
             int dividend = col;
@@ -278,15 +267,13 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Colle une image dans une cellule
-         * 
-         * path : String - Chemin du fichier excel
-         * line : int - Numéro de la ligne où mettre l'image
-         * column : int - Numéro de la colonne où mettre l'image
-         * image : Image - Image à coller
-         * 
-         */
+        /// <summary>
+        /// Pastes an image into a cell.
+        /// </summary>
+        /// <param name="path">Path of the Excel file.</param>
+        /// <param name="line">Line number to place the image.</param>
+        /// <param name="column">Column number to place the image.</param>
+        /// <param name="image">Image to paste.</param>
         public void PasteImage(String path, int line, int column, Image image)
         {
             if (!workbooks.ContainsKey(path)) return;
@@ -298,13 +285,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Exporte la première page d'un fichier excel en pdf
-         * 
-         * path : String - Chemin du fichier excel
-         * pdfPath : String - Chemin du fichier pdf à exporter
-         * 
-         */
+        /// <summary>
+        /// Exports the first page of an Excel file to PDF.
+        /// </summary>
+        /// <param name="path">Path of the Excel file.</param>
+        /// <param name="pdfPath">Path of the PDF file to export.</param>
         public void ExportFirstPageToPdf(String path, String pdfPath)
         {
             if (!workbooks.ContainsKey(path)) return;
@@ -314,13 +299,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Sauvegarde un fichier excel
-         * 
-         * path : String - Chemin du fichier à sauvegarder
-         * pathToSave : String - Chemin où sauvegarder le fichier
-         * 
-         */
+        /// <summary>
+        /// Saves an Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file to save.</param>
+        /// <param name="pathToSave">Path to save the file.</param>
         public void SaveWorkBook(String path, String pathToSave)
         {
             if (!workbooks.ContainsKey(path)) return;

@@ -5,15 +5,15 @@ using System.Windows.Controls;
 namespace Application.UI.UserControls
 {
     /// <summary>
-    /// Logique d'interaction pour AddMesureType.xaml
-    /// Ce control a pour objectif de permettre à l'utilisateur de créer un type de mesure ou d'en modifier un déjà existant
+    /// Interaction logic for AddMeasureType.xaml
+    /// This control aims to allow the user to create a measurement type or modify an existing one
     /// </summary>
     public partial class AddMeasureType : UserControl
     {
-        // Le type de mesure à modifier (dans le cas d'une modification). Il prend la valeur null dans le cas d'une création
+        // The measurement type to modify (in case of modification). It takes the value null in case of creation
         private Data.MeasureType? measureType;
 
-        // Les différents champs à remplir pour créer un type de mesure
+        // The different fields to fill in to create a measurement type
         private TextBox measureName;
         private TextBox measureNominalValueIndex;
         private TextBox measureTolerancePlusIndex;
@@ -27,7 +27,7 @@ namespace Application.UI.UserControls
         {
             InitializeComponent();
 
-            // Les différents champs à remplir pour créer un type de mesure
+            // The different fields to fill in to create a measurement type
             this.measureName = (TextBox)this.FindName("MeasureName");
             this.measureNominalValueIndex = (TextBox)this.FindName("MeasureNominalValueIndex");
             this.measureTolerancePlusIndex = (TextBox)this.FindName("MeasureTolerancePlusIndex");
@@ -38,10 +38,10 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de pré-remplir les champs du formulaire avec les informations du type de mesure à modifier
-         * @param measureType Le type de mesure à charger
-         */
+        /// <summary>
+        /// Allows pre-filling the form fields with information from the measurement type to modify
+        /// </summary>
+        /// <param name="measureType">The measurement type to load</param>
         public void LoadMeasureType(Data.MeasureType? measureType)
         {
             this.measureType = measureType;
@@ -67,19 +67,19 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de récupérer les informations du formulaire une fois rempli
-         * @return Le type de mesure créé
-         */
+        /// <summary>
+        /// Retrieves the form information once filled
+        /// </summary>
+        /// <returns>The created measurement type</returns>
         public Data.MeasureType GetMeasureTypeFromPage()
         {
-            if (this.measureName.Text == "" 
-                || this.measureNominalValueIndex.Text == "" 
-                || this.measureTolerancePlusIndex.Text == "" 
-                || this.measureValueIndex.Text == "" 
-                || this.measureToleranceMinusIndex.Text == "" 
+            if (this.measureName.Text == ""
+                || this.measureNominalValueIndex.Text == ""
+                || this.measureTolerancePlusIndex.Text == ""
+                || this.measureValueIndex.Text == ""
+                || this.measureToleranceMinusIndex.Text == ""
             )
-                throw new ConfigDataException("Tous les champs obligatoires doivent être remplis");
+                throw new ConfigDataException("All mandatory fields must be filled");
 
             return new Data.MeasureType()
             {
@@ -94,9 +94,11 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de sauvegarder le type de mesure créé ou modifié
-         */
+        /// <summary>
+        /// Saves the created or modified measurement type
+        /// </summary>
+        /// <param name="sender">The object that triggered the event</param>
+        /// <param name="e">The event arguments</param>
         private void saveMeasureType(object sender, RoutedEventArgs e)
         {
             try
@@ -106,7 +108,7 @@ namespace Application.UI.UserControls
                 MainWindow parentWindow = (MainWindow)Window.GetWindow(this);
                 parentWindow.goToMeasureTypes(sender, e);
             }
-            catch(ConfigDataException ex)
+            catch (ConfigDataException ex)
             {
                 MainWindow.DisplayError(ex.Message);
             }

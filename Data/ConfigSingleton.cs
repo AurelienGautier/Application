@@ -3,6 +3,7 @@ using System.IO;
 using System.Data;
 using System.Drawing;
 using Excel = Microsoft.Office.Interop.Excel;
+using Application.Writers;
 
 namespace Application.Data
 {
@@ -207,11 +208,7 @@ namespace Application.Data
 
             dataSet.AcceptChanges();
 
-            String json = JsonConvert.SerializeObject(dataSet, Formatting.Indented);
-
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\measureTypes.json");
-            writer.Write(json);
-            writer.Close();
+            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\measureTypes.json", dataSet);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -290,11 +287,7 @@ namespace Application.Data
                 { "Signature", signaturePath }
             };
 
-            String json = JsonConvert.SerializeObject(data);
-
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\conf.json");
-            writer.Write(json);
-            writer.Close();
+            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -381,28 +374,26 @@ namespace Application.Data
 
         private void getStandardsFromExcelFile()
         {
-            Excel.Application excelApp = new Excel.Application();
+            ExcelApiLinkSingleton excelApiLink = ExcelApiLinkSingleton.Instance;
+            String workbookPath  = Environment.CurrentDirectory + "\\res\\etalons.xlsm";
+            excelApiLink.OpenWorkBook(workbookPath);
 
-            Excel.Workbook workbook = excelApp.Workbooks.Open(Environment.CurrentDirectory + "\\res\\etalons");
-
-            Excel.Worksheet ws = workbook.Sheets["raccordements à jour "];
+            excelApiLink.ChangeWorkSheet(workbookPath, "raccordements à jour ");
 
             int currentLine = 9;
 
-            while (ws.Cells[currentLine, 1].Value != null)
+            while(excelApiLink.ReadCell(workbookPath, currentLine, 1) != "")
             {
-                Excel.Range range = ws.Range[ws.Cells[currentLine, 1], ws.Cells[currentLine, 2]];
-
-                if(range.MergeCells)
+                if(!excelApiLink.MergeCells(workbookPath, currentLine, 1, currentLine, 2))
                 {
                     currentLine++;
                 }
                 else
                 {
-                    String code = ws.Cells[currentLine, 1].Value.ToString();
-                    String name = ws.Cells[currentLine, 2].Value.ToString();
-                    String raccordement = ws.Cells[currentLine + 1, 2].Value.ToString();
-                    String validity = ws.Cells[currentLine + 2, 2].Value.ToString().Substring(0, 10);
+                    String code = excelApiLink.ReadCell(workbookPath, currentLine, 1);
+                    String name = excelApiLink.ReadCell(workbookPath, currentLine, 2);
+                    String raccordement = excelApiLink.ReadCell(workbookPath, currentLine + 1, 2);
+                    String validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2).Substring(0, 10);
 
                     this.standards.Add(new Standard(code, name, raccordement, validity));
 
@@ -410,8 +401,7 @@ namespace Application.Data
                 }
             }
 
-            workbook.Close();
-            excelApp.Quit();
+            excelApiLink.CloseWorkBook(workbookPath);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -433,13 +423,11 @@ namespace Application.Data
         {
             this.standards.Clear();
 
+            this.standards.Add(new Standard("", "", "", ""));
+
             this.getStandardsFromExcelFile();
 
-            String json = JsonConvert.SerializeObject(this.standards);
-
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\standards.json");
-            writer.Write(json);
-            writer.Close();
+            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -495,11 +483,7 @@ namespace Application.Data
             this.headerFieldsMatch["PieceReceptionDate"] = pieceReceptionDate;
             this.headerFieldsMatch["Observations"] = observations;
 
-            String json = JsonConvert.SerializeObject(headerFieldsMatch);
-
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\headerFields.json");
-            writer.Write(json);
-            writer.Close();
+            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\headerFields.json", this.headerFieldsMatch);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -523,11 +507,7 @@ namespace Application.Data
             this.pageNames["HeaderPage"] = headerPage;
             this.pageNames["MeasurePage"] = measurePage;
 
-            String json = JsonConvert.SerializeObject(pageNames);
-
-            StreamWriter writer = new StreamWriter(Environment.CurrentDirectory + "\\conf\\pageNames.json");
-            writer.Write(json);
-            writer.Close();
+            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\pageNames.json", this.pageNames);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -535,6 +515,17 @@ namespace Application.Data
         public Dictionary<String, String> GetPageNames()
         {
             return this.pageNames;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void writeJsonFile(String filePath, Object data)
+        {
+            String json = JsonConvert.SerializeObject(data, Formatting.Indented);
+
+            StreamWriter writer = new StreamWriter(filePath);
+            writer.Write(json);
+            writer.Close();
         }
 
         /*-------------------------------------------------------------------------*/

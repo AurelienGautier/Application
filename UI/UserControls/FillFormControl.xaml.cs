@@ -9,8 +9,7 @@ using System.Windows.Controls;
 namespace Application.UI.UserControls
 {
     /// <summary>
-    /// Logique d'interaction pour FillForm.xaml
-    /// Permet à l'utilisateur de remplir automatiquement un formulaire dont les données proviennent de la machine 
+    /// Represents a user control that allows the user to automatically fill a form with data got from a machine.
     /// </summary>
     public partial class FillFormControl : UserControl
     {
@@ -23,23 +22,26 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Initializes a new instance of the FillFormControl class.
+        /// </summary>
         public FillFormControl()
         {
             InitializeComponent();
 
-            // Initialisation de la liste des machines et binding avec le formulaire
+            // Initialize the list of machines and bind it to the form
             this.machines = new List<String> { "Mitutoyo", "Ayonis" };
             Machines.ItemsSource = this.machines;
             Machines.SelectedIndex = 0;
 
             this.formFillingManager = new FormFillingManager();
 
-            // Récupération de la liste des formulaires existants
+            // Retrieve the list of existing forms
             this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
 
-            // Ajout des attributs code de chaque élément de standards à AvailableOptions
+            // Add the code attributes of each standards element to AvailableOptions
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
             AvailableOptions = new BindingList<string>(standards);
 
@@ -55,9 +57,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Permet de mettre à jour les données concernant les étalons
-         */
+        /// <summary>
+        /// Updates the data related to the standards.
+        /// </summary>
         public void BindData()
         {
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
@@ -74,9 +76,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * L'action qui est appelée lorsque l'utilisateur clique sur "nouveau"
-         */
+        /// <summary>
+        /// Action called when the user clicks decides to create a new form.
+        /// </summary>
         private void fillAform(object sender, RoutedEventArgs e)
         {
             this.callFormFilling(null, SignForm.IsChecked == true, false);
@@ -84,12 +86,12 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * L'action qui est appelée lorsque l'utilisateur clique sur "modifier"
-         */
+        /// <summary>
+        /// Action called when the user decides to modify an existing form.
+        /// </summary>
         private void modifyAform(object sender, RoutedEventArgs e)
         {
-            String formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
+            String formToModify = this.formFillingManager.GetFileToOpen("Choose the form to modify", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
             if (formToModify == "") return;
 
             this.callFormFilling(formToModify, SignForm.IsChecked == true, true);
@@ -97,26 +99,24 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Prépare l'objet de type Form et l'envoie au FormFillingManager pour remplir le formulaire
-         */
+        /// <summary>
+        /// Prepares the Form object and sends it to the FormFillingManager to fill the form.
+        /// </summary>
         private void callFormFilling(String? formToOverwritePath, bool sign, bool modify)
         {
-            // Ajouter la récupération des étalons
-
-            // Vérification de la signature si l'utilisateur souhaite signer le document
+            // Check the signature if the user wants to sign the document
             if (sign && ConfigSingleton.Instance.Signature == null)
             {
-                MainWindow.DisplayError("Il est impossible de signer ce document car la signature est incorrect ou non sélectionnée.");
+                MainWindow.DisplayError("It is impossible to sign this document because the signature is incorrect or not selected.");
                 return;
             }
 
-            // Recherche du formulaire sélectionné dans la liste des formulaires
+            // Find the selected form in the list of forms
             Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
 
             if (form == null)
             {
-                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en charge.");
+                MainWindow.DisplayError("The selected form is not supported.");
                 return;
             }
 
@@ -127,8 +127,8 @@ namespace Application.UI.UserControls
 
             List<Standard> standards = this.getStandardsFromComboBox();
 
-            // Remplissage du formulaire en utilisant le FormFillingManager
-            this.formFillingManager.ManageFormFilling(form, this.getParser((String) Machines.SelectedItem), standards);
+            // Fill the form using the FormFillingManager
+            this.formFillingManager.ManageFormFilling(form, this.getParser((String)Machines.SelectedItem), standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -142,10 +142,10 @@ namespace Application.UI.UserControls
             foreach (var selectedOption in selectedOptions)
             {
                 if (selectedOption == null)
-                    throw new ConfigDataException("Nan mé watzeufeuk ct pa sencé spacé ssa !!!");
+                    throw new ConfigDataException("Oops, something went wrong!");
 
                 Standard? standard = ConfigSingleton.Instance.GetStandardFromCode(selectedOption);
-                if (standard == null) throw new ConfigDataException("L'étalon sélectionné n'existe pas.");
+                if (standard == null) throw new ConfigDataException("The selected standard does not exist.");
 
                 standards.Add(standard);
             }
@@ -155,29 +155,29 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * L'action qui est appelée lorsque l'utilisateur sélectionne une autre machine
-         * Change le contenu de la liste des formulaires en fonction de la machine sélectionnée
-         */
+        /// <summary>
+        /// Action called when the user selects a different machine.
+        /// Changes the content of the forms list based on the selected machine.
+        /// </summary>
         private void changeMachine(object sender, SelectionChangedEventArgs e)
         {
-            if ((String)Machines.SelectedItem == "Ayonis") 
+            if ((String)Machines.SelectedItem == "Ayonis")
                 this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetAyonisForms());
             else this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
 
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
 
-            if((String)Forms.SelectedItem == null) Forms.SelectedIndex = 0;
+            if ((String)Forms.SelectedItem == null) Forms.SelectedIndex = 0;
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne le parser correspondant à la machine sélectionnée
-         */
+        /// <summary>
+        /// Returns the parser corresponding to the selected machine.
+        /// </summary>
         private Parser.Parser getParser(String selectedMachine)
         {
-            if(selectedMachine == "Ayonis") return new ExcelParser();
+            if (selectedMachine == "Ayonis") return new ExcelParser();
             return new TextFileParser();
         }
 
@@ -202,6 +202,9 @@ namespace Application.UI.UserControls
         /*-------------------------------------------------------------------------*/
     }
 
+    /// <summary>
+    /// Represents an item in the dropdown list.
+    /// </summary>
     public class ComboBoxItem
     {
         public BindingList<string>? AvailableOptions { get; set; }
