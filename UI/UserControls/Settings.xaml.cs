@@ -16,28 +16,33 @@ namespace Application.UI.UserControls
 
             Dictionary<string, string> headerFields = ConfigSingleton.Instance.GetHeaderFieldsMatch();
 
-            Designation.Text = headerFields["Designation"];
-            PlanNb.Text = headerFields["PlanNb"];
-            Index.Text = headerFields["Index"];
-            ClientName.Text = headerFields["ClientName"];
-            ObservationNum.Text = headerFields["ObservationNum"];
-            PieceReceptionDate.Text = headerFields["PieceReceptionDate"];
-            Observations.Text = headerFields["Observations"];
+            if (headerFields.ContainsKey("Designation")) Designation.Text = headerFields["Designation"];
+            if (headerFields.ContainsKey("PlanNb")) PlanNb.Text = headerFields["PlanNb"];
+            if (headerFields.ContainsKey("Index")) Index.Text = headerFields["Index"];
+            if (headerFields.ContainsKey("ClientName")) ClientName.Text = headerFields["ClientName"];
+            if (headerFields.ContainsKey("ObservationNum")) ObservationNum.Text = headerFields["ObservationNum"];
+            if (headerFields.ContainsKey("PieceReceptionDate")) PieceReceptionDate.Text = headerFields["PieceReceptionDate"];
+            if (headerFields.ContainsKey("Observations")) Observations.Text = headerFields["Observations"];
 
             Dictionary<string, string> pageNames = ConfigSingleton.Instance.GetPageNames();
-            HeaderPage.Text = pageNames["HeaderPage"];
-            MeasurePage.Text = pageNames["MeasurePage"];
+            if(pageNames.ContainsKey("HeaderPage")) HeaderPage.Text = pageNames["HeaderPage"];
+            if(pageNames.ContainsKey("MeasurePage")) MeasurePage.Text = pageNames["MeasurePage"];
         }
 
         /*-------------------------------------------------------------------------*/
 
         private void saveSettingsClick(object sender, System.Windows.RoutedEventArgs e)
         {
-            this.saveHeaderFields();
-
-            this.savePageNames();
-
-            this.displaySuccess("Les paramètres ont été sauvegardés avec succès");
+            try
+            {
+                this.saveHeaderFields();
+                this.savePageNames();
+                this.displaySuccess("Les paramètres ont été sauvegardés avec succès");
+            }
+            catch (InvalidFieldException ex)
+            {
+                this.displayError(ex.Message);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -46,8 +51,7 @@ namespace Application.UI.UserControls
         {
             if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "" || ObservationNum.Text == "" || PieceReceptionDate.Text == "" || Observations.Text == "")
             {
-                this.displayError("Tous les champs d'en-tête doivent être remplis");
-                return;
+                throw new InvalidFieldException("Tous les champs d'en-tête doivent être remplis");
             }
 
             ConfigSingleton.Instance.SetHeaderFieldsMatch(Designation.Text, PlanNb.Text, Index.Text, ClientName.Text, ObservationNum.Text, PieceReceptionDate.Text, Observations.Text);
@@ -59,8 +63,7 @@ namespace Application.UI.UserControls
         {
             if(HeaderPage.Text == "" || MeasurePage.Text == "")
             {
-                this.displayError("Tous les noms de page doivent être remplis");
-                return;
+                throw new InvalidFieldException("Tous les noms de page doivent être remplis");
             }
 
             ConfigSingleton.Instance.SetPageNames(HeaderPage.Text, MeasurePage.Text);
@@ -73,14 +76,12 @@ namespace Application.UI.UserControls
             try
             {
                 ConfigSingleton.Instance.UpdateStandards();
+                this.displaySuccess("Les standards ont été mis à jour avec succès");
             }
             catch(ConfigDataException ex)
             {
                 this.displayError(ex.Message);
-                return;
             }
-
-            this.displaySuccess("Les standards ont été mis à jour avec succès");
         }
 
         /*-------------------------------------------------------------------------*/

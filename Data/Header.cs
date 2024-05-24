@@ -30,26 +30,33 @@ namespace Application.Data
             if (matchWithFileFields == null)
                 throw new ConfigDataException("Le fichier de configuration contenant les paramètres de l'en-tête est incorrect ou introuvable");
 
-            if (rawHeader.ContainsKey(matchWithFileFields["Designation"]))
-                this.Designation = rawHeader[matchWithFileFields["Designation"]];
+            try
+            {
+                if (rawHeader.ContainsKey(matchWithFileFields["Designation"]))
+                    this.Designation = rawHeader[matchWithFileFields["Designation"]];
 
-            if (rawHeader.ContainsKey(matchWithFileFields["PlanNb"]))
-                this.PlanNb = rawHeader[matchWithFileFields["PlanNb"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["PlanNb"]))
+                    this.PlanNb = rawHeader[matchWithFileFields["PlanNb"]];
 
-            if (rawHeader.ContainsKey(matchWithFileFields["Index"]))
-                this.Index = rawHeader[matchWithFileFields["Index"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["Index"]))
+                    this.Index = rawHeader[matchWithFileFields["Index"]];
             
-            if (rawHeader.ContainsKey(matchWithFileFields["ClientName"]))
-                this.ClientName = rawHeader[matchWithFileFields["ClientName"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["ClientName"]))
+                    this.ClientName = rawHeader[matchWithFileFields["ClientName"]];
 
-            if (rawHeader.ContainsKey(matchWithFileFields["ObservationNum"]))
-                this.ObservationNum = rawHeader[matchWithFileFields["ObservationNum"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["ObservationNum"]))
+                    this.ObservationNum = rawHeader[matchWithFileFields["ObservationNum"]];
 
-            if (rawHeader.ContainsKey(matchWithFileFields["PieceReceptionDate"]))
-                this.PieceReceptionDate = rawHeader[matchWithFileFields["PieceReceptionDate"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["PieceReceptionDate"]))
+                    this.PieceReceptionDate = rawHeader[matchWithFileFields["PieceReceptionDate"]];
 
-            if (rawHeader.ContainsKey(matchWithFileFields["Observations"]))
-                this.Observations = rawHeader[matchWithFileFields["Observations"]];
+                if (rawHeader.ContainsKey(matchWithFileFields["Observations"]))
+                    this.Observations = rawHeader[matchWithFileFields["Observations"]];
+            }
+            catch
+            {
+                // If the file is not correctly formatted, the fields are left empty
+            }
         }   
     }
 }

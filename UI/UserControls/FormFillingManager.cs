@@ -94,6 +94,10 @@ namespace Application.UI.UserControls
             {
                 MainWindow.DisplayError(e.Message);
             }
+            catch (ConfigDataException e)
+            {
+                MainWindow.DisplayError(e.Message);
+            }
         }
 
         /*-------------------------------------------------------------------------*/

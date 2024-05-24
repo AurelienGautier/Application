@@ -79,7 +79,16 @@ namespace Application.UI.UserControls
                 || this.measureValueIndex.Text == ""
                 || this.measureToleranceMinusIndex.Text == ""
             )
-                throw new ConfigDataException("All mandatory fields must be filled");
+                throw new ConfigDataException("Tous les champs obligatoires doivent être remplis.");
+
+            int tryInt;
+
+            if (!int.TryParse(measureNominalValueIndex.Text, out tryInt)
+                || !int.TryParse(measureTolerancePlusIndex.Text, out tryInt)
+                || !int.TryParse(measureValueIndex.Text, out tryInt)
+                || !int.TryParse(measureToleranceMinusIndex.Text, out tryInt)
+            )
+                throw new ConfigDataException("Tous les indices doivent être des nombres entiers.");
 
             return new Data.MeasureType()
             {

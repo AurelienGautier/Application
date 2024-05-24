@@ -71,14 +71,13 @@ namespace Application.Data
          */
         private Image? getSignatureFromFile()
         {
-            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
+            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
+
+            if (json == null) return null;
 
             Dictionary<String, String>? data = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
 
-            if (data == null)
-                throw new Exceptions.ConfigDataException("Le fichier de configuration est incorrect ou a été déplacé.");
-            else if(!data.ContainsKey("Signature"))
-                throw new Exceptions.ConfigDataException("Le fichier de configuration ne contient pas le champ signature.");
+            if (data == null) return null;
             
             Image? signature;
             try
@@ -103,7 +102,9 @@ namespace Application.Data
         {
             String filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            String json = this.getFileContent(filePath);
+            String? json = this.getFileContent(filePath);
+
+            if (json == null) return;
 
             DataSet? dataSet = JsonConvert.DeserializeObject<DataSet>(json);
 
@@ -164,11 +165,20 @@ namespace Application.Data
          * @return String
          * 
          */
-        private String getFileContent(String filePath)
+        private String? getFileContent(String filePath)
         {
-            StreamReader reader = new StreamReader(filePath);
-            String content = reader.ReadToEnd();
-            reader.Close();
+            String content = "";
+
+            try
+            {
+                StreamReader reader = new StreamReader(filePath);
+                content = reader.ReadToEnd();
+                reader.Close();
+            }
+            catch
+            {
+                return null;
+            }
 
             return content;
         }
@@ -411,7 +421,9 @@ namespace Application.Data
         {
             this.standards.Add(new Standard("", "", "", ""));
 
-            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
+            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
+
+            if (json == null) return;
 
             List<Standard>? standardsFromFile = JsonConvert.DeserializeObject<List<Standard>>(json);
 
@@ -455,7 +467,9 @@ namespace Application.Data
 
         private void getHeaderFieldsFromFile()
         {
-            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
+            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
+
+            if (json == null) return;
 
             Dictionary<String, String>? headerFields = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
 
@@ -491,7 +505,9 @@ namespace Application.Data
 
         private void getPageNamesFromFile()
         {
-            String json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
+            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
+
+            if (json == null) return;
 
             Dictionary<String, String>? pageNamesFromFile = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
 
@@ -524,6 +540,8 @@ namespace Application.Data
         {
             String json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
+            Directory.CreateDirectory(Environment.CurrentDirectory + "\\conf");
+            File.Create(filePath).Close();
             StreamWriter writer = new StreamWriter(filePath);
             writer.Write(json);
             writer.Close();

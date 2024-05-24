@@ -18,7 +18,7 @@ namespace Application
         private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
         private readonly UI.UserControls.Settings settingsControl;
 
-        public ImageSource logo { get; set; }
+        private ImageSource? logo = null;
 
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
@@ -35,8 +35,15 @@ namespace Application
             this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
             this.settingsControl = new UI.UserControls.Settings();
 
-            logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
-            Logo.Source = logo;
+            try
+            {
+                logo = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\lelogodefoula.png"));
+                Logo.Source = logo;
+            }
+            catch
+            {
+                // Do nothing, the logo will just not be displayed
+            }
 
             CurrentControl.Content = this.fillFormControl;
         }
