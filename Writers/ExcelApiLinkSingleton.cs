@@ -141,11 +141,11 @@ namespace Application.Writers
         {
             if (!workbooks.ContainsKey(path)) return;
 
-            workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);
 
             try
             {
                 workbooks[path].Sheets[workbooks[path].Sheets.Count].Name = newSheetName;
+                workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);
             }
             catch
             {

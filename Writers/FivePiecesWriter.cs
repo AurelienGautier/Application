@@ -48,7 +48,7 @@ namespace Application.Writers
 
             TotalPageNumber *= iterations;
 
-            for(int i = 2; i <= TotalPageNumber; i++)
+            for(int i = 2; i < TotalPageNumber; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }

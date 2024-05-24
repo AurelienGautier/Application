@@ -161,8 +161,6 @@ namespace Application.Writers
                 excelApiLink.WriteCell(form.Path, standardLine + 2, 1, "Validité:");
                 excelApiLink.WriteCell(form.Path, standardLine + 2, 4, standard.Validity);
 
-                Console.WriteLine(standard.Validity);
-
                 standardLine += 4;
             }
         }

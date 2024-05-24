@@ -29,7 +29,7 @@ namespace Application.Writers
 
             int pageNumber = linesToWrite / MAX_LINES + 1;
 
-            for (int i = 2; i <= pageNumber; i++)
+            for (int i = 2; i < pageNumber; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }

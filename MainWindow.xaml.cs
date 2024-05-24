@@ -22,17 +22,12 @@ namespace Application
 
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
-        
-        [DllImport("Kernel32")]
-        public static extern void AllocConsole();
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
         public MainWindow()
         {
-            AllocConsole();
-
             InitializeComponent();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
