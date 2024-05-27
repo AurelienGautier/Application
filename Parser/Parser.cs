@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Parser
+﻿namespace Application.Parser
 {
-    internal abstract class Parser
+    public abstract class Parser
     {
         protected List<Data.Piece>? dataParsed;
 

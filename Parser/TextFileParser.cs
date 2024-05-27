@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Application.Parser
 {
-    internal class TextFileParser : Parser
+    public class TextFileParser : Parser
     {
         private const string ENCODING = "iso-8859-1";
         private StreamReader? sr;

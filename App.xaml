@@ -106,6 +106,13 @@
             </Style.Triggers>
         </Style>
         
+        <!--Style pour un bouton de recherche de fichier-->
+        <Style x:Key="BrowseButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseStyle}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Width" Value="46"/>
+        </Style>
+        
         <!--Style pour un bouton de suppression-->
         <Style x:Key="DeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource EditButtonStyle}">
             <Setter Property="Background" Value="#d32f2f"/>

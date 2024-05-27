@@ -3,6 +3,8 @@ using Application.Exceptions;
 using Application.Parser;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -34,6 +36,7 @@ namespace Application.UI.UserControls
             Machines.ItemsSource = this.machines;
             Machines.SelectedIndex = 0;
 
+            // Initialize the FormFillingManager
             this.formFillingManager = new FormFillingManager();
 
             // Retrieve the list of existing forms
@@ -45,14 +48,12 @@ namespace Application.UI.UserControls
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
             AvailableOptions = new BindingList<string>(standards);
 
+            // Initialize the ComboBoxItems list
             ComboBoxItems = new BindingList<ComboBoxItem>();
-
-            ComboBoxItem firstComboBox = new ComboBoxItem { AvailableOptions = AvailableOptions };
-            firstComboBox.SelectedOption = AvailableOptions[0];
-
-            ComboBoxItems.Add(firstComboBox);
-
             Standards.ItemsSource = ComboBoxItems;
+
+            // Hide the browse folder button by default
+            BrowseFolderButton.Visibility = Visibility.Hidden;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -81,7 +82,9 @@ namespace Application.UI.UserControls
         /// </summary>
         private void fillAform(object sender, RoutedEventArgs e)
         {
-            this.callFormFilling(null, SignForm.IsChecked == true, false);
+            if (!isFormCorrectlyFilled()) return;
+
+            this.callFormFilling(null, false);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -91,10 +94,58 @@ namespace Application.UI.UserControls
         /// </summary>
         private void modifyAform(object sender, RoutedEventArgs e)
         {
-            String formToModify = this.formFillingManager.GetFileToOpen("Choose the form to modify", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
+            if (!isFormCorrectlyFilled()) return;
+
+            String formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
             if (formToModify == "") return;
 
-            this.callFormFilling(formToModify, SignForm.IsChecked == true, true);
+            this.callFormFilling(formToModify, true);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Checks if the form is correctly filled.
+        /// </summary>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        private bool isFormCorrectlyFilled()
+        {
+            // Check the signature if the user wants to sign the document
+            if (SignForm.IsChecked == true && ConfigSingleton.Instance.Signature == null)
+            {
+                MainWindow.DisplayError("Il est impossible de signer le document car la signature est incorrecte ou non sélectionée.");
+                return false;
+            }
+
+            if(SourcePathTextBox.Text == "")
+            {
+                MainWindow.DisplayError("Veuillez renseigner le chemins du fichier ou du dossier source.");
+                return false;
+            }
+            else if(BrowseFileButton.IsVisible && !File.Exists(SourcePathTextBox.Text))
+            {
+                MainWindow.DisplayError("Le chemin du fichier source n'existe pas.");
+                return false;
+            }
+            else if(BrowseFolderButton.IsVisible && !Directory.Exists(SourcePathTextBox.Text))
+            {
+                MainWindow.DisplayError("Le chemin du dossier source n'existe pas.");
+                return false;
+            }
+
+            if(DestinationPathTextBox.Text == "")
+            {
+                MainWindow.DisplayError("Veuillez renseigner le chemin du formulaire de destination.");
+                return false;
+            }
+            else if(!Directory.Exists(Path.GetDirectoryName(DestinationPathTextBox.Text)))
+            {
+                MainWindow.DisplayError("Le chemin du dossier de destination n'existe pas.");
+                return false;
+            }
+
+            return true;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -102,37 +153,35 @@ namespace Application.UI.UserControls
         /// <summary>
         /// Prepares the Form object and sends it to the FormFillingManager to fill the form.
         /// </summary>
-        private void callFormFilling(String? formToOverwritePath, bool sign, bool modify)
+        private void callFormFilling(String? formToOverwritePath, bool modify)
         {
-            // Check the signature if the user wants to sign the document
-            if (sign && ConfigSingleton.Instance.Signature == null)
-            {
-                MainWindow.DisplayError("It is impossible to sign this document because the signature is incorrect or not selected.");
-                return;
-            }
-
             // Find the selected form in the list of forms
             Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
 
             if (form == null)
             {
-                MainWindow.DisplayError("The selected form is not supported.");
+                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
                 return;
             }
 
             form.Modify = modify;
-            form.Sign = sign;
+            form.Sign = SignForm.IsChecked == true;
 
             if (formToOverwritePath != null) form.Path = formToOverwritePath;
 
             List<Standard> standards = this.getStandardsFromComboBox();
 
             // Fill the form using the FormFillingManager
-            this.formFillingManager.ManageFormFilling(form, this.getParser((String)Machines.SelectedItem), standards);
+            this.formFillingManager.ManageFormFilling(form, this.getParser(), standards, SourcePathTextBox.Text, DestinationPathTextBox.Text);
         }
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Get the list of standards selected by the user.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ConfigDataException"></exception>
         private List<Standard> getStandardsFromComboBox()
         {
             List<Standard> standards = new List<Standard>();
@@ -142,10 +191,10 @@ namespace Application.UI.UserControls
             foreach (var selectedOption in selectedOptions)
             {
                 if (selectedOption == null)
-                    throw new ConfigDataException("Oops, something went wrong!");
+                    throw new ConfigDataException("Waw mé cé pa neaurmal ssa ia 1 preaublaym atancion oulala");
 
                 Standard? standard = ConfigSingleton.Instance.GetStandardFromCode(selectedOption);
-                if (standard == null) throw new ConfigDataException("The selected standard does not exist.");
+                if (standard == null) throw new ConfigDataException("L'étalon sélectionné n'existe pas.");
 
                 standards.Add(standard);
             }
@@ -168,6 +217,37 @@ namespace Application.UI.UserControls
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
 
             if ((String)Forms.SelectedItem == null) Forms.SelectedIndex = 0;
+
+            this.changeForm(sender, e);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Action called when the user selects a different form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void changeForm(object sender, SelectionChangedEventArgs e)
+        {
+            Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+
+            if (form == null)
+            {
+                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
+                return;
+            }
+
+            if (form.DataFrom == DataFrom.Folder)
+            {
+                BrowseFolderButton.Visibility = Visibility.Visible;
+                BrowseFileButton.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                BrowseFolderButton.Visibility = Visibility.Hidden;
+                BrowseFileButton.Visibility = Visibility.Visible;
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -175,14 +255,19 @@ namespace Application.UI.UserControls
         /// <summary>
         /// Returns the parser corresponding to the selected machine.
         /// </summary>
-        private Parser.Parser getParser(String selectedMachine)
+        private Parser.Parser getParser()
         {
-            if (selectedMachine == "Ayonis") return new ExcelParser();
+            if ((String)Machines.SelectedItem == "Ayonis") return new ExcelParser();
             return new TextFileParser();
         }
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Action called when the user wants to add a new standard to the list.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddStandard_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxItem comboBoxItem = new ComboBoxItem { AvailableOptions = AvailableOptions };
@@ -192,11 +277,61 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Action called when the user wants to remove a standard from the list.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveStandard_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             ComboBoxItem optionToRemove = (ComboBoxItem)button.DataContext;
             ComboBoxItems.Remove(optionToRemove);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Open a dialog box to select the file to parse.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void browseSourceFile(object sender, RoutedEventArgs e)
+        {
+            String fileToParse = this.formFillingManager.GetFileToOpen("Choisir le fichier à convertir", this.getParser().GetFileExtension());
+            if (fileToParse == "") return;
+
+            SourcePathTextBox.Text = fileToParse;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Open a dialog to select the folder to parse
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void browseSourceFolder(object sender, RoutedEventArgs e)
+        {
+            String folderToParse = this.formFillingManager.GetFolderToOpen("Choisir le dossier à convertir");
+            if (folderToParse == "") return;
+
+            SourcePathTextBox.Text = folderToParse;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Action called when the user wants to select the path where to save the filled excel form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void browseDestinationFile(object sender, RoutedEventArgs e)
+        {
+            String fileToSave = this.formFillingManager.GetFileToSave();
+            if (fileToSave == "") return;
+
+            DestinationPathTextBox.Text = fileToSave;
         }
 
         /*-------------------------------------------------------------------------*/

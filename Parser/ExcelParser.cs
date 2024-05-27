@@ -2,7 +2,7 @@
 
 namespace Application.Parser
 {
-    internal class ExcelParser : Parser
+    public class ExcelParser : Parser
     {
         public ExcelParser()
         {

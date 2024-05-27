@@ -16,14 +16,14 @@ namespace Application.UI.UserControls
          * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
          * parser: Parser - Le parser correspondant au type de fichier à parser
          */
-        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards)
+        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards, String dataPath, String fileToSave)
         {
             // Parsing des données
-            List<Piece>? data = this.getData(form.DataFrom, parser);
+            List<Piece>? data = this.getData(form.DataFrom, parser, dataPath);
             if (data == null) return;
 
             // Remplissage du formulaire
-            this.FillForm(form, data, standards);
+            this.FillForm(form, data, standards, fileToSave);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -31,7 +31,7 @@ namespace Application.UI.UserControls
         /**
          * Récupère les données à insérer dans le formulaire en prenant en compte le type de provenance du formulaire
          */
-        private List<Piece>? getData(DataFrom dataFrom, Parser.Parser parser)
+        private List<Piece>? getData(DataFrom dataFrom, Parser.Parser parser, String dataPath)
         {
             List<Piece>? data;
 
@@ -41,14 +41,11 @@ namespace Application.UI.UserControls
                 // Si c'est un formulaire 5 pièces mitutoyo, on récupère les données de tous les fichiers d'un répertoire
                 if (dataFrom == DataFrom.Folder)
                 {
-                    data = this.getDataFromFolder(parser);
+                    data = this.getDataFromFolder(parser, dataPath);
                 }
                 else
                 {
-                    String fileToParse = this.GetFileToOpen("Sélectionner le fichier à convertir", parser.GetFileExtension());
-                    if (fileToParse == "") return null;
-
-                    data = parser.ParseFile(fileToParse);
+                    data = parser.ParseFile(dataPath);
                 }
             }
             catch (MeasureTypeNotFoundException e)
@@ -74,14 +71,10 @@ namespace Application.UI.UserControls
          * data : List<Piece> - Les données à insérer dans le formulaire
          * header : Dictionary<String, String> - Les informations à insérer dans l'entête du formulaire
          */
-        public void FillForm(Form form, List<Piece> data, List<Standard> standards)
+        public void FillForm(Form form, List<Piece> data, List<Standard> standards, String fileToSave)
         {
             try
             {
-                // Récupération de l'emplacement du formulaire à créer
-                String fileToSave = this.GetFileToSave();
-                if (fileToSave == "") return;
-
                 // Écriture du formulaire
                 ExcelWriter writer;
 
@@ -107,12 +100,9 @@ namespace Application.UI.UserControls
          * 
          * parser: Parser - Le parser correspondant au type de fichier à parser
          */
-        private List<Data.Piece>? getDataFromFolder(Parser.Parser parser)
+        private List<Data.Piece>? getDataFromFolder(Parser.Parser parser, String folderPath)
         {
-            String folderName = this.getFolderToOpen("Choisir le répertoire contenant les données des pièces à convertir");
-            if (folderName == "") return null;
-
-            DirectoryInfo directory = new DirectoryInfo(folderName);
+            DirectoryInfo directory = new DirectoryInfo(folderPath);
 
             List<Data.Piece> data = directory
                 .GetFiles()
@@ -168,7 +158,7 @@ namespace Application.UI.UserControls
          * 
          * title : String - Le titre de la fenêtre de dialogue
          */
-        private String getFolderToOpen(String title)
+        public String GetFolderToOpen(String title)
         {
             var dialog = new OpenFolderDialog();
             dialog.Title = title;
@@ -182,9 +172,9 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Ouvre une fenêtre de dialogue pour sélectionner le chemin où sauvegarder un fichier
-         */
+        /// <summary>
+        /// Open a dialog window to select the path where to save a file
+        /// </summary>
         public String GetFileToSave()
         {
             var saveFileDialog = new SaveFileDialog();

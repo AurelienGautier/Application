@@ -1,6 +1,6 @@
 ﻿namespace Application.Data
 {
-    internal class Piece
+    public class Piece
     {
         // Il y a une liste de données pour chaque plan de mesure pour les données de la pièce
         private readonly List<List<Data>> pieceData;

@@ -2,7 +2,7 @@
 
 namespace Application.Data
 {
-    internal class Header
+    public class Header
     {
         public String Designation { get; set; }
         public String PlanNb { get; set; }
