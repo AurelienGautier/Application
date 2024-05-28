@@ -211,8 +211,6 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /**
-         * SaveAndQuit
-         * 
          * Sauvegarde le fichier et ferme l'application
          * 
          */

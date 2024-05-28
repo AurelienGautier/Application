@@ -11,7 +11,7 @@ using System.Windows.Controls;
 namespace Application.UI.UserControls
 {
     /// <summary>
-    /// Represents a user control that allows the user to automatically fill a form with data got from a machine.
+    /// Interaction logic for FillFormControl.xaml
     /// </summary>
     public partial class FillFormControl : UserControl
     {
@@ -21,6 +21,8 @@ namespace Application.UI.UserControls
 
         private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
+
+        private Form? currentForm = null;
 
         /*-------------------------------------------------------------------------*/
 
@@ -44,6 +46,8 @@ namespace Application.UI.UserControls
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
 
+            this.currentForm = this.forms[0];
+
             // Add the code attributes of each standards element to AvailableOptions
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
             AvailableOptions = new BindingList<string>(standards);
@@ -54,6 +58,9 @@ namespace Application.UI.UserControls
 
             // Hide the browse folder button by default
             BrowseFolderButton.Visibility = Visibility.Hidden;
+
+            // Hide the measure number stack by default
+            MeasureNumStack.Visibility = Visibility.Collapsed;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -112,6 +119,12 @@ namespace Application.UI.UserControls
         /// <returns></returns>
         private bool isFormCorrectlyFilled()
         {
+            if (this.currentForm == null)
+            {
+                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
+                return false;
+            }
+
             // Check the signature if the user wants to sign the document
             if (SignForm.IsChecked == true && ConfigSingleton.Instance.Signature == null)
             {
@@ -145,6 +158,26 @@ namespace Application.UI.UserControls
                 MainWindow.DisplayError("Le chemin du dossier de destination n'existe pas.");
                 return false;
             }
+
+            if(this.currentForm.Type == FormType.Capability)
+            {
+                if (MeasureNum.Text == "")
+                {
+                    MainWindow.DisplayError("Veuillez renseigner le numéro de mesure.");
+                    return false;
+                }
+
+                try
+                {
+                    this.currentForm.CapabilityMeasureNumber = int.Parse(MeasureNum.Text);
+                }
+                catch
+                {
+                    MainWindow.DisplayError("Le numéro de mesure doit être un nombre.");
+                    return false;
+                }
+            }
+
 
             return true;
         }
@@ -231,15 +264,15 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void changeForm(object sender, SelectionChangedEventArgs e)
         {
-            Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
 
-            if (form == null)
+            if (this.currentForm == null)
             {
                 MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
                 return;
             }
 
-            if (form.DataFrom == DataFrom.Folder)
+            if (this.currentForm.DataFrom == DataFrom.Folder)
             {
                 BrowseFolderButton.Visibility = Visibility.Visible;
                 BrowseFileButton.Visibility = Visibility.Hidden;
@@ -248,6 +281,15 @@ namespace Application.UI.UserControls
             {
                 BrowseFolderButton.Visibility = Visibility.Hidden;
                 BrowseFileButton.Visibility = Visibility.Visible;
+            }
+
+            if (this.currentForm.Type == FormType.Capability)
+            {
+                MeasureNumStack.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MeasureNumStack.Visibility = Visibility.Collapsed;
             }
         }
 

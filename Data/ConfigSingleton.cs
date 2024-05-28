@@ -363,6 +363,7 @@ namespace Application.Data
             forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
             forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 26, 26, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
             forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Folder, 18, 75));
+            forms.Add(new Form("Capabilité", Environment.CurrentDirectory + "\\form\\capabilite", 26, 103, 5, 53, 11, FormType.Capability, DataFrom.File, 18, 75));
 
             return forms;
         }

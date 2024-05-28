@@ -3,7 +3,8 @@
     enum FormType
     {
         OnePiece,
-        FivePieces
+        FivePieces,
+        Capability
     }
 
     enum DataFrom
@@ -28,6 +29,7 @@
         public DataFrom DataFrom { get; set; }
         public int ClientLine { get; set; }
         public int StandardLine { get; set; }
+        public int? CapabilityMeasureNumber { get; set; }
 
         public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine, int standardLine)
         {

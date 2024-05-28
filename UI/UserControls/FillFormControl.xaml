@@ -30,7 +30,13 @@
                         <!--#endregion-->
                         
                         <Separator />
-            
+
+                        <StackPanel x:Name="MeasureNumStack" Margin="0, 10, 0, 0">
+                            <Label Content="Numéro de la mesure" Style="{StaticResource BaseStyle}" />
+                            <TextBox x:Name="MeasureNum" Style="{StaticResource TextBoxStyle}" Background="White" Margin="0, 0, 0, 10" />
+                            <Separator />
+                        </StackPanel>
+
                         <!--#region Source file path choice-->
                         <StackPanel  Margin="0, 10, 0, 10">
                             <Label Content="Fichier source" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
@@ -89,7 +95,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <ComboBox x:Name="TextBox" Grid.Column="0" Style="{StaticResource ComboBoxStyle1}" Width="248" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}"/>
+                                            <ComboBox x:Name="TextBox" Grid.Column="0" Style="{StaticResource ComboBoxStyle1}" Width="115" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}"/>
                                             <Button Grid.Column="1" Style="{StaticResource DeleteButtonStyle}" Click="RemoveStandard_Click" Content="X" Height="46" />
                                         </Grid>
                                     </DataTemplate>
@@ -138,4 +144,3 @@
         </Grid>
     </ScrollViewer>
 </UserControl>
-    

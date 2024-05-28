@@ -6,42 +6,51 @@ using Application.Data;
 
 namespace Application.UI.UserControls
 {
+    /// <summary>
+    /// Manages the filling of forms in an Excel file based on user-selected form type.
+    /// </summary>
     internal class FormFillingManager
     {
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Appelle la méthode de remplissage du fichier excel correspondant au type de formulaire choisi par l'utilisateur
-         * 
-         * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
-         * parser: Parser - Le parser correspondant au type de fichier à parser
-         */
+        /// <summary>
+        /// Calls the method to fill the corresponding Excel file based on the user-selected form type.
+        /// </summary>
+        /// <param name="form">The object containing the necessary information for formatting the form.</param>
+        /// <param name="parser">The parser corresponding to the file type to parse.</param>
+        /// <param name="standards">The list of standards to be used for filling the form.</param>
+        /// <param name="dataPath">The path to the data file.</param>
+        /// <param name="fileToSave">The path to save the filled form.</param>
         public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards, String dataPath, String fileToSave)
         {
-            // Parsing des données
-            List<Piece>? data = this.getData(form.DataFrom, parser, dataPath);
+            // Parsing the data
+            List<Piece>? data = this.GetData(form.DataFrom, parser, dataPath);
             if (data == null) return;
 
-            // Remplissage du formulaire
+            // Filling the form
             this.FillForm(form, data, standards, fileToSave);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère les données à insérer dans le formulaire en prenant en compte le type de provenance du formulaire
-         */
-        private List<Piece>? getData(DataFrom dataFrom, Parser.Parser parser, String dataPath)
+        /// <summary>
+        /// Retrieves the data to be inserted into the form based on the form's data source type.
+        /// </summary>
+        /// <param name="dataFrom">The data source type of the form.</param>
+        /// <param name="parser">The parser corresponding to the file type to parse.</param>
+        /// <param name="dataPath">The path to the data file.</param>
+        /// <returns>The list of data pieces to be inserted into the form.</returns>
+        private List<Piece>? GetData(DataFrom dataFrom, Parser.Parser parser, String dataPath)
         {
             List<Piece>? data;
 
-            // Parsing des données
+            // Parsing the data
             try
             {
-                // Si c'est un formulaire 5 pièces mitutoyo, on récupère les données de tous les fichiers d'un répertoire
+                // If it's a 5-piece Mitutoyo form, retrieve data from all files in a directory
                 if (dataFrom == DataFrom.Folder)
                 {
-                    data = this.getDataFromFolder(parser, dataPath);
+                    data = this.GetDataFromFolder(parser, dataPath);
                 }
                 else
                 {
@@ -64,22 +73,23 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Remplit le formulaire excel
-         * 
-         * form : Form - L'objet contenant les informations nécessaire à la mise en forme du formulaire
-         * data : List<Piece> - Les données à insérer dans le formulaire
-         * header : Dictionary<String, String> - Les informations à insérer dans l'entête du formulaire
-         */
+        /// <summary>
+        /// Fills the Excel form.
+        /// </summary>
+        /// <param name="form">The object containing the necessary information for formatting the form.</param>
+        /// <param name="data">The data to be inserted into the form.</param>
+        /// <param name="standards">The information to be inserted into the form header.</param>
+        /// <param name="fileToSave">The path to save the filled form.</param>
         public void FillForm(Form form, List<Piece> data, List<Standard> standards, String fileToSave)
         {
             try
             {
-                // Écriture du formulaire
+                // Writing the form
                 ExcelWriter writer;
 
-                if(form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
-                else writer = new FivePiecesWriter(fileToSave, form);
+                if (form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
+                else if (form.Type == FormType.FivePieces) writer = new FivePiecesWriter(fileToSave, form);
+                else writer = new CapabilityWriter(fileToSave, form);
 
                 writer.WriteData(data, standards);
             }
@@ -91,16 +101,21 @@ namespace Application.UI.UserControls
             {
                 MainWindow.DisplayError(e.Message);
             }
+            catch (IncoherentValueException e)
+            {
+                MainWindow.DisplayError(e.Message);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère les données de tous les fichiers d'un répertoire
-         * 
-         * parser: Parser - Le parser correspondant au type de fichier à parser
-         */
-        private List<Data.Piece>? getDataFromFolder(Parser.Parser parser, String folderPath)
+        /// <summary>
+        /// Retrieves the data from all files in a directory.
+        /// </summary>
+        /// <param name="parser">The parser corresponding to the file type to parse.</param>
+        /// <param name="folderPath">The path to the directory.</param>
+        /// <returns>The list of data pieces retrieved from the files in the directory.</returns>
+        private List<Data.Piece>? GetDataFromFolder(Parser.Parser parser, String folderPath)
         {
             DirectoryInfo directory = new DirectoryInfo(folderPath);
 
@@ -116,12 +131,12 @@ namespace Application.UI.UserControls
                     }
                     catch (IncorrectFormatException)
                     {
-                        MainWindow.DisplayError("Le format du fichier " + fileName + " est incorrect.");
+                        MainWindow.DisplayError("The file format of " + fileName + " is incorrect.");
                         return Enumerable.Empty<Data.Piece>();
                     }
                     catch (MeasureTypeNotFoundException)
                     {
-                        MainWindow.DisplayError("Un type de mesure n'a pas été trouvé dans le fichier " + fileName);
+                        MainWindow.DisplayError("A measure type was not found in the file " + fileName);
                         return Enumerable.Empty<Data.Piece>();
                     }
                 })
@@ -132,12 +147,12 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Ouvre une fenêtre de dialogue pour sélectionner le chemin d'un fichier
-         * 
-         * title : String - Le titre de la fenêtre de dialogue
-         * extensions : String - Les extensions de fichiers autorisées
-         */
+        /// <summary>
+        /// Opens a dialog window to select a file path.
+        /// </summary>
+        /// <param name="title">The title of the dialog window.</param>
+        /// <param name="extensions">The allowed file extensions.</param>
+        /// <returns>The selected file path.</returns>
         public String GetFileToOpen(String title, String extensions)
         {
             var dialog = new OpenFileDialog();
@@ -153,11 +168,11 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Ouvre une fenêtre de dialogue pour sélectionner le chemin d'un répertoire
-         * 
-         * title : String - Le titre de la fenêtre de dialogue
-         */
+        /// <summary>
+        /// Opens a dialog window to select a folder path.
+        /// </summary>
+        /// <param name="title">The title of the dialog window.</param>
+        /// <returns>The selected folder path.</returns>
         public String GetFolderToOpen(String title)
         {
             var dialog = new OpenFolderDialog();
@@ -173,12 +188,13 @@ namespace Application.UI.UserControls
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Open a dialog window to select the path where to save a file
+        /// Opens a dialog window to select the path where to save a file.
         /// </summary>
+        /// <returns>The selected file path.</returns>
         public String GetFileToSave()
         {
             var saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Fichiers Excel (*.xlsx)|*.xlsx";
+            saveFileDialog.Filter = "Excel Files (*.xlsx)|*.xlsx";
 
             saveFileDialog.FileName = "rapport";
 
@@ -187,7 +203,7 @@ namespace Application.UI.UserControls
             if (saveFileDialog.ShowDialog() == true)
                 fileName = saveFileDialog.FileName;
 
-            // Supprime l'extension du fichier excel
+            // Remove the extension from the Excel file
             if (fileName.Length > 5)
                 fileName = fileName.Remove(fileName.Length - 5);
 
