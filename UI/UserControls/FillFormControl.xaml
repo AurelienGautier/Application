@@ -10,110 +10,131 @@
              Background="{StaticResource BackgroundColor}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-            <!--#region Grid definition-->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <!--#endregion-->
-
-            <!--#region Machine choice-->
-            <Label Grid.Row="0" Content="Machine" Margin="0, 0, 0, 20" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" />
-            <ComboBox Grid.Row="0" Grid.Column="1" Margin="0, 0, 0, 20" Style="{StaticResource ComboBoxStyle1}" x:Name="Machines" SelectionChanged="changeMachine"/>
-            <!--#endregion-->
-            
-            <!--#region From choice-->
-            <Label Grid.Row="1" Content="Formulaire" Margin="0, 0, 0, 20" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0, 0, 0, 20" x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" SelectionChanged="changeForm"/>
-            <!--#endregion-->
-            
-            <!--#region Source file path choice-->
-            <Label Grid.Row="2" Content="Fichier source" Margin="0, 0, 0, 20" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
-            <Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Margin="0, 0, 0, 20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBox x:Name="SourcePathTextBox" Grid.Column="0" Margin="0" Style="{StaticResource TextBoxStyle}" Background="White" Width="248" />
-                <Button x:Name="BrowseFileButton" Click="browseSourceFile" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
-                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="File" Background="White" Width="24" Height="24"/>
-                </Button>
-                <Button x:Name="BrowseFolderButton" Click="browseSourceFolder" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
-                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="Folder" Background="White" Width="24" Height="24"/>
-                </Button>
-            </Grid>
-            <!--#endregion-->
-
-            <!--#region Destination file path choice-->
-            <Label Grid.Row="3" Grid.Column="0" Content="Fichier de destination" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" Margin="0, 0, 0, 20"/>
-            <Grid Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" Margin="0, 0, 0, 20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBox x:Name="DestinationPathTextBox" Grid.Column="0" Margin="0" Style="{StaticResource TextBoxStyle}" Background="White" Width="248" />
-                <Button Click="browseDestinationFile" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
-                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="File" Background="White" Width="24" Height="24"/>
-                </Button>
-            </Grid>
-            <!--#endregion-->
-
-            <!--#region Standards choice-->
-            <Label Grid.Row="4" Content="Étalons" Style="{StaticResource BaseStyle}" VerticalAlignment="Top" Margin="0, 10, 0, 0"/>
-            <StackPanel Grid.Row="4" Grid.Column="1" Margin="0, 0, 0, 20">
-                <ItemsControl Grid.Row="2" Grid.Column="1" x:Name="Standards">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Center">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <ComboBox x:Name="TextBox" Grid.Column="0" Style="{StaticResource ComboBoxStyle1}" Width="248" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}"/>
-
-                                    <Button Grid.Column="1" Style="{StaticResource DeleteButtonStyle}" Click="RemoveStandard_Click" Content="X" Height="46" />
-                                </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource EditButtonStyle}" Click="AddStandard_Click" Width="100" Margin="0, 20, 0, 0">
-                    <Icon:PackIconMaterial Kind="Plus" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
-                </Button>
-            </StackPanel>
-            <!--#endregion-->
-
-            <!--#region Sign or not-->
-            <Label Grid.Row="5" Content="Signer" Style="{StaticResource BaseStyle}" />
-            <CheckBox Grid.Row="5" Grid.Column="1" Style="{StaticResource CheckBoxStyle}" x:Name="SignForm"/>
-            <!--#endregion-->
-            
-            <!--#region Create destination excel file-->
-            <DockPanel Grid.Row="6" Grid.Column="1" LastChildFill="False" Margin="0, 0, 0, 0" HorizontalAlignment="Center">
+            <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="NewForm" Content="Nouveau" Click="fillAform" Style="{StaticResource AddButtonStyle}" Margin="0, 0, 30, 0"/>
-                    <Button x:Name="ModifyForm" Content="Modifier" Click="modifyAform" Style="{StaticResource AddButtonStyle}" Margin="30, 0, 0, 0"/>
+                    <StackPanel Orientation="Vertical" Margin="0, 0, 50, 0">
+                        <!--#region Machine choice-->
+                        <StackPanel Margin="0, 10, 0, 10">
+                            <Label Grid.Row="1" Content="Machine" Style="{StaticResource BaseStyle}" VerticalAlignment="Center" />
+                            <ComboBox Style="{StaticResource ComboBoxStyle1}" x:Name="Machines" SelectionChanged="changeMachine"/>
+                        </StackPanel>
+                        <!--#endregion-->
+
+                        <Separator />
+
+                        <!--#region From choice-->
+                        <StackPanel Margin="0, 10, 0, 10">
+                            <Label Content="Formulaire" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" SelectionChanged="changeForm"/>
+                        </StackPanel>
+                        <!--#endregion-->
+                        
+                        <Separator />
+            
+                        <!--#region Source file path choice-->
+                        <StackPanel  Margin="0, 10, 0, 10">
+                            <Label Content="Fichier source" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
+                            <Grid HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox x:Name="SourcePathTextBox" Grid.Column="0" Margin="0" Style="{StaticResource TextBoxStyle}" Background="White" Width="248" />
+                                <Button x:Name="BrowseFileButton" Margin="0" Click="browseSourceFile" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
+                                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="File" Background="White" Width="24" Height="24"/>
+                                </Button>
+                                <Button x:Name="BrowseFolderButton" Click="browseSourceFolder" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
+                                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="Folder" Background="White" Width="24" Height="24"/>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                        <!--#endregion-->
+                        
+                        <Separator />
+
+                        <!--#region Destination file path choice-->
+                        <StackPanel Margin="0, 10, 0, 10">
+                            <Label Content="Fichier de destination" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
+                            <Grid HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox x:Name="DestinationPathTextBox" Grid.Column="0" Margin="0" Style="{StaticResource TextBoxStyle}" Background="White" Width="248" />
+                                <Button Click="browseDestinationFile" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
+                                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="File" Background="White" Width="24" Height="24"/>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                        <!--#endregion-->
+                        
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="50, 0, 0, 0">
+                        <!--#region Standards choice-->
+                        <Label Content="Étalons" Style="{StaticResource BaseStyle}" VerticalAlignment="Top" Margin="0, 10, 0, 0"/>
+                        <StackPanel Margin="0, 0, 0, 20">
+                            <ItemsControl x:Name="Standards">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid HorizontalAlignment="Center">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ComboBox x:Name="TextBox" Grid.Column="0" Style="{StaticResource ComboBoxStyle1}" Width="248" ItemsSource="{Binding Path=AvailableOptions}" SelectedItem="{Binding Path=SelectedOption, Mode=TwoWay}"/>
+                                            <Button Grid.Column="1" Style="{StaticResource DeleteButtonStyle}" Click="RemoveStandard_Click" Content="X" Height="46" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button Style="{StaticResource EditButtonStyle}" Click="AddStandard_Click" Width="100" Margin="0, 20, 0, 0">
+                                <Icon:PackIconMaterial Kind="Plus" Style="{StaticResource ButtonIconStyle}" Width="16" Height="16" />
+                            </Button>
+                        </StackPanel>
+                        <!--#endregion-->
+
+                    </StackPanel>
                 </StackPanel>
-            </DockPanel>
-            <!--#endregion-->
+
+                <Separator/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50*"/>
+                        <ColumnDefinition Width="50*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--#region Sign or not-->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label Content="Signer" Style="{StaticResource BaseStyle}" />
+                        <CheckBox  Style="{StaticResource SliderCheckBox}" x:Name="SignForm" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <!--#endregion-->
+
+                    <!--#region Choose to create or to modify-->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <RadioButton x:Name="New" Content="Nouveau" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" IsChecked="True" HorizontalAlignment="Left"/>
+                        <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right"/>
+                    </StackPanel>
+                    <!--#endregion-->
+                    
+                </Grid>
+                
+                <Separator/>
+                
+                <!--#region Create destination excel file-->
+                <Button Margin="0, 10, 0, 0" x:Name="NewForm" Content="Valider" Click="fillAform" Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Center"/>
+                <!--#endregion-->
+                
+            </StackPanel>
         </Grid>
     </ScrollViewer>
 </UserControl>

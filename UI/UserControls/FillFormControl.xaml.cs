@@ -84,22 +84,23 @@ namespace Application.UI.UserControls
         {
             if (!isFormCorrectlyFilled()) return;
 
-            this.callFormFilling(null, false);
-        }
+            RadioButton? selectedRadioButton = FindName("Modify") as RadioButton;
 
-        /*-------------------------------------------------------------------------*/
+            if (selectedRadioButton == null || selectedRadioButton.Content == null)
+            {
+                MainWindow.DisplayError("Le bouton radio n'a pas été trouvé.");
+                return;
+            }
 
-        /// <summary>
-        /// Action called when the user decides to modify an existing form.
-        /// </summary>
-        private void modifyAform(object sender, RoutedEventArgs e)
-        {
-            if (!isFormCorrectlyFilled()) return;
+            String? formToModify = null;
 
-            String formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
-            if (formToModify == "") return;
+            if (selectedRadioButton.IsChecked == true)
+            {
+                formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
+                if (formToModify == "") return;
+            }
 
-            this.callFormFilling(formToModify, true);
+            this.callFormFilling(formToModify, false);
         }
 
         /*-------------------------------------------------------------------------*/
