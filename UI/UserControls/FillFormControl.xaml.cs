@@ -91,23 +91,18 @@ namespace Application.UI.UserControls
         {
             if (!isFormCorrectlyFilled()) return;
 
-            RadioButton? selectedRadioButton = FindName("Modify") as RadioButton;
-
-            if (selectedRadioButton == null || selectedRadioButton.Content == null)
-            {
-                MainWindow.DisplayError("Le bouton radio n'a pas été trouvé.");
-                return;
-            }
-
             String? formToModify = null;
 
-            if (selectedRadioButton.IsChecked == true)
+            if (this.currentForm == null) return;
+
+            if (this.currentForm.Modify)
             {
                 formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
                 if (formToModify == "") return;
             }
 
-            this.callFormFilling(formToModify, false);
+            this.callFormFilling(formToModify);
+            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -187,26 +182,22 @@ namespace Application.UI.UserControls
         /// <summary>
         /// Prepares the Form object and sends it to the FormFillingManager to fill the form.
         /// </summary>
-        private void callFormFilling(String? formToOverwritePath, bool modify)
+        private void callFormFilling(String? formToOverwritePath)
         {
-            // Find the selected form in the list of forms
-            Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
-
-            if (form == null)
+            if (this.currentForm == null)
             {
                 MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
                 return;
             }
 
-            form.Modify = modify;
-            form.Sign = SignForm.IsChecked == true;
+            this.currentForm.Sign = SignForm.IsChecked == true;
 
-            if (formToOverwritePath != null) form.Path = formToOverwritePath;
+            if (formToOverwritePath != null) this.currentForm.Path = formToOverwritePath;
 
             List<Standard> standards = this.getStandardsFromComboBox();
 
             // Fill the form using the FormFillingManager
-            this.formFillingManager.ManageFormFilling(form, this.getParser(), standards, SourcePathTextBox.Text, DestinationPathTextBox.Text);
+            this.formFillingManager.ManageFormFilling(this.currentForm, this.getParser(), standards, SourcePathTextBox.Text, DestinationPathTextBox.Text);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -375,6 +366,34 @@ namespace Application.UI.UserControls
             if (fileToSave == "") return;
 
             DestinationPathTextBox.Text = fileToSave;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Action called when the user wants to modify an existing form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Modify_Checked(object sender, RoutedEventArgs e)
+        {
+            if (this.currentForm == null) return;
+
+            this.currentForm.Modify = true;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Action called when the user wants to create a new form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void New_Check(object sender, RoutedEventArgs e)
+        {
+            if (this.currentForm == null) return;
+
+            this.currentForm.Modify = false;
         }
 
         /*-------------------------------------------------------------------------*/

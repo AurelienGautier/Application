@@ -127,8 +127,8 @@
 
                     <!--#region Choose to create or to modify-->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <RadioButton x:Name="New" Content="Nouveau" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" IsChecked="True" HorizontalAlignment="Left"/>
-                        <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right"/>
+                        <RadioButton x:Name="New" Content="Nouveau" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" IsChecked="True" HorizontalAlignment="Left" Checked="New_Check"/>
+                        <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right" Checked="Modify_Checked"/>
                     </StackPanel>
                     <!--#endregion-->
                     
@@ -139,8 +139,8 @@
                 <!--#region Create destination excel file-->
                 <Button Margin="0, 10, 0, 0" x:Name="NewForm" Content="Valider" Click="fillAform" Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Center"/>
                 <!--#endregion-->
-                
             </StackPanel>
+
         </Grid>
     </ScrollViewer>
 </UserControl>

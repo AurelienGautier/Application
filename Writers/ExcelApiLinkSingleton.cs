@@ -1,5 +1,6 @@
 ﻿using Application.Data;
 using Application.Exceptions;
+using Microsoft.Office.Interop.Excel;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -92,11 +93,10 @@ namespace Application.Writers
         /// <param name="path">Path of the file to close.</param>
         public void CloseWorkBook(String path)
         {
-            if (workbooks.ContainsKey(path))
-            {
-                workbooks[path].Close();
-                workbooks.Remove(path);
-            }
+            if (!workbooks.ContainsKey(path)) return;
+
+            workbooks[path].Close();
+            workbooks.Remove(path);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -108,10 +108,9 @@ namespace Application.Writers
         /// <param name="sheet">Number of the sheet to select.</param>
         public void ChangeWorkSheet(String path, int sheet)
         {
-            if (workbooks.ContainsKey(path))
-            {
-                workbooks[path].Sheets[sheet].Activate();
-            }
+            if (!workbooks.ContainsKey(path)) return;
+            
+            workbooks[path].Sheets[sheet].Activate();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -123,10 +122,9 @@ namespace Application.Writers
         /// <param name="sheet">Name of the sheet to select.</param>
         public void ChangeWorkSheet(String path, String sheet)
         {
-            if (workbooks.ContainsKey(path))
-            {
-                workbooks[path].Sheets[sheet].Activate();
-            }
+            if (!workbooks.ContainsKey(path)) return;
+            
+            workbooks[path].Sheets[sheet].Activate();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -141,11 +139,12 @@ namespace Application.Writers
         {
             if (!workbooks.ContainsKey(path)) return;
 
+            Console.WriteLine("coucou les musulmans moi je mange la glaceuh");
 
             try
             {
+                workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);            
                 workbooks[path].Sheets[workbooks[path].Sheets.Count].Name = newSheetName;
-                workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);
             }
             catch
             {
@@ -318,18 +317,40 @@ namespace Application.Writers
             this.workbooks[path].ActiveSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
         }
 
-        /*-------------------------------------------------------------------------*/
-
         /// <summary>
-        /// Exports the first page of an Excel file to PDF.
+        /// Delete an image into a cell.
         /// </summary>
         /// <param name="path">Path of the Excel file.</param>
-        /// <param name="pdfPath">Path of the PDF file to export.</param>
-        public void ExportFirstPageToPdf(String path, String pdfPath)
+        /// <param name="line">Line number of the image to delete.</param>
+        /// <param name="column">Column number of the image to delete.</param>
+        public void DeleteImage(String path, int line, int column)
         {
             if (!workbooks.ContainsKey(path)) return;
 
-            workbooks[path].ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, pdfPath, Type.Missing, Type.Missing, Type.Missing, 1, 1, false, Type.Missing);
+            var shapes = this.workbooks[path].ActiveSheet.Shapes;
+            for (int i = shapes.Count; i >= 1; i--)
+            {
+                var shape = shapes.Item(i);
+                if (shape.TopLeftCell.Row == line && shape.TopLeftCell.Column == column)
+                {
+                    shape.Delete();
+                    break;
+                }
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Exports the Excel file to PDF.
+        /// </summary>
+        /// <param name="path">Path of the Excel file.</param>
+        /// <param name="pdfPath">Path of the PDF file to export.</param>
+        public void ExportToPdf(String path, String pdfPath)
+        {
+            if (!workbooks.ContainsKey(path)) return;
+
+            workbooks[path].ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, pdfPath);
         }
 
         /*-------------------------------------------------------------------------*/

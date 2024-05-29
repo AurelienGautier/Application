@@ -3,6 +3,9 @@ using Application.Exceptions;
 
 namespace Application.Writers
 {
+    /// <summary>
+    /// Base class for writing data to an Excel file.
+    /// </summary>
     internal abstract class ExcelWriter
     {
         private readonly string fileToSavePath;
@@ -14,15 +17,12 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Constructeur de la classe
-         * fileName : string - Chemin du fichier à sauvegarder
-         * line : int - Ligne de la première cellule à remplir
-         * col : int - Colonne de la première cellule à remplir
-         * workBookPath : string - Chemin du formulaire vierge dans lequel écrire
-         * 
-         */
-        protected ExcelWriter(String fileName, Form form)
+        /// <summary>
+        /// Constructor for the ExcelWriter class.
+        /// </summary>
+        /// <param name="fileName">The path of the file to save.</param>
+        /// <param name="form">The form object containing the initial line and column values.</param>
+        protected ExcelWriter(string fileName, Form form)
         {
             this.fileToSavePath = fileName;
             this.currentLine = form.FirstLine;
@@ -38,18 +38,22 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Ecrit les données des pièces dans le fichier excel
-         * data : List<Piece> - Liste des pièces à écrire
-         * 
-         */
+        /// <summary>
+        /// Writes the data of the pieces to the Excel file.
+        /// </summary>
+        /// <param name="data">The list of pieces to write.</param>
+        /// <param name="standards">The list of standards to write.</param>
         public void WriteData(List<Data.Piece> data, List<Standard> standards)
         {
             this.pieces = data;
 
             writeHeader(data[0].GetHeader(), standards);
 
-            if (!form.Modify) CreateWorkSheets();
+            if (!form.Modify) 
+            {
+                Console.WriteLine("coucou les musulmans moi je mange la galce de merde");
+                CreateWorkSheets();
+            }
 
             WritePiecesValues();
 
@@ -57,7 +61,7 @@ namespace Application.Writers
             {
                 signForm();
 
-                exportFirstPageToPdf();
+                exportToPdf();
             }
 
             saveAndQuit();
@@ -65,13 +69,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Remplit l'en-tête du rapport Excel
-         * 
-         * header : Dictionary<string, string> - Dictionnaire contenant les informations de l'entête
-         * designLine : int - Numéro de la ligne où écrire la désignation
-         * 
-         */
+        /// <summary>
+        /// Writes the header of the Excel report.
+        /// </summary>
+        /// <param name="header">The dictionary containing the header information.</param>
+        /// <param name="standards">The list of standards to write.</param>
         private void writeHeader(Header header, List<Standard> standards)
         {
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
@@ -85,36 +87,34 @@ namespace Application.Writers
 
             this.writeClient(header.ClientName);
 
-            if(!form.Modify) this.writeStandards(standards);
+            if (!form.Modify) this.writeStandards(standards);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Remplit les informations du client dans l'en-tête du formulaire en allant les chercher dans le fichier des clients
-         * 
-         * client : String - Nom du client
-         * 
-         */
-        private void writeClient(String client)
+        /// <summary>
+        /// Writes the client information in the header of the form by retrieving it from the client file.
+        /// </summary>
+        /// <param name="client">The name of the client.</param>
+        private void writeClient(string client)
         {
-            String clientWorkbookPath = Environment.CurrentDirectory + "\\res\\ADRESSE";
+            string clientWorkbookPath = Environment.CurrentDirectory + "\\res\\ADRESSE";
             excelApiLink.OpenWorkBook(clientWorkbookPath);
             excelApiLink.ChangeWorkSheet(clientWorkbookPath, "ADRESSE");
 
             int currentLineWs2 = 2;
 
-            // Tant que la ligne actuelle n'est pas vide et que le client n'a pas été trouvé
+            // While the current line is not empty and the client has not been found
             while (excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != ""
                 && excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != client)
             {
                 currentLineWs2++;
             }
 
-            String address = "";
-            String bp = "";
-            String postalCode = "";
-            String city = "";
+            string address = "";
+            string bp = "";
+            string postalCode = "";
+            string city = "";
 
             if (excelApiLink.ReadCell(clientWorkbookPath, currentLineWs2, 2) != "")
             {
@@ -135,15 +135,15 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Remplit les informations des étalons dans la page d'en-tête du formulaire
-         * 
-         */
+        /// <summary>
+        /// Writes the standards information in the header page of the form.
+        /// </summary>
+        /// <param name="standards">The list of standards to write.</param>
         private void writeStandards(List<Standard> standards)
         {
             int linesToShift = standards.Count * 4;
 
-            // Décalage des valeurs vers le bas
+            // Shift the values downwards
             excelApiLink.ShiftLines(form.Path, form.StandardLine, 1, 15, linesToShift);
 
             int standardLine = form.StandardLine;
@@ -167,26 +167,23 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Crée les feuilles de calculs nécessaires (délégué aux classes filles)
-         * 
-         */
+        /// <summary>
+        /// Creates the necessary worksheets (delegated to child classes).
+        /// </summary>
         public abstract void CreateWorkSheets();
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Ecrit les valeurs des pièces dans le fichier excel (délégué aux classes filles)
-         * 
-         */
+        /// <summary>
+        /// Writes the values of the pieces to the Excel file (delegated to child classes).
+        /// </summary>
         public abstract void WritePiecesValues();
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Colle l'image de la signature sur le formulaire
-         * 
-         */
+        /// <summary>
+        /// Pastes the signature image on the form.
+        /// </summary>
         private void signForm()
         {
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
@@ -199,24 +196,26 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Exporte la première page du fichier excel en pdf
-         * 
-         */
-        private void exportFirstPageToPdf()
+        /// <summary>
+        /// Exports the first page of the Excel file to PDF.
+        /// </summary>
+        private void exportToPdf()
         {
-            excelApiLink.ExportFirstPageToPdf(form.Path, fileToSavePath.Replace(".xlsx", ".pdf"));
+            excelApiLink.ExportToPdf(form.Path, fileToSavePath.Replace(".xlsx", ".pdf"));
+            excelApiLink.DeleteImage(form.Path, form.LineToSign, form.ColumnToSign);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Sauvegarde le fichier et ferme l'application
-         * 
-         */
+        /// <summary>
+        /// Saves the file and closes the application.
+        /// </summary>
         private void saveAndQuit()
         {
             excelApiLink.SaveWorkBook(form.Path, fileToSavePath);
+
+
+
             excelApiLink.CloseWorkBook(form.Path);
         }
 

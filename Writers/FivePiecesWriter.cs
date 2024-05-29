@@ -2,6 +2,9 @@
 
 namespace Application.Writers
 {
+    /// <summary>
+    /// Represents a writer for a specific type of Excel file that handles five pieces of data.
+    /// </summary>
     internal class FivePiecesWriter : ExcelWriter
     {
         private int pageNumber;
@@ -14,13 +17,11 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * FivePiecesWriter
-         * 
-         * Constructeur de la classe
-         * fileName : string - Nom du fichier à sauvegarder
-         * 
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FivePiecesWriter"/> class.
+        /// </summary>
+        /// <param name="fileName">The name of the file to be saved.</param>
+        /// <param name="form">The form associated with the writer.</param>
         public FivePiecesWriter(string fileName, Form form) : base(fileName, form)
         {
             this.pageNumber = 1;
@@ -33,22 +34,19 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * CreateWorkSheets
-         * 
-         * Crée toutes les pages Excel nécessaire pour insérer toutes les données
-         * 
-         */
+        /// <summary>
+        /// Creates all the necessary Excel worksheets to insert all the data.
+        /// </summary>
         public override void CreateWorkSheets()
         {
-            int TotalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
+            int totalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
 
             int iterations = base.pieces.Count / 5;
             if (base.pieces.Count % 5 != 0) iterations++;
 
-            TotalPageNumber *= iterations;
+            totalPageNumber *= iterations;
 
-            for(int i = 2; i < TotalPageNumber; i++)
+            for (int i = 2; i <= totalPageNumber; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
@@ -56,24 +54,21 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * WritePiecesValues
-         * 
-         * Écrit les valeurs de mesure des pièces dans le fichier Excel
-         * 
-         */
+        /// <summary>
+        /// Writes the measurement values of the pieces to the Excel file.
+        /// </summary>
         public override void WritePiecesValues()
         {
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
-            for(int i = 0; i < base.pieces.Count; i++)
+            for (int i = 0; i < base.pieces.Count; i++)
             {
                 this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
                 this.pieceData.Add(base.pieces[i].GetData());
             }
 
             int iterations = pieceData.Count / 5;
-            if(pieceData.Count % 5 != 0) iterations++;
+            if (pieceData.Count % 5 != 0) iterations++;
 
             for (int i = 0; i < iterations; i++)
             {
@@ -84,24 +79,21 @@ namespace Application.Writers
                 if (i == pieceData.Count / 5 - 1 && pieceData.Count % 5 != 0) this.max = pieceData.Count;
                 else this.max += 5;
 
-                if(i < iterations - 1) this.ChangePage();
+                if (i < iterations - 1) this.ChangePage();
             }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Write5pieces
-         * 
-         * Écrit toutes les valeurs pour un groupe de 5 pièces dans le fichier Excel
-         * 
-         */
+        /// <summary>
+        /// Writes all the values for a group of five pieces to the Excel file.
+        /// </summary>
         private void write5pieces()
         {
-            // Pour chaque plan
+            // For each plan
             for (int i = 0; i < pieceData[0].Count; i++)
             {
-                // Écriture du plan
+                // Write the plan
                 if (measurePlans[0][i] != "")
                 {
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
@@ -109,23 +101,24 @@ namespace Application.Writers
                     this.linesWritten++;
                 }
 
-                // Changement de page si l'actuelle est complète
+                // Change page if the current one is full
                 if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
 
-                // Pour chaque mesure du plan
+                // For each measurement in the plan
                 for (int j = 0; j < pieceData[0][i].Count; j++)
                 {
-                    if(!base.form.Modify)
+                    if (!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].NominalValue);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[0][i][j].NominalValue);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
                     }
 
                     base.currentColumn += 3;
 
-                    // Écriture des valeurs des pièces
-                    for(int k = this.min; k < this.max; k++)
+                    // Write the values of the pieces
+                    for (int k = this.min; k < this.max; k++)
                     {
                         base.currentColumn += 3;
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[k][i][j].Value);
@@ -136,7 +129,7 @@ namespace Application.Writers
                     base.currentLine++;
                     this.linesWritten++;
 
-                    // Changement de page si l'actuelle est complète
+                    // Change page if the current one is full
                     if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
                 }
             }
@@ -144,12 +137,9 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * ChangePage
-         * 
-         * Passe à la page de mesure suivante
-         * 
-         */
+        /// <summary>
+        /// Switches to the next measurement page.
+        /// </summary>
         public void ChangePage()
         {
             this.pageNumber++;
