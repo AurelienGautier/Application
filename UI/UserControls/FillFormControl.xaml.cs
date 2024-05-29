@@ -259,8 +259,7 @@ namespace Application.UI.UserControls
 
             if (this.currentForm == null)
             {
-                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
-                return;
+                this.currentForm = this.forms[0];
             }
 
             if (this.currentForm.DataFrom == DataFrom.Folder)

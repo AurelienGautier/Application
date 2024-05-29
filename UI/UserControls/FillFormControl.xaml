@@ -28,7 +28,7 @@
                             <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" SelectionChanged="changeForm"/>
                         </StackPanel>
                         <!--#endregion-->
-                        
+
                         <Separator />
 
                         <StackPanel x:Name="MeasureNumStack" Margin="0, 10, 0, 0">
@@ -56,7 +56,7 @@
                             </Grid>
                         </StackPanel>
                         <!--#endregion-->
-                        
+
                         <Separator />
 
                         <!--#region Destination file path choice-->
@@ -75,7 +75,7 @@
                             </Grid>
                         </StackPanel>
                         <!--#endregion-->
-                        
+
                     </StackPanel>
 
                     <StackPanel Orientation="Vertical" Margin="50, 0, 0, 0">
@@ -131,16 +131,15 @@
                         <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right" Checked="Modify_Checked"/>
                     </StackPanel>
                     <!--#endregion-->
-                    
+
                 </Grid>
-                
+
                 <Separator/>
-                
+
                 <!--#region Create destination excel file-->
                 <Button Margin="0, 10, 0, 0" x:Name="NewForm" Content="Valider" Click="fillAform" Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Center"/>
                 <!--#endregion-->
             </StackPanel>
-
         </Grid>
     </ScrollViewer>
 </UserControl>

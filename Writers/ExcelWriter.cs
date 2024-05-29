@@ -51,7 +51,6 @@ namespace Application.Writers
 
             if (!form.Modify) 
             {
-                Console.WriteLine("coucou les musulmans moi je mange la galce de merde");
                 CreateWorkSheets();
             }
 
@@ -213,8 +212,6 @@ namespace Application.Writers
         private void saveAndQuit()
         {
             excelApiLink.SaveWorkBook(form.Path, fileToSavePath);
-
-
 
             excelApiLink.CloseWorkBook(form.Path);
         }

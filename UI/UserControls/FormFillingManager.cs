@@ -196,7 +196,7 @@ namespace Application.UI.UserControls
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm";
 
-            saveFileDialog.FileName = "rapport";
+            saveFileDialog.FileName = "rapport.xlsm";
 
             String fileName = "";
 

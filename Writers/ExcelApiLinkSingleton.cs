@@ -44,6 +44,7 @@ namespace Application.Writers
         private ExcelApiLinkSingleton()
         {
             this.excelApp = new Excel.Application();
+            this.excelApp.DisplayAlerts = false;
             this.workbooks = new Dictionary<String, Excel.Workbook>();
         }
 
@@ -138,8 +139,6 @@ namespace Application.Writers
         public void CopyWorkSheet(String path, String sheetName, String newSheetName)
         {
             if (!workbooks.ContainsKey(path)) return;
-
-            Console.WriteLine("coucou les musulmans moi je mange la glaceuh");
 
             try
             {
