@@ -124,7 +124,7 @@ namespace Application.Writers
         public void ChangeWorkSheet(String path, String sheet)
         {
             if (!workbooks.ContainsKey(path)) return;
-            
+            Console.WriteLine("ChangeWorkSheet: " + sheet);
             workbooks[path].Sheets[sheet].Activate();
         }
 

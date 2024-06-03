@@ -10,11 +10,27 @@ namespace Application.Writers
         {
         }
 
+        /// <summary>
+        /// Creates a worksheet for each capability measure
+        /// </summary>
+        /// <exception cref="Exceptions.IncorrectValuesToTreatException"></exception>
         public override void CreateWorkSheets()
         {
-            // The capability form only has one measure page
+            if(form.CapabilityMeasureNumber == null)
+            {
+                throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
+            }
+
+            for(int i = 2; i <= form.CapabilityMeasureNumber.Count; i++)
+            {
+                excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
+            }
         }
 
+        /// <summary>
+        /// Writes the values of each capability measure in a different worksheet
+        /// </summary>
+        /// <exception cref="Exceptions.IncoherentValueException"></exception>
         public override void WritePiecesValues()
         {
             excelApiLink.ChangeWorkSheet(form.Path, "Capa");
@@ -22,30 +38,42 @@ namespace Application.Writers
             int line = form.FirstLine;
             int col = 5;
 
-            if(form.CapabilityMeasureNumber == null) return;
-            int capabilityMeasureNumber = (int)form.CapabilityMeasureNumber;
+            if (form.CapabilityMeasureNumber == null) return;
+            List<int> capabilityMeasureNumber = form.CapabilityMeasureNumber;
 
             // Write the values of the pieces in the capability form
-            foreach (Piece piece in pieces)
+            for (int i = 0; i < capabilityMeasureNumber.Count; i++)
             {
-                try
+                if(i > 0)
                 {
-                    double currentValue = piece.GetData()[0][capabilityMeasureNumber].Value;
-
-                    excelApiLink.WriteCell(form.Path, line, col, currentValue);
-                    linesWritten++;
-                    line++;
-
-                    if (linesWritten == maxLines)
-                    {
-                        linesWritten = 0;
-                        line = form.FirstLine;
-                        col ++;
-                    }
+                    excelApiLink.ChangeWorkSheet(form.Path, "Capa (" + (i + 1) + ")");
+                    line = form.FirstLine;
+                    col = 5;
+                    linesWritten = 0;
                 }
-                catch
+
+                int num = capabilityMeasureNumber[i];
+                foreach (Piece piece in pieces)
                 {
-                    throw new Exceptions.IncoherentValueException("Le format du fichier n'est pas cohérent avec la valeur le numéro de mesure fourni.");
+                    try
+                    {
+                        double currentValue = piece.GetData()[0][num].Value;
+
+                        excelApiLink.WriteCell(form.Path, line, col, currentValue);
+                        linesWritten++;
+                        line++;
+
+                        if (linesWritten == maxLines)
+                        {
+                            linesWritten = 0;
+                            line = form.FirstLine;
+                            col++;
+                        }
+                    }
+                    catch
+                    {
+                        throw new Exceptions.IncoherentValueException("Le format du fichier n'est pas cohérent avec la valeur le numéro de mesure fourni.");
+                    }
                 }
             }
         }

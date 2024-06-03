@@ -164,7 +164,10 @@ namespace Application.UI.UserControls
 
                 try
                 {
-                    this.currentForm.CapabilityMeasureNumber = int.Parse(MeasureNum.Text);
+                    List<String> list = MeasureNum.Text.Split(',').ToList();
+                    List<int> capabilityValues = list.Select(int.Parse).ToList();
+
+                    this.currentForm.CapabilityMeasureNumber = capabilityValues;
                 }
                 catch
                 {

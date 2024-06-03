@@ -32,7 +32,7 @@
                         <Separator />
 
                         <StackPanel x:Name="MeasureNumStack" Margin="0, 10, 0, 0">
-                            <Label Content="Numéro de la mesure" Style="{StaticResource BaseStyle}" />
+                            <Label Content="Numéros de mesure" Style="{StaticResource BaseStyle}" />
                             <TextBox x:Name="MeasureNum" Style="{StaticResource TextBoxStyle}" Background="White" Margin="0, 0, 0, 10" />
                             <Separator />
                         </StackPanel>
