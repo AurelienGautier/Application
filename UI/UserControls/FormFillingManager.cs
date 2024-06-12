@@ -58,7 +58,7 @@ namespace Application.UI.UserControls
                     }
                     else if (measureNumber != newPieces[0].GetLinesToWriteNumber())
                     {
-                        MainWindow.DisplayError("Le nombre de mesures des pièces n'est pas le même.");
+                        MainWindow.DisplayError("Le nombre de mesures des pièces n'est pas le même entre le fichier numéro 1 et le fichier numéro " + (i + 1));
                         return null;
                     }
 
