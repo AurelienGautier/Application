@@ -15,7 +15,7 @@ namespace Application
     {
         private readonly UI.UserControls.FillFormControl fillFormControl;
         private readonly UI.UserControls.MeasureTypesControl measureTypesControl;
-        private readonly UI.UserControls.AddMeasureType addMesureTypeControl;
+        private readonly UI.UserControls.AddMeasureTypeControl addMesureTypeControl;
         private readonly UI.UserControls.Settings settingsControl;
 
         private ImageSource? logo = null;
@@ -31,13 +31,13 @@ namespace Application
         /// </summary>
         public MainWindow()
         {
-            InitializeComponent();
-
             AllocConsole();
+
+            InitializeComponent();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
-            this.addMesureTypeControl = new UI.UserControls.AddMeasureType();
+            this.addMesureTypeControl = new UI.UserControls.AddMeasureTypeControl();
             this.settingsControl = new UI.UserControls.Settings();
 
             try

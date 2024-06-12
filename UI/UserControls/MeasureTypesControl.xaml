@@ -15,7 +15,13 @@
         
         <Button Grid.Row="0" Click="addMeasureType" Style="{StaticResource AddButtonStyle}" Content="Ajouter" Margin="30" />
 
-        <DataGrid Grid.Row="1" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}" CellStyle="{DynamicResource DataGridCellStyle1}" RowStyle="{DynamicResource DataGridRowStyle1}" Style="{DynamicResource DataGridStyle1}" x:Name="MeasureTypes" ItemsSource="{Binding MeasureType}">
+        <DataGrid Grid.Row="1" 
+                  ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle1}" 
+                  CellStyle="{DynamicResource DataGridCellStyle1}" 
+                  RowStyle="{DynamicResource DataGridRowStyle1}" 
+                  Style="{DynamicResource DataGridStyle1}" 
+                  x:Name="MeasureTypes" 
+                  ItemsSource="{Binding MeasureType}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Type de mesure" Binding="{Binding Name}" CanUserResize="False" IsReadOnly="True" />
                 <DataGridTextColumn Header="Indice valeur nom." Binding="{Binding NominalValueIndex}" CanUserResize="False" IsReadOnly="True" />

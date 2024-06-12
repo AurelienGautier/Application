@@ -56,9 +56,6 @@ namespace Application.UI.UserControls
             ComboBoxItems = new BindingList<ComboBoxItem>();
             Standards.ItemsSource = ComboBoxItems;
 
-            // Hide the browse folder button by default
-            BrowseFolderButton.Visibility = Visibility.Hidden;
-
             // Hide the measure number stack by default
             MeasureNumStack.Visibility = Visibility.Collapsed;
         }
@@ -110,7 +107,6 @@ namespace Application.UI.UserControls
         /// <summary>
         /// Checks if the form is correctly filled.
         /// </summary>
-        /// <param name="sign"></param>
         /// <returns></returns>
         private bool isFormCorrectlyFilled()
         {
@@ -127,34 +123,24 @@ namespace Application.UI.UserControls
                 return false;
             }
 
-            if(SourcePathTextBox.Text == "")
+            if (SourcePathTextBox.Text == "")
             {
                 MainWindow.DisplayError("Veuillez renseigner le chemins du fichier ou du dossier source.");
                 return false;
             }
-            else if(BrowseFileButton.IsVisible && !File.Exists(SourcePathTextBox.Text))
-            {
-                MainWindow.DisplayError("Le chemin du fichier source n'existe pas.");
-                return false;
-            }
-            else if(BrowseFolderButton.IsVisible && !Directory.Exists(SourcePathTextBox.Text))
-            {
-                MainWindow.DisplayError("Le chemin du dossier source n'existe pas.");
-                return false;
-            }
 
-            if(DestinationPathTextBox.Text == "")
+            if (DestinationPathTextBox.Text == "")
             {
                 MainWindow.DisplayError("Veuillez renseigner le chemin du formulaire de destination.");
                 return false;
             }
-            else if(!Directory.Exists(Path.GetDirectoryName(DestinationPathTextBox.Text)))
+            else if (!Directory.Exists(Path.GetDirectoryName(DestinationPathTextBox.Text)))
             {
                 MainWindow.DisplayError("Le chemin du dossier de destination n'existe pas.");
                 return false;
             }
 
-            if(this.currentForm.Type == FormType.Capability)
+            if (this.currentForm.Type == FormType.Capability)
             {
                 if (MeasureNum.Text == "")
                 {
@@ -200,7 +186,7 @@ namespace Application.UI.UserControls
             List<Standard> standards = this.getStandardsFromComboBox();
 
             // Fill the form using the FormFillingManager
-            this.formFillingManager.ManageFormFilling(this.currentForm, this.getParser(), standards, SourcePathTextBox.Text, DestinationPathTextBox.Text);
+            this.formFillingManager.ManageFormFilling(this.currentForm, this.getParser(), standards, DestinationPathTextBox.Text);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -265,17 +251,6 @@ namespace Application.UI.UserControls
                 this.currentForm = this.forms[0];
             }
 
-            if (this.currentForm.DataFrom == DataFrom.Folder)
-            {
-                BrowseFolderButton.Visibility = Visibility.Visible;
-                BrowseFileButton.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                BrowseFolderButton.Visibility = Visibility.Hidden;
-                BrowseFileButton.Visibility = Visibility.Visible;
-            }
-
             if (this.currentForm.Type == FormType.Capability)
             {
                 MeasureNumStack.Visibility = Visibility.Visible;
@@ -332,12 +307,20 @@ namespace Application.UI.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void browseSourceFile(object sender, RoutedEventArgs e)
+        private void browseSourceFiles(object sender, RoutedEventArgs e)
         {
-            String fileToParse = this.formFillingManager.GetFileToOpen("Choisir le fichier à convertir", this.getParser().GetFileExtension());
-            if (fileToParse == "") return;
+            if(this.currentForm == null) return;
 
-            SourcePathTextBox.Text = fileToParse;
+            List<String> filesToParse = this.formFillingManager.GetFilesToOpen("Choisir le fichier à convertir", this.getParser().GetFileExtension(), this.currentForm.DataFrom == DataFrom.Files);
+            
+            if (filesToParse.Count == 0) return;
+
+            foreach (String file in filesToParse)
+            {
+                SourcePathTextBox.Text += file + ";";
+            }
+
+            this.currentForm.SourceFiles = filesToParse;
         }
 
         /*-------------------------------------------------------------------------*/

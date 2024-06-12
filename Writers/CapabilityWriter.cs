@@ -21,6 +21,8 @@ namespace Application.Writers
                 throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
             }
 
+            Console.WriteLine(form.CapabilityMeasureNumber.Count);
+
             for(int i = 2; i <= form.CapabilityMeasureNumber.Count; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
@@ -72,7 +74,7 @@ namespace Application.Writers
                     }
                     catch
                     {
-                        throw new Exceptions.IncoherentValueException("Le format du fichier n'est pas cohérent avec la valeur le numéro de mesure fourni.");
+                        throw new Exceptions.IncoherentValueException("Le format du fichier n'est pas cohérent avec la valeur l'un des numéros de mesure fournis.");
                     }
                 }
             }

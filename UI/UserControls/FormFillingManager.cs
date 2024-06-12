@@ -21,10 +21,10 @@ namespace Application.UI.UserControls
         /// <param name="standards">The list of standards to be used for filling the form.</param>
         /// <param name="dataPath">The path to the data file.</param>
         /// <param name="fileToSave">The path to save the filled form.</param>
-        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards, String dataPath, String fileToSave)
+        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards, String fileToSave)
         {
             // Parsing the data
-            List<Piece>? data = this.GetData(form.DataFrom, parser, dataPath);
+            List<Piece>? data = this.GetData(form, parser);
             if (data == null) return;
 
             // Filling the form
@@ -40,21 +40,29 @@ namespace Application.UI.UserControls
         /// <param name="parser">The parser corresponding to the file type to parse.</param>
         /// <param name="dataPath">The path to the data file.</param>
         /// <returns>The list of data pieces to be inserted into the form.</returns>
-        private List<Piece>? GetData(DataFrom dataFrom, Parser.Parser parser, String dataPath)
+        private List<Piece>? GetData(Form form, Parser.Parser parser)
         {
-            List<Piece>? data;
+            List<Piece> data = new List<Piece>();
+            int? measureNumber = null;
 
             // Parsing the data
             try
             {
-                // If it's a 5-piece Mitutoyo form, retrieve data from all files in a directory
-                if (dataFrom == DataFrom.Folder)
+                for (int i = 0; i < form.SourceFiles.Count; i++)
                 {
-                    data = this.GetDataFromFolder(parser, dataPath);
-                }
-                else
-                {
-                    data = parser.ParseFile(dataPath);
+                    List<Piece> newPieces = parser.ParseFile(form.SourceFiles[i]);
+
+                    if(measureNumber == null)
+                    {
+                        measureNumber = newPieces[0].GetLinesToWriteNumber();
+                    }
+                    else if (measureNumber != newPieces[0].GetLinesToWriteNumber())
+                    {
+                        MainWindow.DisplayError("Le nombre de mesures des pièces n'est pas le même.");
+                        return null;
+                    }
+
+                    data.AddRange(parser.ParseFile(form.SourceFiles[i]));
                 }
             }
             catch (MeasureTypeNotFoundException e)
@@ -110,44 +118,6 @@ namespace Application.UI.UserControls
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Retrieves the data from all files in a directory.
-        /// </summary>
-        /// <param name="parser">The parser corresponding to the file type to parse.</param>
-        /// <param name="folderPath">The path to the directory.</param>
-        /// <returns>The list of data pieces retrieved from the files in the directory.</returns>
-        private List<Data.Piece>? GetDataFromFolder(Parser.Parser parser, String folderPath)
-        {
-            DirectoryInfo directory = new DirectoryInfo(folderPath);
-
-            List<Data.Piece> data = directory
-                .GetFiles()
-                .Where(file => file.Extension == ".mit" || file.Extension == ".txt" || file.Extension == ".MIT")
-                .Select(file => file.FullName)
-                .SelectMany(fileName =>
-                {
-                    try
-                    {
-                        return parser.ParseFile(fileName);
-                    }
-                    catch (IncorrectFormatException)
-                    {
-                        MainWindow.DisplayError("The file format of " + fileName + " is incorrect.");
-                        return Enumerable.Empty<Data.Piece>();
-                    }
-                    catch (MeasureTypeNotFoundException)
-                    {
-                        MainWindow.DisplayError("A measure type was not found in the file " + fileName);
-                        return Enumerable.Empty<Data.Piece>();
-                    }
-                })
-                .ToList();
-
-            return data;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
         /// Opens a dialog window to select a file path.
         /// </summary>
         /// <param name="title">The title of the dialog window.</param>
@@ -164,6 +134,32 @@ namespace Application.UI.UserControls
             if (dialog.ShowDialog() == true) fileName = dialog.FileName;
 
             return fileName;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Opens a dialog window to select one or multiple file path.
+        /// </summary>
+        /// <param name="title">The title of the dialog window.</param>
+        /// <param name="extensions">The allowed file extensions.</param>
+        /// <param name="multiSelect">True if multiple files can be selected, false otherwise.</param>
+        /// <returns>The selected file path.</returns>
+        public List<String> GetFilesToOpen(String title, String extensions, bool multiSelect)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = title;
+            dialog.Filter = extensions;
+            dialog.Multiselect = multiSelect;
+
+            List<String> fileNames = new List<String>();
+
+            if (dialog.ShowDialog() == true)
+            {
+                fileNames.AddRange(dialog.FileNames);
+            }
+
+            return fileNames;
         }
 
         /*-------------------------------------------------------------------------*/

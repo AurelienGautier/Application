@@ -13,7 +13,7 @@ namespace Application.Parser
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
             base.dataParsed = new List<Data.Piece>();
-            ExcelApiLinkSingleton excelApiLink = ExcelApiLinkSingleton.Instance;
+            ExcelLibraryLinkSingleton excelApiLink = ExcelLibraryLinkSingleton.Instance;
             excelApiLink.OpenWorkBook(fileToParse);
             excelApiLink.ChangeWorkSheet(fileToParse, 1);
 
@@ -53,18 +53,15 @@ namespace Application.Parser
                     throw new Exceptions.MeasureTypeNotFoundException(libelle, fileToParse, cellName);
                 }
 
-                String symbol = measureType.Symbol;
-
                 // Pour chaque pièce (parcours de lignes)
                 for(int i = 0; i < nbPieces; i++)
                 {
                     int valueRow = multiplePieces ? 118 : 37;
 
-                    Data.Data data = new Data.Data();
+                    Data.Measure data = new Data.Measure(measureType);
                     data.NominalValue = nominalValue;
                     data.TolerancePlus = tolPlus;
                     data.ToleranceMinus = tolMinus;
-                    data.Symbol = symbol;
                     data.Value = Convert.ToDouble(excelApiLink.ReadCell(fileToParse, valueRow + i, col));
 
                     base.dataParsed[i].AddData(data);
@@ -85,9 +82,9 @@ namespace Application.Parser
             int row = 118;
             int nbPieces = 0;
 
-            while (ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != "")
+            while (ExcelLibraryLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != "")
             {
-                nbPieces = Convert.ToInt32(ExcelApiLinkSingleton.Instance.ReadCell(fileToParse, row, 1));
+                nbPieces = Convert.ToInt32(ExcelLibraryLinkSingleton.Instance.ReadCell(fileToParse, row, 1));
                 row++;
             }
 

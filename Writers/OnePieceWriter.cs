@@ -6,11 +6,15 @@ namespace Application.Writers
     internal class OnePieceWriter : ExcelWriter
     {
         private const int MAX_LINES = 22;
+        private int linesWritten;
+        private int pageNumber;
 
         /*-------------------------------------------------------------------------*/
 
         public OnePieceWriter(string fileName, Form form) : base(fileName, form)
         {
+            this.linesWritten = 0;
+            this.pageNumber = 1;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -27,9 +31,9 @@ namespace Application.Writers
         {
             int linesToWrite = pieces[0].GetLinesToWriteNumber();
 
-            int pageNumber = linesToWrite / MAX_LINES;
+            int numberOfPages = linesToWrite / MAX_LINES;
 
-            for (int i = 2; i < pageNumber; i++)
+            for (int i = 2; i < numberOfPages; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
@@ -46,10 +50,7 @@ namespace Application.Writers
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
             List<String> measurePlans = pieces[0].GetMeasurePlans();
-            List<List<Data.Data>> pieceData = pieces[0].GetData();
-
-            int linesWritten = 0;
-            int pageNumber = 1;
+            List<List<Data.Measure>> pieceData = pieces[0].GetData();
 
             for (int i = 0; i < pieceData.Count; i++)
             {
@@ -58,25 +59,13 @@ namespace Application.Writers
                 {
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
                     base.currentLine++;
-                    linesWritten++;
+                    this.linesWritten++;
                 }
 
                 // Changement de page si l'actuelle est complète
-                if (linesWritten == MAX_LINES)
+                if (this.linesWritten == MAX_LINES)
                 {
-                    pageNumber++;
-
-                    try
-                    {
-                        excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
-                    }
-                    catch
-                    {
-                        if (form.Modify) return;
-                    }
-
-                    base.currentLine -= linesWritten;
-                    linesWritten = 0;
+                    this.ChangePage();
                 }
 
                 // Écriture des données ligne par ligne
@@ -84,7 +73,7 @@ namespace Application.Writers
                 {
                     if(!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[i][j].Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[i][j].MeasureType.Symbol);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[i][j].NominalValue);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus);
@@ -96,28 +85,33 @@ namespace Application.Writers
                     }
 
                     base.currentLine++;
-                    linesWritten++;
+                    this.linesWritten++;
 
-                    if (linesWritten == MAX_LINES)
+                    if (this.linesWritten == MAX_LINES)
                     {
-                        pageNumber++;
-
-                        try
-                        {
-                            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
-                        }
-                        catch
-                        {
-                            if (form.Modify) return;
-                        }
-
-                        base.currentLine -= linesWritten;
-                        linesWritten = 0;
+                        this.ChangePage();
                     }
                 }
             }
         }
 
         /*-------------------------------------------------------------------------*/
+
+        private void ChangePage()
+        {
+            pageNumber++;
+
+            try
+            {
+                excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
+            }
+            catch
+            {
+                if (form.Modify) return;
+            }
+
+            base.currentLine -= linesWritten;
+            linesWritten = 0;
+        }
     }
 }

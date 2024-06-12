@@ -3,7 +3,7 @@
     public class Piece
     {
         // Il y a une liste de données pour chaque plan de mesure pour les données de la pièce
-        private readonly List<List<Data>> pieceData;
+        private readonly List<List<Measure>> pieceData;
 
         private readonly List<String> measurePlans;
 
@@ -13,7 +13,7 @@
 
         public Piece() 
         {
-            this.pieceData = new List<List<Data>>();
+            this.pieceData = new List<List<Measure>>();
             this.measurePlans = new List<String>();
 
             // Création de l'en-tête vide
@@ -55,7 +55,7 @@
         public void AddMeasurePlan(String measurePlan)
         {
             this.measurePlans.Add(measurePlan);
-            this.pieceData.Add(new List<Data>());
+            this.pieceData.Add(new List<Measure>());
         }
 
         /*-------------------------------------------------------------------------*/
@@ -67,7 +67,7 @@
          * data : Data.Data - Donnée à ajouter
          * 
          */
-        public void AddData(Data data)
+        public void AddData(Measure data)
         {
             if (this.pieceData.Count == 0)
             {
@@ -100,7 +100,7 @@
          * return : List<List<Data.Data>> - Liste des données
          * 
          */
-        public List<List<Data>> GetData()
+        public List<List<Measure>> GetData()
         {
             return this.pieceData;
         }

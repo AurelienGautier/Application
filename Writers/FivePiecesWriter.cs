@@ -9,7 +9,7 @@ namespace Application.Writers
     {
         private int pageNumber;
         private readonly List<List<String>> measurePlans;
-        private readonly List<List<List<Data.Data>>> pieceData;
+        private readonly List<List<List<Data.Measure>>> pieceData;
         private int linesWritten;
         private int min;
         private int max;
@@ -26,7 +26,7 @@ namespace Application.Writers
         {
             this.pageNumber = 1;
             this.measurePlans = new List<List<String>>();
-            this.pieceData = new List<List<List<Data.Data>>>();
+            this.pieceData = new List<List<List<Data.Measure>>>();
             this.linesWritten = 0;
             this.min = 0;
             this.max = 5;
@@ -66,6 +66,8 @@ namespace Application.Writers
                 this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
                 this.pieceData.Add(base.pieces[i].GetData());
             }
+
+            this.max = this.pieceData.Count < 5 ? this.pieceData.Count : 5;
 
             int iterations = pieceData.Count / 5;
             if (pieceData.Count % 5 != 0) iterations++;
@@ -109,10 +111,17 @@ namespace Application.Writers
                 {
                     if (!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].MeasureType.Symbol);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[0][i][j].NominalValue);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
+                    }
+
+                    if (form.Modify && excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn) == "")
+                    {
+                        excelApiLink.CloseWorkBook(form.Path);
+
+                        throw (new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources"));
                     }
 
                     base.currentColumn += 3;
@@ -143,7 +152,17 @@ namespace Application.Writers
         public void ChangePage()
         {
             this.pageNumber++;
-            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
+
+            try
+            {
+                excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
+            }
+            catch 
+            {
+                excelApiLink.CloseWorkBook(form.Path);
+
+                throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
+            }
 
             base.currentLine = 17;
             this.linesWritten = 0;

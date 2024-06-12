@@ -251,7 +251,7 @@ namespace Application.Data
          * @return Data? - L'objet Data créé ou null si le type de mesure n'existe pas
          * 
          */
-        public Data? GetData(List<String> line, List<double> values)
+        public Measure? GetData(List<String> line, List<double >values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
 
@@ -260,7 +260,7 @@ namespace Application.Data
             if (measureType == null)
                 return null;
 
-            return measureType.CreateData(values);
+            return new Measure(measureType, values);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -362,7 +362,7 @@ namespace Application.Data
 
             forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
             forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 26, 26, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Folder, 18, 75));
+            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Files, 18, 75));
             forms.Add(new Form("Capabilité", Environment.CurrentDirectory + "\\form\\capabilite", 26, 103, 5, 53, 11, FormType.Capability, DataFrom.File, 18, 75));
 
             return forms;
@@ -384,7 +384,7 @@ namespace Application.Data
 
         private void getStandardsFromExcelFile()
         {
-            ExcelApiLinkSingleton excelApiLink = ExcelApiLinkSingleton.Instance;
+            ExcelLibraryLinkSingleton excelApiLink = ExcelLibraryLinkSingleton.Instance;
             String workbookPath  = Environment.CurrentDirectory + "\\res\\etalons.xlsm";
             excelApiLink.OpenWorkBook(workbookPath);
 

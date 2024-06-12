@@ -47,11 +47,8 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBox x:Name="SourcePathTextBox" Grid.Column="0" Margin="0" Style="{StaticResource TextBoxStyle}" Background="White" Width="248" />
-                                <Button x:Name="BrowseFileButton" Margin="0" Click="browseSourceFile" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
+                                <Button x:Name="BrowseFileButton" Margin="0" Click="browseSourceFiles" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
                                     <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="File" Background="White" Width="24" Height="24"/>
-                                </Button>
-                                <Button x:Name="BrowseFolderButton" Click="browseSourceFolder" Grid.Column="1" Style="{StaticResource BrowseButtonStyle}" BorderThickness="0" Background="White" Width="24">
-                                    <Icon:PackIconMaterial Style="{StaticResource ButtonIconStyle}" Kind="Folder" Background="White" Width="24" Height="24"/>
                                 </Button>
                             </Grid>
                         </StackPanel>

@@ -3,6 +3,10 @@ using System.IO;
 
 namespace Application.Parser
 {
+    /// <summary>
+    /// Represents a text file parser that inherits from the base Parser class.
+    /// This class is responsible for parsing a text file and returning a list of pieces.
+    /// </summary>
     public class TextFileParser : Parser
     {
         private const string ENCODING = "iso-8859-1";
@@ -13,6 +17,9 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Initializes a new instance of the TextFileParser class.
+        /// </summary>
         public TextFileParser()
         {
             this.fileToParse = "";
@@ -20,12 +27,11 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Parse un fichier texte et retourne une liste de pièces
-         * fileToParse : String - Nom du fichier à parser
-         * return : List<Data.Piece> - Liste de pièces
-         * 
-         */
+        /// <summary>
+        /// Parses a text file and returns a list of pieces.
+        /// </summary>
+        /// <param name="fileToParse">The name of the file to parse.</param>
+        /// <returns>The list of pieces.</returns>
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
             this.fileToParse = fileToParse;
@@ -38,7 +44,7 @@ namespace Application.Parser
             while ((line = sr.ReadLine()) != null)
             {
                 manageLineType(line);
-                lineIndex++; 
+                lineIndex++;
             }
 
             sr.Close();
@@ -48,16 +54,15 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Gère le type de ligne en fonction de son contenu
-         * line : String - Ligne à analyser
-         *                                 
-         */
+        /// <summary>
+        /// Manages the line type based on its content.
+        /// </summary>
+        /// <param name="line">The line to analyze.</param>
         private void manageLineType(string line)
         {
             List<string> words;
 
-            // Récupération de chaque mot de la ligne dans words en supprimant les espaces
+            // Retrieves each word from the line in words by removing spaces
             words = line.Split(' ').ToList();
             words = words.Where((item, index) => item != "" && item != " ").ToList();
 
@@ -72,11 +77,10 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Parse l'en-tête si une ligne de type header est détectée
-         * line : String - Ligne à analyser
-         *                                 
-         */
+        /// <summary>
+        /// Parses the header if a header line is detected.
+        /// </summary>
+        /// <param name="line">The line to analyze.</param>
         private void manageHeaderType(string line)
         {
             if (dataParsed == null) return;
@@ -97,11 +101,10 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère le nom du plan de mesure de la ligne
-         * words : List<String> - Ligne à analyser sous forme de liste des mots
-         *
-         */
+        /// <summary>
+        /// Retrieves the measure plan name from the line.
+        /// </summary>
+        /// <param name="words">The line to analyze as a list of words.</param>
         private void manageMeasurePlan(List<string> words)
         {
             if (!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
@@ -120,16 +123,15 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Gère une ligne de type valeur
-         * words : List<String> - Ligne à analyser sous forme de liste des mots
-         *
-         */
+        /// <summary>
+        /// Manages a value type line.
+        /// </summary>
+        /// <param name="words">The line to analyze as a list of words.</param>
         private void manageValueType(List<string> words)
         {
-            if(!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
+            if (!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
 
-            // Suppression du nombre inutile qui apparaît parfois sur certaines mesures
+            // Removes the unnecessary number that sometimes appears on certain measures
             int testInt;
             if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
 
@@ -167,15 +169,15 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne le type de mesure d'une ligne contenant une mesure
-         * line : List<String> - Ligne contenant la mesure
-         * return : Data - Type de mesure de la ligne
-         *
-         */
-        private Data.Data getData(List<string> line, List<double> values) 
+        /// <summary>
+        /// Returns the measure type of a line containing a measure.
+        /// </summary>
+        /// <param name="line">The line containing the measure.</param>
+        /// <param name="values">The list of values.</param>
+        /// <returns>The measure type of the line.</returns>
+        private Data.Measure getData(List<string> line, List<double> values)
         {
-            Data.Data? data = Data.ConfigSingleton.Instance.GetData(line, values);
+            Data.Measure? data = Data.ConfigSingleton.Instance.GetData(line, values);
 
             if (data == null)
             {
@@ -187,6 +189,10 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the file extension for the parser.
+        /// </summary>
+        /// <returns>The file extension.</returns>
         public override string GetFileExtension()
         {
             return "(*.mit;*.txt)|*.mit;*.txt";

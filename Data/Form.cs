@@ -30,6 +30,7 @@
         public int ClientLine { get; set; }
         public int StandardLine { get; set; }
         public List<int>? CapabilityMeasureNumber { get; set; }
+        public List<String> SourceFiles { get; set; }
 
         public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine, int standardLine)
         {
@@ -42,10 +43,11 @@
             this.ColumnToSign = columnToSign;
             this.Modify = false;
             this.Sign = false;
-            Type = type;
-            DataFrom = dataFrom;
-            ClientLine = clientLine;
-            StandardLine = standardLine;
+            this.Type = type;
+            this.DataFrom = dataFrom;
+            this.ClientLine = clientLine;
+            this.StandardLine = standardLine;
+            this.SourceFiles = new List<String>();
         }
     }
 }

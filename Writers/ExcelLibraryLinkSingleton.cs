@@ -10,11 +10,11 @@ using Excel = Microsoft.Office.Interop.Excel;
 namespace Application.Writers
 {
     /// <summary>
-    /// Singleton class for managing the Excel API.
+    /// Singleton class for managing the Excel Library.
     /// </summary>
-    internal class ExcelApiLinkSingleton
+    internal class ExcelLibraryLinkSingleton
     {
-        private static ExcelApiLinkSingleton? instance = null;
+        private static ExcelLibraryLinkSingleton? instance = null;
         private readonly Excel.Application excelApp;
         private readonly Dictionary<String, Excel.Workbook> workbooks;
 
@@ -23,13 +23,13 @@ namespace Application.Writers
         /// <summary>
         /// Returns the instance of the class, creating it if it is null.
         /// </summary>
-        public static ExcelApiLinkSingleton Instance
+        public static ExcelLibraryLinkSingleton Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new ExcelApiLinkSingleton();
+                    instance = new ExcelLibraryLinkSingleton();
                 }
 
                 return instance;
@@ -41,7 +41,7 @@ namespace Application.Writers
         /// <summary>
         /// Constructor of the class.
         /// </summary>
-        private ExcelApiLinkSingleton()
+        private ExcelLibraryLinkSingleton()
         {
             this.excelApp = new Excel.Application();
             this.excelApp.DisplayAlerts = false;
@@ -53,7 +53,7 @@ namespace Application.Writers
         /// <summary>
         /// Destructor of the class.
         /// </summary>
-        ~ExcelApiLinkSingleton()
+        ~ExcelLibraryLinkSingleton()
         {
             foreach (var workbook in workbooks)
             {
@@ -124,7 +124,7 @@ namespace Application.Writers
         public void ChangeWorkSheet(String path, String sheet)
         {
             if (!workbooks.ContainsKey(path)) return;
-            Console.WriteLine("ChangeWorkSheet: " + sheet);
+            
             workbooks[path].Sheets[sheet].Activate();
         }
 

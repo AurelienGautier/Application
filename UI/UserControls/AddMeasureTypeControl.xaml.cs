@@ -8,7 +8,7 @@ namespace Application.UI.UserControls
     /// Interaction logic for AddMeasureType.xaml
     /// This control aims to allow the user to create a measurement type or modify an existing one
     /// </summary>
-    public partial class AddMeasureType : UserControl
+    public partial class AddMeasureTypeControl : UserControl
     {
         // The measurement type to modify (in case of modification). It takes the value null in case of creation
         private Data.MeasureType? measureType;
@@ -23,7 +23,7 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        public AddMeasureType()
+        public AddMeasureTypeControl()
         {
             InitializeComponent();
 

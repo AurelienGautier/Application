@@ -98,7 +98,7 @@ namespace Application.UI.UserControls
             if (libelle == null) return;
 
             // Show a confirmation message box
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to delete the measure type " + libelle + "?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            MessageBoxResult result = MessageBox.Show("Êtes-vous sûr de vouloir supprimer le type de mesure " + libelle + "?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             // If the user clicks No, return
             if (result == MessageBoxResult.No) return;

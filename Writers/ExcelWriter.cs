@@ -13,7 +13,7 @@ namespace Application.Writers
         protected int currentColumn;
         protected List<Data.Piece> pieces;
         protected Form form;
-        protected ExcelApiLinkSingleton excelApiLink;
+        protected ExcelLibraryLinkSingleton excelApiLink;
 
         /*-------------------------------------------------------------------------*/
 
@@ -29,11 +29,11 @@ namespace Application.Writers
             this.currentColumn = form.FirstColumn;
             this.form = form;
 
-            ExcelApiLinkSingleton.Instance.OpenWorkBook(form.Path);
+            ExcelLibraryLinkSingleton.Instance.OpenWorkBook(form.Path);
 
             this.pieces = new List<Data.Piece>();
 
-            this.excelApiLink = ExcelApiLinkSingleton.Instance;
+            this.excelApiLink = ExcelLibraryLinkSingleton.Instance;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -85,8 +85,7 @@ namespace Application.Writers
             excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
 
             this.writeClient(header.ClientName);
-
-            if (!form.Modify) this.writeStandards(standards);
+            this.writeStandards(standards);
         }
 
         /*-------------------------------------------------------------------------*/
