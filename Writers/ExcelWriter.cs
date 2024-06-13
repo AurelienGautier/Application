@@ -46,7 +46,7 @@ namespace Application.Writers
         public void WriteData(List<Data.Piece> data, List<Standard> standards)
         {
             this.pieces = data;
-            Console.WriteLine("La taille: " + data.Count);
+
             writeHeader(data[0].GetHeader(), standards);
 
             if (!form.Modify) CreateWorkSheets();
@@ -210,6 +210,18 @@ namespace Application.Writers
             excelApiLink.SaveWorkBook(form.Path, fileToSavePath);
 
             excelApiLink.CloseWorkBook(form.Path);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Throws an exception indicating that the number of measures is different between the report to modify and the source file(s).
+        /// </summary>
+        protected void throwIncoherentValueException()
+        {
+            excelApiLink.CloseWorkBook(form.Path);
+            
+            throw new Exceptions.IncoherentValueException("Le nombre de mesures est différent entre le rapport à modifier et le(s) fichier(s) source(s).");
         }
 
         /*-------------------------------------------------------------------------*/

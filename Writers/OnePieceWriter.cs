@@ -1,6 +1,4 @@
-﻿using Excel = Microsoft.Office.Interop.Excel;
-using Application.Data;
-using Microsoft.Office.Interop.Excel;
+﻿using Application.Data;
 
 namespace Application.Writers
 {
@@ -63,8 +61,13 @@ namespace Application.Writers
                 // Writing the plan
                 if (measurePlans[i] != "")
                 {
-                    if (this.isLastLine(pieceData, i, 0) && this.isNextLineEmpty())
-                        this.throwIncoherentValueException();
+                    if(base.form.Modify)
+                    {
+                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
+                            base.throwIncoherentValueException();
+                        else if (this.isLastLine(pieceData, i, 0) && !this.isNextLineEmpty())
+                            base.throwIncoherentValueException();
+                    }
 
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
                     base.currentLine++;
@@ -92,9 +95,9 @@ namespace Application.Writers
                     if (form.Modify)
                     {
                         if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 2) == "")
-                            this.throwIncoherentValueException();
-                        else if (this.isLastLine(pieceData, i, j) && this.isNextLineEmpty())
-                            this.throwIncoherentValueException();
+                            base.throwIncoherentValueException();
+                        else if (this.isLastLine(pieceData, i, j) && !this.isNextLineEmpty())
+                            base.throwIncoherentValueException();
                     }
 
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);
@@ -143,9 +146,9 @@ namespace Application.Writers
         private bool isNextLineEmpty()
         {
             if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "")
-                return true;
+                return false;
 
-            return false;
+            return true;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -165,18 +168,6 @@ namespace Application.Writers
                 return true;
 
             return false;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Throws an exception indicating that the number of measures is different between the report to modify and the source file(s).
-        /// </summary>
-        private void throwIncoherentValueException()
-        {
-            excelApiLink.CloseWorkBook(form.Path);
-
-            throw new Exceptions.IncoherentValueException("The number of measures is different between the report to modify and the source file(s).");
         }
 
         /*-------------------------------------------------------------------------*/

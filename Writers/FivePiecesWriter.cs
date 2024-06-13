@@ -98,6 +98,14 @@ namespace Application.Writers
                 // Write the plan
                 if (measurePlans[0][i] != "")
                 {
+                    if (base.form.Modify)
+                    {
+                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn) == "")
+                            base.throwIncoherentValueException();
+                        else if (this.isLastLine(pieceData[0], i, 0) && !this.isNextLineEmpty())
+                            base.throwIncoherentValueException();
+                    }
+
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
                     base.currentLine++;
                     this.linesWritten++;
@@ -117,11 +125,12 @@ namespace Application.Writers
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
                     }
 
-                    if (form.Modify && excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn) == "")
+                    if (base.form.Modify)
                     {
-                        excelApiLink.CloseWorkBook(form.Path);
-
-                        throw (new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources"));
+                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
+                            base.throwIncoherentValueException();
+                        else if (this.isLastLine(pieceData[0], i, j) && !this.isNextLineEmpty())
+                            base.throwIncoherentValueException();
                     }
 
                     base.currentColumn += 3;
@@ -159,9 +168,7 @@ namespace Application.Writers
             }
             catch 
             {
-                excelApiLink.CloseWorkBook(form.Path);
-
-                throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
+                base.throwIncoherentValueException();
             }
 
             base.currentLine = 17;
@@ -174,6 +181,40 @@ namespace Application.Writers
                 excelApiLink.WriteCell(form.Path, 15, col, (i + 1).ToString());
                 col += 3;
             }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Checks if the current line is the last line of the form to modify.
+        /// </summary>
+        /// <param name="pieceData">The piece data.</param>
+        /// <param name="i">The current index of the measure plan.</param>
+        /// <param name="j">The current index of the measurement data within the measure plan.</param>
+        /// <returns>True if the current line is the last line, false otherwise.</returns>
+        private bool isLastLine(List<List<Data.Measure>> pieceData, int i, int j)
+        {
+            if (i != pieceData.Count - 1) return false;
+
+            if (pieceData[i].Count == 0 || j == pieceData[i].Count - 1)
+                return true;
+
+            return false;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Checks if the next line in the Excel worksheet is empty.
+        /// </summary>
+        /// <returns>True if the next line is empty, false otherwise.</returns>
+        private bool isNextLineEmpty()
+        {
+            if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn) != ""
+                && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 1) != "")
+                return false;
+
+            return true;
         }
 
         /*-------------------------------------------------------------------------*/

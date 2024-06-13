@@ -90,11 +90,6 @@ namespace Application.UI.UserControls
 
             if(Modify.IsChecked == true) this.currentForm.Modify = true;
 
-            foreach (String file in this.currentForm.SourceFiles)
-            {
-                Console.WriteLine(file);
-            }
-
             if (!isFormCorrectlyFilled()) return;
 
             String? formToModify = null;

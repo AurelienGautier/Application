@@ -52,8 +52,6 @@ namespace Application.UI.UserControls
                 {
                     List<Piece> newPieces = parser.ParseFile(form.SourceFiles[i]);
 
-                    Console.WriteLine(form.SourceFiles[i]);
-
                     if(measureNumber == null)
                     {
                         measureNumber = newPieces[0].GetLinesToWriteNumber();
