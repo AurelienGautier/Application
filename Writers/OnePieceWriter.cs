@@ -59,15 +59,8 @@ namespace Application.Writers
                 // Écriture du plan
                 if (measurePlans[i] != "")
                 {
-                    if ( // if the number of measures in the report is greater than the number of measures in the source file
-                            i == pieceData.Count - 1
-                            && pieceData[i].Count == 0
-                            && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "")
-                    {
-                        excelApiLink.CloseWorkBook(form.Path);
-
-                        throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
-                    }
+                    if (this.isLastLine(pieceData, i, 0) && this.isNextLineEmpty())
+                        this.throwIncoherentValueException();
                         
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
                     base.currentLine++;
@@ -90,25 +83,14 @@ namespace Application.Writers
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus);
                     }
-                    
-                    if (form.Modify) // Throw an error if thnumber of measures in the report is different from the number of measures in the source file
+
+                    // Throws an error if the number of measures in the report is different from the number of measures in the source file
+                    if (form.Modify) 
                     {
-                        // if the number of measures in the report is smaller than the number of measures in the source file
                         if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 2) == "")
-                        {
-                            excelApiLink.CloseWorkBook(form.Path);
-
-                            throw (new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources"));
-                        }
-                        else if ( // if the number of measures in the report is greater than the number of measures in the source file
-                            i == pieceData.Count - 1 
-                            && j == pieceData[i].Count - 1
-                            && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "" )
-                        {
-                            excelApiLink.CloseWorkBook(form.Path);
-
-                            throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
-                        }
+                            this.throwIncoherentValueException();
+                        else if (this.isLastLine(pieceData, i, j) && this.isNextLineEmpty())
+                            this.throwIncoherentValueException();
                     }
 
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);
@@ -143,6 +125,37 @@ namespace Application.Writers
 
             base.currentLine -= linesWritten;
             linesWritten = 0;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private bool isNextLineEmpty()
+        {
+            if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "")
+                return true;
+
+            return false;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private bool isLastLine(List<List<Data.Measure>> pieceData, int i, int j)
+        {
+            if (i != pieceData.Count - 1) return false; 
+
+            if (pieceData[i].Count == 0 || j == pieceData[i].Count - 1)
+                return true;
+            
+            return false;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void throwIncoherentValueException()
+        {
+            excelApiLink.CloseWorkBook(form.Path);
+
+            throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
         }
 
         /*-------------------------------------------------------------------------*/
