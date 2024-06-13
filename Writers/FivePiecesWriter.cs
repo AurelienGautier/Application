@@ -46,7 +46,9 @@ namespace Application.Writers
 
             totalPageNumber *= iterations;
 
-            for (int i = 2; i <= totalPageNumber; i++)
+            int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
+
+            for (int i = firstPageToCreate; i <= totalPageNumber; i++)
             {
                 excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
@@ -101,9 +103,13 @@ namespace Application.Writers
                     if (base.form.Modify)
                     {
                         if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn) == "")
+                        {
                             base.throwIncoherentValueException();
-                        else if (this.isLastLine(pieceData[0], i, 0) && !this.isNextLineEmpty())
+                        }
+                        else if (this.isLastLine(pieceData[0], i, -1) && !this.isNextLineEmpty())
+                        {
                             base.throwIncoherentValueException();
+                        }
                     }
 
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
@@ -164,6 +170,7 @@ namespace Application.Writers
 
             try
             {
+
                 excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
             }
             catch 
@@ -211,7 +218,7 @@ namespace Application.Writers
         private bool isNextLineEmpty()
         {
             if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn) != ""
-                && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 1) != "")
+                || excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 1) != "")
                 return false;
 
             return true;

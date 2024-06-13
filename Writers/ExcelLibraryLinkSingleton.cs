@@ -373,5 +373,34 @@ namespace Application.Writers
         }
 
         /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Returns the number of worksheets in an Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <returns>Number of worksheets.</returns>
+        public int GetNumberOfPages(String path)
+        {
+            if (!workbooks.ContainsKey(path)) return 0;
+
+            return workbooks[path].Sheets.Count;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Returns the name of a worksheet in an Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file.</param>
+        /// <param name="page">Number of the worksheet.</param>
+        /// <returns>Name of the worksheet.</returns>
+        public String GetPageName(String path, int page)
+        {
+            if (!workbooks.ContainsKey(path)) return "";
+
+            return workbooks[path].Sheets[page].Name;
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

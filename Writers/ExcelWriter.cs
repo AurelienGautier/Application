@@ -49,7 +49,7 @@ namespace Application.Writers
 
             writeHeader(data[0].GetHeader(), standards);
 
-            if (!form.Modify) CreateWorkSheets();
+            CreateWorkSheets();
 
             WritePiecesValues();
 
@@ -222,6 +222,29 @@ namespace Application.Writers
             excelApiLink.CloseWorkBook(form.Path);
             
             throw new Exceptions.IncoherentValueException("Le nombre de mesures est différent entre le rapport à modifier et le(s) fichier(s) source(s).");
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Gets the number of pages containing measurement values in the Excel file.
+        /// </summary>
+        /// <returns>The number of pages</returns>
+        protected int getMeasurePagesNumber()
+        {
+            int pageNumber = 0;
+
+            for (int i = 1; i <= excelApiLink.GetNumberOfPages(form.Path); i++)
+            {
+                string pageName = excelApiLink.GetPageName(form.Path, i);
+
+                if (pageName.StartsWith("Mesures"))
+                {
+                    pageNumber++;
+                }
+            }
+
+            return pageNumber;
         }
 
         /*-------------------------------------------------------------------------*/

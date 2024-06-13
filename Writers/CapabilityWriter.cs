@@ -16,16 +16,19 @@ namespace Application.Writers
         /// <exception cref="Exceptions.IncorrectValuesToTreatException"></exception>
         public override void CreateWorkSheets()
         {
-            if(form.CapabilityMeasureNumber == null)
+            if(!base.form.Modify)
             {
-                throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
-            }
+                if(form.CapabilityMeasureNumber == null)
+                {
+                    throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
+                }
 
-            Console.WriteLine(form.CapabilityMeasureNumber.Count);
+                Console.WriteLine(form.CapabilityMeasureNumber.Count);
 
-            for(int i = 2; i <= form.CapabilityMeasureNumber.Count; i++)
-            {
-                excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
+                for(int i = 2; i <= form.CapabilityMeasureNumber.Count; i++)
+                {
+                    excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
+                }
             }
         }
 

@@ -33,13 +33,16 @@ namespace Application.Writers
         /// </summary>
         public override void CreateWorkSheets()
         {
-            int linesToWrite = pieces[0].GetLinesToWriteNumber();
-
-            int numberOfPages = linesToWrite / MAX_LINES;
-
-            for (int i = 2; i < numberOfPages; i++)
+            if(!base.form.Modify)
             {
-                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
+                int linesToWrite = pieces[0].GetLinesToWriteNumber();
+
+                int numberOfPages = linesToWrite / MAX_LINES;
+
+                for (int i = 2; i < numberOfPages; i++)
+                {
+                    excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
+                }
             }
         }
 
@@ -65,7 +68,7 @@ namespace Application.Writers
                     {
                         if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
                             base.throwIncoherentValueException();
-                        else if (this.isLastLine(pieceData, i, 0) && !this.isNextLineEmpty())
+                        else if (this.isLastLine(pieceData, i, -1) && !this.isNextLineEmpty())
                             base.throwIncoherentValueException();
                     }
 
