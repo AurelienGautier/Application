@@ -22,7 +22,7 @@ namespace Application.UI.UserControls
         private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
 
-        private Form? currentForm = null;
+        private Form currentForm;
 
         /*-------------------------------------------------------------------------*/
 
@@ -46,7 +46,7 @@ namespace Application.UI.UserControls
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
 
-            this.currentForm = this.forms[0];
+            this.currentForm = this.forms[0].Copy();
 
             // Add the code attributes of each standards element to AvailableOptions
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
@@ -86,6 +86,15 @@ namespace Application.UI.UserControls
         /// </summary>
         private void fillAform(object sender, RoutedEventArgs e)
         {
+            this.currentForm.SourceFiles = SourcePathTextBox.Text.Split('|').ToList();
+
+            if(Modify.IsChecked == true) this.currentForm.Modify = true;
+
+            foreach (String file in this.currentForm.SourceFiles)
+            {
+                Console.WriteLine(file);
+            }
+
             if (!isFormCorrectlyFilled()) return;
 
             String? formToModify = null;
@@ -99,7 +108,7 @@ namespace Application.UI.UserControls
             }
 
             this.callFormFilling(formToModify);
-            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem).Copy();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -125,8 +134,19 @@ namespace Application.UI.UserControls
 
             if (SourcePathTextBox.Text == "")
             {
-                MainWindow.DisplayError("Veuillez renseigner le chemins du fichier ou du dossier source.");
+                MainWindow.DisplayError("Veuillez renseigner le chemin du fichier ou du dossier source.");
                 return false;
+            }
+            else
+            {
+                for(int i = 0; i < this.currentForm.SourceFiles.Count; i++)
+                {
+                    if (!File.Exists(this.currentForm.SourceFiles[i]))
+                    {
+                        MainWindow.DisplayError("Le fichier source " + this.currentForm.SourceFiles[i] + " n'existe pas.");
+                        return false;
+                    }
+                }
             }
 
             if (DestinationPathTextBox.Text == "")
@@ -161,7 +181,6 @@ namespace Application.UI.UserControls
                     return false;
                 }
             }
-
 
             return true;
         }
@@ -244,11 +263,11 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void changeForm(object sender, SelectionChangedEventArgs e)
         {
-            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem).Copy();
 
             if (this.currentForm == null)
             {
-                this.currentForm = this.forms[0];
+                this.currentForm = this.forms[0].Copy();
             }
 
             if (this.currentForm.Type == FormType.Capability)
@@ -315,12 +334,14 @@ namespace Application.UI.UserControls
             
             if (filesToParse.Count == 0) return;
 
+            SourcePathTextBox.Text = "";
+
             foreach (String file in filesToParse)
             {
-                SourcePathTextBox.Text += file + ";";
+                SourcePathTextBox.Text += file + "|";
             }
 
-            this.currentForm.SourceFiles = filesToParse;
+            SourcePathTextBox.Text = SourcePathTextBox.Text.Remove(SourcePathTextBox.Text.Length - 1);
         }
 
         /*-------------------------------------------------------------------------*/

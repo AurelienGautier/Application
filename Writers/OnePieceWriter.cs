@@ -1,5 +1,6 @@
 ﻿using Excel = Microsoft.Office.Interop.Excel;
 using Application.Data;
+using Microsoft.Office.Interop.Excel;
 
 namespace Application.Writers
 {
@@ -52,11 +53,22 @@ namespace Application.Writers
             List<String> measurePlans = pieces[0].GetMeasurePlans();
             List<List<Data.Measure>> pieceData = pieces[0].GetData();
 
+
             for (int i = 0; i < pieceData.Count; i++)
             {
                 // Écriture du plan
                 if (measurePlans[i] != "")
                 {
+                    if ( // if the number of measures in the report is greater than the number of measures in the source file
+                            i == pieceData.Count - 1
+                            && pieceData[i].Count == 0
+                            && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "")
+                    {
+                        excelApiLink.CloseWorkBook(form.Path);
+
+                        throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
+                    }
+                        
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
                     base.currentLine++;
                     this.linesWritten++;
@@ -67,7 +79,7 @@ namespace Application.Writers
                 {
                     this.ChangePage();
                 }
-
+                
                 // Écriture des données ligne par ligne
                 for (int j = 0; j < pieceData[i].Count; j++)
                 {
@@ -78,11 +90,28 @@ namespace Application.Writers
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus);
                     }
-
-                    if(base.form.Modify && excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 6) != "") 
+                    
+                    if (form.Modify) // Throw an error if thnumber of measures in the report is different from the number of measures in the source file
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);
+                        // if the number of measures in the report is smaller than the number of measures in the source file
+                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 2) == "")
+                        {
+                            excelApiLink.CloseWorkBook(form.Path);
+
+                            throw (new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources"));
+                        }
+                        else if ( // if the number of measures in the report is greater than the number of measures in the source file
+                            i == pieceData.Count - 1 
+                            && j == pieceData[i].Count - 1
+                            && excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "" )
+                        {
+                            excelApiLink.CloseWorkBook(form.Path);
+
+                            throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
+                        }
                     }
+
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);
 
                     base.currentLine++;
                     this.linesWritten++;
@@ -107,11 +136,15 @@ namespace Application.Writers
             }
             catch
             {
-                if (form.Modify) return;
+                excelApiLink.CloseWorkBook(form.Path);
+
+                throw new Exceptions.IncoherentValueException("Le nombre de mesures n'est pas le même entre le rapport à modifier et le ou les fichiers sources");
             }
 
             base.currentLine -= linesWritten;
             linesWritten = 0;
         }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

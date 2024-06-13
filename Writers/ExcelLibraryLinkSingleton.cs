@@ -1,8 +1,6 @@
 ﻿using Application.Data;
 using Application.Exceptions;
-using Microsoft.Office.Interop.Excel;
 using System.Drawing;
-using System.IO;
 using System.Text;
 using System.Windows;
 using Excel = Microsoft.Office.Interop.Excel;

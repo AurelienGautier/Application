@@ -49,5 +49,10 @@
             this.StandardLine = standardLine;
             this.SourceFiles = new List<String>();
         }
+
+        public Form Copy()
+        {
+            return (Form)this.MemberwiseClone();
+        }
     }
 }

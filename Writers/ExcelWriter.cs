@@ -46,13 +46,10 @@ namespace Application.Writers
         public void WriteData(List<Data.Piece> data, List<Standard> standards)
         {
             this.pieces = data;
-
+            Console.WriteLine("La taille: " + data.Count);
             writeHeader(data[0].GetHeader(), standards);
 
-            if (!form.Modify) 
-            {
-                CreateWorkSheets();
-            }
+            if (!form.Modify) CreateWorkSheets();
 
             WritePiecesValues();
 
