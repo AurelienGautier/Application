@@ -48,9 +48,20 @@ namespace Application.Writers
 
             int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
 
+            if(base.form.Modify && firstPageToCreate > totalPageNumber)
+            {
+                for(int i = firstPageToCreate - 1; i > totalPageNumber; i--)
+                {
+                    excelApiLink.DeleteWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
+                }
+            }
+
             for (int i = firstPageToCreate; i <= totalPageNumber; i++)
             {
-                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
+                String nbToCopy = " (" + (i - firstPageToCreate + 1).ToString() + ")";
+                if (nbToCopy == " (1)") nbToCopy = "";
+
+                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + nbToCopy, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
         }
 
@@ -134,9 +145,13 @@ namespace Application.Writers
                     if (base.form.Modify)
                     {
                         if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
+                        {
                             base.throwIncoherentValueException();
+                        }
                         else if (this.isLastLine(pieceData[0], i, j) && !this.isNextLineEmpty())
+                        {
                             base.throwIncoherentValueException();
+                        }
                     }
 
                     base.currentColumn += 3;
@@ -170,7 +185,6 @@ namespace Application.Writers
 
             try
             {
-
                 excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
             }
             catch 

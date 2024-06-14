@@ -152,6 +152,20 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
+        /// Deletes a worksheet from an Excel file.
+        /// </summary>
+        /// <param name="path">Path of the file</param>
+        /// <param name="sheetName">Name of the sheet to delete</param>
+        public void DeleteWorkSheet(String path, String sheetName)
+        {
+            if (!workbooks.ContainsKey(path)) return;
+
+            workbooks[path].Sheets[sheetName].Delete();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
         /// Writes a value to a cell in a worksheet.
         /// </summary>
         /// <param name="path">Path of the file.</param>
@@ -399,6 +413,16 @@ namespace Application.Writers
             if (!workbooks.ContainsKey(path)) return "";
 
             return workbooks[path].Sheets[page].Name;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        public void DisplayWorkSheets(String path)
+        {
+            foreach (Excel.Worksheet sheet in workbooks[path].Sheets)
+            {
+                Console.WriteLine(sheet.Name);
+            }
         }
 
         /*-------------------------------------------------------------------------*/

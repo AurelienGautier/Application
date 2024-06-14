@@ -29,7 +29,6 @@ namespace Application
         /// </summary>
         public MainWindow()
         {
-
             InitializeComponent();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
