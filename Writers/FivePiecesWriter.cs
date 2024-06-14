@@ -156,6 +156,17 @@ namespace Application.Writers
 
                     base.currentColumn += 3;
 
+                    if (base.form.Modify)
+                    {
+                        int tempCurrentColumn = 4;
+
+                        for(int l = 0; l < 5; l++)
+                        {
+                            tempCurrentColumn += 3;
+                            excelApiLink.WriteCell(form.Path, base.currentLine, tempCurrentColumn, "");
+                        }
+                    }
+
                     // Write the values of the pieces
                     for (int k = this.min; k < this.max; k++)
                     {
