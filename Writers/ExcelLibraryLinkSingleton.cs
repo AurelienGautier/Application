@@ -361,7 +361,14 @@ namespace Application.Writers
         {
             if (!workbooks.ContainsKey(path)) return;
 
-            workbooks[path].ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, pdfPath);
+            try
+            {
+                workbooks[path].ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, pdfPath);
+            }
+            catch
+            {
+                throw new Exceptions.FileAlreadyInUseException(pdfPath);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -382,7 +389,7 @@ namespace Application.Writers
             }
             catch
             {
-                throw new Exceptions.ExcelFileAlreadyInUseException(pathToSave);
+                throw new Exceptions.FileAlreadyInUseException(pathToSave);
             }
         }
 

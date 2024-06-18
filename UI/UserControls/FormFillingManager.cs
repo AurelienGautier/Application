@@ -101,7 +101,7 @@ namespace Application.UI.UserControls
 
                 writer.WriteData(data, standards);
             }
-            catch (ExcelFileAlreadyInUseException e)
+            catch (FileAlreadyInUseException e)
             {
                 MainWindow.DisplayError(e.Message);
             }

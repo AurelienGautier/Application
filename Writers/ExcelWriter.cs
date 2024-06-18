@@ -72,17 +72,20 @@ namespace Application.Writers
         /// <param name="standards">The list of standards to write.</param>
         private void writeHeader(Header header, List<Standard> standards)
         {
-            excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
+            if (!form.Modify)
+            {
+                excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["HeaderPage"]);
 
-            excelApiLink.WriteCell(form.Path, form.DesignLine, 4, header.Designation);
-            excelApiLink.WriteCell(form.Path, form.DesignLine + 2, 4, header.PlanNb);
-            excelApiLink.WriteCell(form.Path, form.DesignLine + 4, 4, header.Index);
-            excelApiLink.WriteCell(form.Path, 14, 1, "N° " + header.ObservationNum);
-            excelApiLink.WriteCell(form.Path, 38, 8, header.PieceReceptionDate);
-            excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
+                excelApiLink.WriteCell(form.Path, form.DesignLine, 4, header.Designation);
+                excelApiLink.WriteCell(form.Path, form.DesignLine + 2, 4, header.PlanNb);
+                excelApiLink.WriteCell(form.Path, form.DesignLine + 4, 4, header.Index);
+                excelApiLink.WriteCell(form.Path, 14, 1, "N° " + header.ObservationNum);
+                excelApiLink.WriteCell(form.Path, 38, 8, header.PieceReceptionDate);
+                excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
 
-            this.writeClient(header.ClientName);
-            this.writeStandards(standards);
+                this.writeClient(header.ClientName);
+                this.writeStandards(standards);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -238,10 +241,8 @@ namespace Application.Writers
             {
                 string pageName = excelApiLink.GetPageName(form.Path, i);
 
-                if (pageName.StartsWith("Mesures"))
-                {
+                if (pageName.StartsWith(ConfigSingleton.Instance.GetPageNames()["MeasurePage"]))
                     pageNumber++;
-                }
             }
 
             return pageNumber;

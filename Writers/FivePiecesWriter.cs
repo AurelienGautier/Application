@@ -46,9 +46,11 @@ namespace Application.Writers
 
             totalPageNumber *= iterations;
 
+            // Pages that already exist in the report don't need to be created again
             int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
 
-            if(base.form.Modify && firstPageToCreate > totalPageNumber)
+            // If the number of pages to create is less than the number of pages in the file, delete the extra pages
+            if (base.form.Modify && firstPageToCreate > totalPageNumber)
             {
                 for(int i = firstPageToCreate - 1; i > totalPageNumber; i--)
                 {
@@ -56,6 +58,7 @@ namespace Application.Writers
                 }
             }
 
+            // Create the necessary pages that don't exist yet
             for (int i = firstPageToCreate; i <= totalPageNumber; i++)
             {
                 String nbToCopy = " (" + (i - firstPageToCreate + 1).ToString() + ")";
@@ -111,18 +114,6 @@ namespace Application.Writers
                 // Write the plan
                 if (measurePlans[0][i] != "")
                 {
-                    if (base.form.Modify)
-                    {
-                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn) == "")
-                        {
-                            base.throwIncoherentValueException();
-                        }
-                        else if (this.isLastLine(pieceData[0], i, -1) && !this.isNextLineEmpty())
-                        {
-                            base.throwIncoherentValueException();
-                        }
-                    }
-
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
                     base.currentLine++;
                     this.linesWritten++;
@@ -140,18 +131,6 @@ namespace Application.Writers
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[0][i][j].NominalValue);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
-                    }
-
-                    if (base.form.Modify)
-                    {
-                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
-                        {
-                            base.throwIncoherentValueException();
-                        }
-                        else if (this.isLastLine(pieceData[0], i, j) && !this.isNextLineEmpty())
-                        {
-                            base.throwIncoherentValueException();
-                        }
                     }
 
                     base.currentColumn += 3;

@@ -84,7 +84,8 @@ namespace Application.Parser
 
             while (ExcelLibraryLinkSingleton.Instance.ReadCell(fileToParse, row, 1) != "")
             {
-                nbPieces = Convert.ToInt32(ExcelLibraryLinkSingleton.Instance.ReadCell(fileToParse, row, 1));
+                nbPieces++;
+
                 row++;
             }
 

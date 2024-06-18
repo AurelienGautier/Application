@@ -13,6 +13,8 @@ namespace Application.Parser
         private StreamReader? sr;
         private String fileToParse;
         int lineIndex = 1;
+
+        // It allows to know if a header line is the first or not
         bool addPieceWhenHeaderMet = true;
 
         /*-------------------------------------------------------------------------*/
@@ -41,6 +43,7 @@ namespace Application.Parser
 
             string? line;
 
+            // Read each line of the file
             while ((line = sr.ReadLine()) != null)
             {
                 manageLineType(line);
@@ -68,10 +71,13 @@ namespace Application.Parser
 
             int testInt;
 
+            // If the line is empty
             if (words.Count == 0) return;
-
+            // If the line is a measure plan
             if (words[0][0] == '*') manageMeasurePlan(words);
+            // If the line is a list of values from a measure
             else if (int.TryParse(words[0], out testInt)) manageValueType(words);
+            // If the line is a header
             else manageHeaderType(line);
         }
 
@@ -85,6 +91,7 @@ namespace Application.Parser
         {
             if (dataParsed == null) return;
 
+            // If a new header is met
             if (this.addPieceWhenHeaderMet)
             {
                 dataParsed.Add(new Data.Piece());
@@ -152,6 +159,13 @@ namespace Application.Parser
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Converts a line of values in the texte file to a list of double values.
+        /// </summary>
+        /// <param name="words">The list of words in the line</param>
+        /// <param name="startIndex">The first word to convert in the list</param>
+        /// <param name="endIndex">The last word to convert in the list</param>
+        /// <returns>A list of doubles converted from a line of the file</returns>
         private List<double> getLineToDoubleList(List<string> words, int startIndex, int endIndex)
         {
             List<double> values = new List<double>();

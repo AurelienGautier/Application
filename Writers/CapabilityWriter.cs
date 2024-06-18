@@ -6,9 +6,9 @@ namespace Application.Writers
     {
         private readonly int maxLines = 25;
 
-        public CapabilityWriter(String fileName, Form form) : base(fileName, form)
-        {
-        }
+        public CapabilityWriter(String fileName, Form form) : base(fileName, form) { }
+
+        /*-------------------------------------------------------------------------*/
 
         /// <summary>
         /// Creates a worksheet for each capability measure
@@ -16,21 +16,27 @@ namespace Application.Writers
         /// <exception cref="Exceptions.IncorrectValuesToTreatException"></exception>
         public override void CreateWorkSheets()
         {
-            if(!base.form.Modify)
+            if(form.CapabilityMeasureNumber == null)
+                throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
+
+            int pagesToWrite = form.CapabilityMeasureNumber.Count;
+            int firstPageToCreate = base.form.Modify ? this.getCapaPagesNumber() + 1 : 2;
+
+            if (firstPageToCreate > pagesToWrite)
             {
-                if(form.CapabilityMeasureNumber == null)
+                for(int i = firstPageToCreate - 1; i > pagesToWrite; i--)
                 {
-                    throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
-                }
-
-                Console.WriteLine(form.CapabilityMeasureNumber.Count);
-
-                for(int i = 2; i <= form.CapabilityMeasureNumber.Count; i++)
-                {
-                    excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
+                    excelApiLink.DeleteWorkSheet(form.Path, "Capa (" + i + ")");
                 }
             }
+
+            for (int i = firstPageToCreate; i <= pagesToWrite; i++)
+            {
+                excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
+            }
         }
+
+        /*-------------------------------------------------------------------------*/
 
         /// <summary>
         /// Writes the values of each capability measure in a different worksheet
@@ -82,5 +88,28 @@ namespace Application.Writers
                 }
             }
         }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Gets the number of pages containing measurement values in the Excel file.
+        /// </summary>
+        /// <returns>The number of pages</returns>
+        private int getCapaPagesNumber()
+        {
+            int pageNumber = 0;
+
+            for (int i = 1; i <= excelApiLink.GetNumberOfPages(form.Path); i++)
+            {
+                string pageName = excelApiLink.GetPageName(form.Path, i);
+
+                if (pageName.StartsWith("Capa"))
+                    pageNumber++;
+            }
+
+            return pageNumber;
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }

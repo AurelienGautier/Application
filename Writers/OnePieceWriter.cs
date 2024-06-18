@@ -33,16 +33,25 @@ namespace Application.Writers
         /// </summary>
         public override void CreateWorkSheets()
         {
-            if(!base.form.Modify)
+            int linesToWrite = pieces[0].GetLinesToWriteNumber();
+
+            int numberOfPages = linesToWrite / MAX_LINES;
+
+            // Pages that already exist in the report don't need to be created again
+            int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
+
+            // If the number of pages to create is less than the number of pages in the file, delete the extra pages
+            if (base.form.Modify && firstPageToCreate > numberOfPages)
             {
-                int linesToWrite = pieces[0].GetLinesToWriteNumber();
-
-                int numberOfPages = linesToWrite / MAX_LINES;
-
-                for (int i = 2; i < numberOfPages; i++)
+                for (int i = firstPageToCreate - 1; i > numberOfPages; i--)
                 {
-                    excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
+                    excelApiLink.DeleteWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
                 }
+            }
+
+            for (int i = firstPageToCreate; i < numberOfPages; i++)
+            {
+                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
             }
         }
 
@@ -92,15 +101,6 @@ namespace Application.Writers
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[i][j].NominalValue);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus);
                         excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus);
-                    }
-
-                    // Throws an error if the number of measures in the report is different from the number of measures in the source file
-                    if (form.Modify)
-                    {
-                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 2) == "")
-                            base.throwIncoherentValueException();
-                        else if (this.isLastLine(pieceData, i, j) && !this.isNextLineEmpty())
-                            base.throwIncoherentValueException();
                     }
 
                     excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);

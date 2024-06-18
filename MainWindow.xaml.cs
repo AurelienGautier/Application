@@ -23,7 +23,6 @@ namespace Application
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
 
-
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
         /// </summary>
