@@ -3,9 +3,7 @@
     public class Piece
     {
         // Il y a une liste de données pour chaque plan de mesure pour les données de la pièce
-        private readonly List<List<Measure>> pieceData;
-
-        private readonly List<String> measurePlans;
+        private readonly List<MeasurePlan> measurePlans;
 
         private readonly Header header;
 
@@ -13,8 +11,7 @@
 
         public Piece() 
         {
-            this.pieceData = new List<List<Measure>>();
-            this.measurePlans = new List<String>();
+            this.measurePlans = new List<MeasurePlan>();
 
             // Création de l'en-tête vide
             this.header = new Header();
@@ -33,11 +30,9 @@
         {
             int lineNb = 0;
 
-            for(int i = 0; i < this.pieceData.Count; i++) 
+            foreach (var plan in this.measurePlans)
             {
-                lineNb++;
-
-                lineNb += this.pieceData[i].Count;
+                lineNb += plan.GetLinesToWriteNumber();
             }
 
             return lineNb;
@@ -54,8 +49,7 @@
          */
         public void AddMeasurePlan(String measurePlan)
         {
-            this.measurePlans.Add(measurePlan);
-            this.pieceData.Add(new List<Measure>());
+            this.measurePlans.Add(new MeasurePlan(measurePlan));
         }
 
         /*-------------------------------------------------------------------------*/
@@ -69,12 +63,12 @@
          */
         public void AddData(Measure data)
         {
-            if (this.pieceData.Count == 0)
+            if (this.measurePlans.Count == 0)
             {
                 this.AddMeasurePlan("");
             }
 
-            this.pieceData[this.pieceData.Count - 1].Add(data);
+            this.measurePlans[this.measurePlans.Count - 1].AddMeasure(data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -86,23 +80,9 @@
          * return : List<String> - Liste des plans de mesure
          * 
          */
-        public List<String> GetMeasurePlans()
+        public List<MeasurePlan> GetMeasurePlans()
         {
             return this.measurePlans;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /**
-         * GetData
-         * 
-         * Retourne la liste des valeurs de mesure de la pièce
-         * return : List<List<Data.Data>> - Liste des données
-         * 
-         */
-        public List<List<Measure>> GetData()
-        {
-            return this.pieceData;
         }
 
         /*-------------------------------------------------------------------------*/

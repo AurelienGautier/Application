@@ -6,32 +6,34 @@ using Application.Writers;
 
 namespace Application.Data
 {
+    /// <summary>
+    /// Represents a singleton configuration class.
+    /// </summary>
     internal class ConfigSingleton
     {
         private static ConfigSingleton? instance = null;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
         private List<Standard> standards;
-        private Dictionary<String, String> headerFieldsMatch;
-        private Dictionary<String, String> pageNames;
+        private Dictionary<string, string> headerFieldsMatch;
+        private Dictionary<string, string> pageNames;
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Constructeur de la classe (privé car singleton donc doit être inaccessible de l'extérieur de la classe)
-         * 
-         */
+        /// <summary>
+        /// Private constructor for the ConfigSingleton class.
+        /// </summary>
         private ConfigSingleton()
         {
             this.measureTypes = new List<MeasureType>();
 
-            this.Signature = this.getSignatureFromFile();
+            this.Signature = this.GetSignatureFromFile();
 
             this.standards = new List<Standard>();
 
-            this.getMeasureDataFromFile();
+            this.GetMeasureDataFromFile();
 
-            this.getStandardsFromJsonFile();
+            this.GetStandardsFromJsonFile();
 
             this.headerFieldsMatch = new Dictionary<string, string>();
 
@@ -44,10 +46,9 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne l'instance du singleton et la crée si elle n'existe pas
-         * 
-         */
+        /// <summary>
+        /// Gets the instance of the ConfigSingleton class.
+        /// </summary>
         public static ConfigSingleton Instance
         {
             get
@@ -63,22 +64,20 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère la signature dans le fichier de configuration
-         * 
-         * @return Image? - La signature ou null si elle n'est pas correcte
-         * 
-         */
-        private Image? getSignatureFromFile()
+        /// <summary>
+        /// Gets the signature from the configuration file.
+        /// </summary>
+        /// <returns>The signature image or null if it is not valid.</returns>
+        private Image? GetSignatureFromFile()
         {
-            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
+            string? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
 
             if (json == null) return null;
 
-            Dictionary<String, String>? data = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+            Dictionary<string, string>? data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
             if (data == null) return null;
-            
+
             Image? signature;
             try
             {
@@ -94,54 +93,51 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère les types de mesure depuis le fichier de configuration
-         * 
-         */
-        private void getMeasureDataFromFile()
+        /// <summary>
+        /// Gets the measure data from the configuration file.
+        /// </summary>
+        private void GetMeasureDataFromFile()
         {
-            String filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
+            string filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            String? json = this.getFileContent(filePath);
+            string? json = this.GetFileContent(filePath);
 
             if (json == null) return;
 
             DataSet? dataSet = JsonConvert.DeserializeObject<DataSet>(json);
 
-            if (dataSet == null) 
+            if (dataSet == null)
                 throw new Exceptions.ConfigDataException("Une erreur s'est produite lors de la récupération des types de mesure.");
 
             DataTable? dataTable = dataSet.Tables["Measures"];
 
-            if (dataTable == null) 
+            if (dataTable == null)
                 throw new Exceptions.ConfigDataException("La syntaxe du fichier contenant les types de mesure est incorrecte.");
 
             foreach (DataRow row in dataTable.Rows)
             {
-                this.addData(row);
+                this.AddData(row);
             }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Désérialise une ligne du fichier de configuration et l'ajoute dans la liste des types de mesure
-         * 
-         * @param DataRow row
-         * 
-         */
-        private void addData(DataRow row)
+        /// <summary>
+        /// Deserializes a row from the configuration file and adds it to the list of measure types.
+        /// </summary>
+        /// <param name="row">The row to add.</param>
+        private void AddData(DataRow row)
         {
-            // Récupération de chaque champ de la ligne
-            String? name = row["Name"].ToString();
-            String? nominalValueIndex = row["NominalValueIndex"].ToString();
-            String? tolPlusIndex = row["TolPlusIndex"].ToString();
-            String? valueIndex = row["ValueIndex"].ToString();
-            String? tolMinusIndex = row["TolMinusIndex"].ToString();
-            String? symbol = row["Symbol"].ToString();
+            // Get each field from the row
+            string? name = row["Name"].ToString();
+            string? nominalValueIndex = row["NominalValueIndex"].ToString();
+            string? tolPlusIndex = row["TolPlusIndex"].ToString();
+            string? valueIndex = row["ValueIndex"].ToString();
+            string? tolMinusIndex = row["TolMinusIndex"].ToString();
+            string? symbol = row["Symbol"].ToString();
 
-            // Lance une exception si un champ est null
-            if(name == null || nominalValueIndex == null || tolPlusIndex == null || valueIndex == null || tolMinusIndex == null || symbol == null)
+            // Throw an exception if any field is null
+            if (name == null || nominalValueIndex == null || tolPlusIndex == null || valueIndex == null || tolMinusIndex == null || symbol == null)
                 throw new Exceptions.ConfigDataException("Il existe au moins un type de mesure dont la syntaxe n'est pas correcte. Veuillez vérifier le contenu du fichier de configuration.");
 
             this.measureTypes.Add(new MeasureType
@@ -157,15 +153,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Récupère le contenu entier d'un fichier
-         * 
-         * @param String filePath - Chemin du fichier dont le contenu est à récupérer
-         * 
-         * @return String
-         * 
-         */
-        private String? getFileContent(String filePath)
+        /// <summary>
+        /// Gets the content of a file.
+        /// </summary>
+        /// <param name="filePath">The path of the file to read.</param>
+        /// <returns>The content of the file or null if it cannot be read.</returns>
+        private string? GetFileContent(string filePath)
         {
             String content = "";
 
@@ -185,11 +178,10 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Convertir les types de mesure en JSON et les écrit dans le fichier de configuration
-         * 
-         */
-        private void serializeMeasureTypes()
+        /// <summary>
+        /// Converts the measure types to JSON and writes them to the configuration file.
+        /// </summary>
+        private void SerializeMeasureTypes()
         {
             DataSet dataSet = new DataSet();
             DataTable dataTable = new DataTable("Measures");
@@ -222,15 +214,12 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Retourne le type de mesure dont le libellé est passé en paramètre
-         * 
-         * @param String libelle
-         * 
-         * @return MeasureType? - Le type de mesure ou null s'il n'existe pas
-         * 
-         */
-        public MeasureType? GetMeasureTypeFromLibelle(String libelle)
+        /// <summary>
+        /// Returns the measure type with the specified label.
+        /// </summary>
+        /// <param name="libelle">The label of the measure type.</param>
+        /// <returns>The measure type or null if it does not exist.</returns>
+        public MeasureType? GetMeasureTypeFromLibelle(string libelle)
         {
             foreach (MeasureType measureType in this.measureTypes)
             {
@@ -242,16 +231,13 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * Crée un objet Data à partir des valeurs passées en paramètre
-         * 
-         * @param List<String> line - Ligne du fichier de données
-         * @param List<double> values - Toutes les valeurs relatives à la ligne
-         * 
-         * @return Data? - L'objet Data créé ou null si le type de mesure n'existe pas
-         * 
-         */
-        public Measure? GetData(List<String> line, List<double >values)
+        /// <summary>
+        /// Creates a Measure object from the values passed as parameters.
+        /// </summary>
+        /// <param name="line">The line from the data file.</param>
+        /// <param name="values">All the values related to the line.</param>
+        /// <returns>The created Measure object or null if the measure type does not exist.</returns>
+        public Measure? GetData(List<string> line, List<double> values)
         {
             if (line[2] == "Pos.") line[2] += line[3];
 
@@ -265,6 +251,10 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the list of measure types.
+        /// </summary>
+        /// <returns>The list of measure types.</returns>
         public List<MeasureType> GetMeasureTypes()
         {
             return this.measureTypes;
@@ -272,15 +262,11 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * SetSignature
-         * 
-         * Modifie la signature dans le fichier de configuration et dans l'instance
-         * 
-         * @param String signaturePath - Chemin vers la nouvelle signature
-         * 
-         */
-        public void SetSignature(String signaturePath)
+        /// <summary>
+        /// Sets the signature in the configuration file and in the instance.
+        /// </summary>
+        /// <param name="signaturePath">The path to the new signature.</param>
+        public void SetSignature(string signaturePath)
         {
             try
             {
@@ -291,27 +277,24 @@ namespace Application.Data
                 throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect.");
             }
 
-            Dictionary<String, String> data = new Dictionary<String, String>
-            {
-                { "Signature", signaturePath }
-            };
+            Dictionary<string, string> data = new Dictionary<string, string>
+                {
+                    { "Signature", signaturePath }
+                };
 
             this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * UpdateMeasureType
-         * 
-         * Modifie un type de mesure dans le fichier de configuration et dans l'instance
-         * 
-         * @param MeasureType measureType - Le type de mesure à modifier
-         * 
-         */
+        /// <summary>
+        /// Updates a measure type in the configuration file and in the instance.
+        /// </summary>
+        /// <param name="measureType">The measure type to update.</param>
+        /// <param name="newMeasureType">The new measure type.</param>
         public void UpdateMeasureType(MeasureType? measureType, MeasureType newMeasureType)
         {
-            if(measureType == null)
+            if (measureType == null)
             {
                 this.measureTypes.Add(newMeasureType);
             }
@@ -327,20 +310,16 @@ namespace Application.Data
                 }
             }
 
-            this.serializeMeasureTypes();
+            this.SerializeMeasureTypes();
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /**
-         * DeleteMeasureType
-         * 
-         * Supprime un type de mesure dans le fichier de configuration et dans l'instance
-         * 
-         * @param MeasureType measureType - Le type de mesure à supprimer
-         * 
-         */
-        public void DeleteMeasureType(String libelle)
+        /// <summary>
+        /// Deletes a measure type from the configuration file and from the instance.
+        /// </summary>
+        /// <param name="libelle">The label of the measure type to delete.</param>
+        public void DeleteMeasureType(string libelle)
         {
             for (int i = 0; i < this.measureTypes.Count; i++)
             {
@@ -351,11 +330,15 @@ namespace Application.Data
                 }
             }
 
-            this.serializeMeasureTypes();
+            this.SerializeMeasureTypes();
         }
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the list of Mitutoyo forms.
+        /// </summary>
+        /// <returns>The list of Mitutoyo forms.</returns>
         public List<Form> GetMitutoyoForms()
         {
             List<Form> forms = new List<Form>();
@@ -370,6 +353,10 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the list of Ayonis forms.
+        /// </summary>
+        /// <returns>The list of Ayonis forms.</returns>
         public List<Form> GetAyonisForms()
         {
             List<Form> forms = new List<Form>();
@@ -382,28 +369,31 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
-        private void getStandardsFromExcelFile()
+        /// <summary>
+        /// Gets the standards from the Excel file.
+        /// </summary>
+        private void GetStandardsFromExcelFile()
         {
             ExcelLibraryLinkSingleton excelApiLink = ExcelLibraryLinkSingleton.Instance;
-            String workbookPath  = Environment.CurrentDirectory + "\\res\\etalons.xlsm";
+            string workbookPath = Environment.CurrentDirectory + "\\res\\etalons.xlsm";
             excelApiLink.OpenWorkBook(workbookPath);
 
             excelApiLink.ChangeWorkSheet(workbookPath, "raccordements à jour ");
 
             int currentLine = 9;
 
-            while(excelApiLink.ReadCell(workbookPath, currentLine, 1) != "")
+            while (excelApiLink.ReadCell(workbookPath, currentLine, 1) != "")
             {
-                if(excelApiLink.MergedCells(workbookPath, currentLine, 1, currentLine, 2))
+                if (excelApiLink.MergedCells(workbookPath, currentLine, 1, currentLine, 2))
                 {
                     currentLine++;
                 }
                 else
                 {
-                    String code = excelApiLink.ReadCell(workbookPath, currentLine, 1);
-                    String name = excelApiLink.ReadCell(workbookPath, currentLine, 2);
-                    String raccordement = excelApiLink.ReadCell(workbookPath, currentLine + 1, 2);
-                    String validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2).Substring(0, 10);
+                    string code = excelApiLink.ReadCell(workbookPath, currentLine, 1);
+                    string name = excelApiLink.ReadCell(workbookPath, currentLine, 2);
+                    string raccordement = excelApiLink.ReadCell(workbookPath, currentLine + 1, 2);
+                    string validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2).Substring(0, 10);
                     validity = validity.Substring(3);
                     validity = validity.Insert(0, "\'");
 
@@ -412,40 +402,48 @@ namespace Application.Data
                     currentLine += 3;
                 }
             }
-
-            excelApiLink.CloseWorkBook(workbookPath);
         }
 
         /*-------------------------------------------------------------------------*/
 
-        private void getStandardsFromJsonFile()
+        /// <summary>
+        /// Gets the standards from the JSON file.
+        /// </summary>
+        private void GetStandardsFromJsonFile()
         {
             this.standards.Add(new Standard("", "", "", ""));
 
-            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
+            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
 
             if (json == null) return;
 
             List<Standard>? standardsFromFile = JsonConvert.DeserializeObject<List<Standard>>(json);
 
-            if(standardsFromFile != null) this.standards = standardsFromFile;
-        }   
+            if (standardsFromFile != null) this.standards = standardsFromFile;
+        }
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Updates the standards in the configuration file.
+        /// </summary>
         public void UpdateStandards()
         {
             this.standards.Clear();
 
             this.standards.Add(new Standard("", "", "", ""));
 
-            this.getStandardsFromExcelFile();
+            this.GetStandardsFromExcelFile();
 
             this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
         }
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the list of standards.
+        /// </summary>
+        /// <returns>The list of the standards</returns>
         public List<Standard> GetStandards()
         {
             return this.standards;
@@ -453,6 +451,11 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the standard from the code specified in parameter.
+        /// </summary>
+        /// <param name="code">The code of the standard to get</param>
+        /// <returns></returns>
         public Standard? GetStandardFromCode(String code)
         {
             if(this.standards != null)
@@ -466,9 +469,13 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the header key name from the configuration file.
+        /// </summary>
+        /// <exception cref="Exceptions.ConfigDataException">If the header config data could not have been got from the config file</exception>
         private void getHeaderFieldsFromFile()
         {
-            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
+            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
 
             if (json == null) return;
 
@@ -482,6 +489,10 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Returns the header key names
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<String, String> GetHeaderFieldsMatch()
         {
             return this.headerFieldsMatch;
@@ -489,6 +500,16 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Sets the header value names
+        /// </summary>
+        /// <param name="designation"></param>
+        /// <param name="planNb"></param>
+        /// <param name="index"></param>
+        /// <param name="clientName"></param>
+        /// <param name="observationNum"></param>
+        /// <param name="pieceReceptionDate"></param>
+        /// <param name="observations"></param>
         public void SetHeaderFieldsMatch(String designation, String planNb, String index, String clientName, String observationNum, String pieceReceptionDate, String observations)
         {
             this.headerFieldsMatch["Designation"] = designation;
@@ -504,9 +525,13 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Gets the page names from the configuration file to know which page is the header page and which one is the measure page.
+        /// </summary>
+        /// <exception cref="Exceptions.ConfigDataException"></exception>
         private void getPageNamesFromFile()
         {
-            String? json = this.getFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
+            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
 
             if (json == null) return;
 
@@ -520,6 +545,11 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Sets the page names in the configuration file.
+        /// </summary>
+        /// <param name="headerPage"></param>
+        /// <param name="measurePage"></param>
         public void SetPageNames(String headerPage, String measurePage)
         {
             this.pageNames["HeaderPage"] = headerPage;
@@ -530,6 +560,10 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Returns the page names
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<String, String> GetPageNames()
         {
             return this.pageNames;
@@ -537,6 +571,11 @@ namespace Application.Data
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Replace the content of a json file with the data passed as parameter.
+        /// </summary>
+        /// <param name="filePath">The path of the file to modify</param>
+        /// <param name="data">The data to write in the file</param>
         private void writeJsonFile(String filePath, Object data)
         {
             String json = JsonConvert.SerializeObject(data, Formatting.Indented);

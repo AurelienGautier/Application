@@ -22,7 +22,7 @@ namespace Application.UI.UserControls
         private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
 
-        private Form currentForm;
+        private Form? currentForm;
 
         /*-------------------------------------------------------------------------*/
 
@@ -258,11 +258,15 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void changeForm(object sender, SelectionChangedEventArgs e)
         {
-            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem).Copy();
+            Form? currentTempForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
 
-            if (this.currentForm == null)
+            if (currentTempForm == null)
             {
                 this.currentForm = this.forms[0].Copy();
+            }
+            else
+            { 
+                this.currentForm = currentTempForm.Copy();
             }
 
             if (this.currentForm.Type == FormType.Capability)

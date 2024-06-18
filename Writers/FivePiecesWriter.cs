@@ -8,9 +8,8 @@ namespace Application.Writers
     internal class FivePiecesWriter : ExcelWriter
     {
         private int pageNumber;
-        private readonly List<List<String>> measurePlans;
-        private readonly List<List<List<Data.Measure>>> pieceData;
         private int linesWritten;
+        readonly private List<List<MeasurePlan>> measurePlans;
         private int min;
         private int max;
         private const int MAX_LINES = 23;
@@ -25,8 +24,7 @@ namespace Application.Writers
         public FivePiecesWriter(string fileName, Form form) : base(fileName, form)
         {
             this.pageNumber = 1;
-            this.measurePlans = new List<List<String>>();
-            this.pieceData = new List<List<List<Data.Measure>>>();
+            this.measurePlans = new List<List<MeasurePlan>>();
             this.linesWritten = 0;
             this.min = 0;
             this.max = 5;
@@ -80,13 +78,12 @@ namespace Application.Writers
             for (int i = 0; i < base.pieces.Count; i++)
             {
                 this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
-                this.pieceData.Add(base.pieces[i].GetData());
             }
 
-            this.max = this.pieceData.Count < 5 ? this.pieceData.Count : 5;
+            this.max = this.measurePlans.Count < 5 ? this.measurePlans.Count : 5;
 
-            int iterations = pieceData.Count / 5;
-            if (pieceData.Count % 5 != 0) iterations++;
+            int iterations = this.measurePlans.Count / 5;
+            if (this.measurePlans.Count % 5 != 0) iterations++;
 
             for (int i = 0; i < iterations; i++)
             {
@@ -94,7 +91,7 @@ namespace Application.Writers
 
                 this.min += 5;
 
-                if (i == pieceData.Count / 5 - 1 && pieceData.Count % 5 != 0) this.max = pieceData.Count;
+                if (i == this.measurePlans.Count / 5 - 1 && this.measurePlans.Count % 5 != 0) this.max = this.measurePlans.Count;
                 else this.max += 5;
 
                 if (i < iterations - 1) this.ChangePage();
@@ -109,12 +106,12 @@ namespace Application.Writers
         private void write5pieces()
         {
             // For each plan
-            for (int i = 0; i < pieceData[0].Count; i++)
+            for (int i = 0; i < measurePlans[0].Count; i++)
             {
                 // Write the plan
-                if (measurePlans[0][i] != "")
+                if (measurePlans[0][i].GetName() != "")
                 {
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i]);
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i].GetName());
                     base.currentLine++;
                     this.linesWritten++;
                 }
@@ -122,15 +119,17 @@ namespace Application.Writers
                 // Change page if the current one is full
                 if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
 
+                List<Measure> measures = measurePlans[0][i].GetMeasures();
+
                 // For each measurement in the plan
-                for (int j = 0; j < pieceData[0][i].Count; j++)
+                for (int j = 0; j < measures.Count; j++)
                 {
                     if (!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[0][i][j].MeasureType.Symbol);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[0][i][j].NominalValue);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[0][i][j].TolerancePlus);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, pieceData[0][i][j].ToleranceMinus);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measures[j].MeasureType.Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measures[j].NominalValue);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, measures[j].TolerancePlus);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, measures[j].ToleranceMinus);
                     }
 
                     base.currentColumn += 3;
@@ -150,7 +149,7 @@ namespace Application.Writers
                     for (int k = this.min; k < this.max; k++)
                     {
                         base.currentColumn += 3;
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, pieceData[k][i][j].Value);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[k][i].GetMeasures()[j].Value);
                     }
 
                     base.currentColumn -= (3 + 3 * (this.max - this.min));

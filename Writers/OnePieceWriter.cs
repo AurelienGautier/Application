@@ -64,24 +64,15 @@ namespace Application.Writers
         {
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
-            List<String> measurePlans = pieces[0].GetMeasurePlans();
-            List<List<Data.Measure>> pieceData = pieces[0].GetData();
+            List<MeasurePlan> measurePlans = pieces[0].GetMeasurePlans();
 
 
-            for (int i = 0; i < pieceData.Count; i++)
+            for (int i = 0; i < measurePlans.Count; i++)
             {
                 // Writing the plan
-                if (measurePlans[i] != "")
+                if (measurePlans[i].GetName() != "")
                 {
-                    if(base.form.Modify)
-                    {
-                        if (excelApiLink.ReadCell(form.Path, base.currentLine, base.currentColumn + 1) == "")
-                            base.throwIncoherentValueException();
-                        else if (this.isLastLine(pieceData, i, -1) && !this.isNextLineEmpty())
-                            base.throwIncoherentValueException();
-                    }
-
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i]);
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i].GetName());
                     base.currentLine++;
                     this.linesWritten++;
                 }
@@ -92,18 +83,20 @@ namespace Application.Writers
                     this.ChangePage();
                 }
 
+                List<Measure> measures = measurePlans[i].GetMeasures();
+
                 // Writing the data line by line
-                for (int j = 0; j < pieceData[i].Count; j++)
+                for (int j = 0; j < measures.Count; j++)
                 {
                     if (!base.form.Modify)
                     {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, pieceData[i][j].MeasureType.Symbol);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, pieceData[i][j].NominalValue);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, pieceData[i][j].TolerancePlus);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, pieceData[i][j].ToleranceMinus);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measures[j].MeasureType.Symbol);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, measures[j].NominalValue);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, measures[j].TolerancePlus);
+                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, measures[j].ToleranceMinus);
                     }
 
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, pieceData[i][j].Value);
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, measures[j].Value);
 
                     base.currentLine++;
                     this.linesWritten++;

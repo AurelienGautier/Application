@@ -68,7 +68,7 @@ namespace Application.Writers
                 {
                     try
                     {
-                        double currentValue = piece.GetData()[0][num].Value;
+                        double currentValue = piece.GetMeasurePlans()[0].GetMeasures()[num].Value;
 
                         excelApiLink.WriteCell(form.Path, line, col, currentValue);
                         linesWritten++;

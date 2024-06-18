@@ -48,7 +48,7 @@ namespace Application.UI.UserControls
                 // Save page names
                 this.savePageNames();
                 // Display success message
-                this.displaySuccess("Settings have been saved successfully");
+                this.displaySuccess("Les paramètres ont été sauvegardées avec succès");
             }
             catch (InvalidFieldException ex)
             {
@@ -67,7 +67,7 @@ namespace Application.UI.UserControls
             // Check if all header fields are filled
             if (Designation.Text == "" || PlanNb.Text == "" || Index.Text == "" || ClientName.Text == "" || ObservationNum.Text == "" || PieceReceptionDate.Text == "" || Observations.Text == "")
             {
-                throw new InvalidFieldException("All header fields must be filled");
+                throw new InvalidFieldException("Tous les champs d'en-tête doivent être remplis");
             }
 
             // Save header fields in the configuration
@@ -84,7 +84,7 @@ namespace Application.UI.UserControls
             // Check if all page names are filled
             if (HeaderPage.Text == "" || MeasurePage.Text == "")
             {
-                throw new InvalidFieldException("All page names must be filled");
+                throw new InvalidFieldException("Tous les noms des pages doivent être remplis");
             }
 
             // Save page names in the configuration
@@ -105,7 +105,7 @@ namespace Application.UI.UserControls
                 // Update standards in the configuration
                 ConfigSingleton.Instance.UpdateStandards();
                 // Display success message
-                this.displaySuccess("Standards have been updated successfully");
+                this.displaySuccess("Les étalons ont été mis à jour avec succès");
             }
             catch (ConfigDataException ex)
             {
