@@ -165,10 +165,33 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
+        protected abstract int CalculateNumberOfMeasurePagesToWrite();
+        protected abstract string GetPageToCopyName(int index);
+        protected abstract string GetCopiedPageName(int index);
+
         /// <summary>
         /// Creates the necessary worksheets (delegated to child classes).
         /// </summary>
-        public abstract void CreateWorkSheets();
+        public void CreateWorkSheets()
+        {
+            int numberOfMeasurePagesToWrite = CalculateNumberOfMeasurePagesToWrite();
+            int numberOfExistingMeasurePages = GetDataPagesNumber();
+
+            // Delete the extra worksheets if the number of existing worksheets is greater than the number of necessary worksheets
+            for (int i = numberOfExistingMeasurePages; i > numberOfMeasurePagesToWrite; i--)
+            {
+                string pageName = ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")";
+                this.DeleteWorkSheet(pageName);
+            }
+
+            // Creates all the necessary worksheets that don't exist yet
+            for (int i = numberOfExistingMeasurePages; i < numberOfMeasurePagesToWrite; i++)
+            {
+                string pageToCopyName = GetPageToCopyName(i);
+                string copiedPageName = GetCopiedPageName(i);
+                this.CopyWorkSheet(pageToCopyName, copiedPageName);
+            }
+        }
 
         /*-------------------------------------------------------------------------*/
 
@@ -246,6 +269,33 @@ namespace Application.Writers
             }
 
             return pageNumber;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        abstract protected int GetDataPagesNumber();
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Uses the ExcelLibraryLinkSingleton to delete a worksheet.
+        /// </summary>
+        /// <param name="sheetName">The name of the worksheet to delete</param>
+        protected void DeleteWorkSheet(string sheetName)
+        {
+            excelApiLink.DeleteWorkSheet(form.Path, sheetName);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Uses the ExcelLibraryLinkSingleton to copy a worksheet.
+        /// </summary>
+        /// <param name="sheetName">The name of the sheet to copy</param>
+        /// <param name="newSheetName">The name of the copied sheet</param>
+        protected void CopyWorkSheet(string sheetName, string newSheetName)
+        {
+            excelApiLink.CopyWorkSheet(form.Path, sheetName, newSheetName);
         }
 
         /*-------------------------------------------------------------------------*/

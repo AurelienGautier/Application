@@ -12,7 +12,7 @@ namespace Application.Writers
         readonly private List<List<MeasurePlan>> measurePlans;
         private int min;
         private int max;
-        private const int MAX_LINES = 23;
+        private const int MAX_LINES_PER_PAGE = 23;
 
         /*-------------------------------------------------------------------------*/
 
@@ -32,38 +32,41 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Creates all the necessary Excel worksheets to insert all the data.
-        /// </summary>
-        public override void CreateWorkSheets()
+        protected override int CalculateNumberOfMeasurePagesToWrite()
         {
-            int totalPageNumber = pieces[0].GetLinesToWriteNumber() / MAX_LINES + 1;
+            int measureLinesToWrite = pieces[0].GetLinesToWriteNumber();
+
+            int numberOfMeasurePagesToWrite = pieces[0].GetLinesToWriteNumber() / MAX_LINES_PER_PAGE;
+            if (measureLinesToWrite % MAX_LINES_PER_PAGE != 0) numberOfMeasurePagesToWrite++;
 
             int iterations = base.pieces.Count / 5;
             if (base.pieces.Count % 5 != 0) iterations++;
 
-            totalPageNumber *= iterations;
+            numberOfMeasurePagesToWrite *= iterations;
 
-            // Pages that already exist in the report don't need to be created again
-            int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
+            return numberOfMeasurePagesToWrite;
+        }
 
-            // If the number of pages to create is less than the number of pages in the file, delete the extra pages
-            if (base.form.Modify && firstPageToCreate > totalPageNumber)
-            {
-                for(int i = firstPageToCreate - 1; i > totalPageNumber; i--)
-                {
-                    excelApiLink.DeleteWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
-                }
-            }
+        protected override string GetPageToCopyName(int index)
+        {
+            int numberOfExistingMeasurePages = base.getMeasurePagesNumber();
 
-            // Create the necessary pages that don't exist yet
-            for (int i = firstPageToCreate; i <= totalPageNumber; i++)
-            {
-                String nbToCopy = " (" + (i - firstPageToCreate + 1).ToString() + ")";
-                if (nbToCopy == " (1)") nbToCopy = "";
+            string nbToCopy = " (" + (index - numberOfExistingMeasurePages + 1).ToString() + ")";
+            if (nbToCopy == " (1)") nbToCopy = "";
 
-                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + nbToCopy, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
-            }
+            string pageToCopyName = ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + nbToCopy;
+
+            return pageToCopyName;
+        }
+
+        protected override string GetCopiedPageName(int index)
+        {
+            return ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + (index + 1).ToString() + ")";
+        }
+
+        protected override int GetDataPagesNumber()
+        {
+            return base.getMeasurePagesNumber();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -117,7 +120,7 @@ namespace Application.Writers
                 }
 
                 // Change page if the current one is full
-                if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
+                if (this.linesWritten == MAX_LINES_PER_PAGE) { this.ChangePage(); }
 
                 List<Measure> measures = measurePlans[0][i].GetMeasures();
 
@@ -158,7 +161,7 @@ namespace Application.Writers
                     this.linesWritten++;
 
                     // Change page if the current one is full
-                    if (this.linesWritten == MAX_LINES) { this.ChangePage(); }
+                    if (this.linesWritten == MAX_LINES_PER_PAGE) { this.ChangePage(); }
                 }
             }
         }
@@ -176,8 +179,10 @@ namespace Application.Writers
             {
                 excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
             }
-            catch 
+            catch
             {
+                Console.WriteLine(base.getMeasurePagesNumber());
+                Console.WriteLine(this.pageNumber);
                 base.throwIncoherentValueException();
             }
 

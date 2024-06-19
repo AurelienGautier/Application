@@ -7,7 +7,7 @@ namespace Application.Writers
     /// </summary>
     internal class OnePieceWriter : ExcelWriter
     {
-        private const int MAX_LINES = 22;
+        private const int MAX_LINES_PER_PAGE = 22;
         private int linesWritten;
         private int pageNumber;
 
@@ -26,33 +26,29 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Creates enough Excel worksheets to write the piece data.
-        /// The first worksheet is the "Mesures" worksheet that contains the piece data.
-        /// If the number of lines to write is greater than MAX_LINES, copies of the "Mesures" worksheet are created.
-        /// </summary>
-        public override void CreateWorkSheets()
+        protected override int CalculateNumberOfMeasurePagesToWrite()
         {
-            int linesToWrite = pieces[0].GetLinesToWriteNumber();
+            int measureLinesToWrite = pieces[0].GetLinesToWriteNumber();
 
-            int numberOfPages = linesToWrite / MAX_LINES;
+            int numberOfMeasurePagesToWrite = measureLinesToWrite / MAX_LINES_PER_PAGE;
+            if (measureLinesToWrite % MAX_LINES_PER_PAGE != 0) numberOfMeasurePagesToWrite++;
 
-            // Pages that already exist in the report don't need to be created again
-            int firstPageToCreate = base.form.Modify ? base.getMeasurePagesNumber() + 1 : 2;
+            return numberOfMeasurePagesToWrite;
+        }
 
-            // If the number of pages to create is less than the number of pages in the file, delete the extra pages
-            if (base.form.Modify && firstPageToCreate > numberOfPages)
-            {
-                for (int i = firstPageToCreate - 1; i > numberOfPages; i--)
-                {
-                    excelApiLink.DeleteWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
-                }
-            }
+        protected override string GetPageToCopyName(int index)
+        {
+            return ConfigSingleton.Instance.GetPageNames()["MeasurePage"];
+        }
 
-            for (int i = firstPageToCreate; i < numberOfPages; i++)
-            {
-                excelApiLink.CopyWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"], ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + i.ToString() + ")");
-            }
+        protected override string GetCopiedPageName(int index)
+        {
+            return ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + (index + 1).ToString() + ")";
+        }
+
+        protected override int GetDataPagesNumber()
+        {
+            return base.getMeasurePagesNumber();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -78,7 +74,7 @@ namespace Application.Writers
                 }
 
                 // Changing page if the current one is full
-                if (this.linesWritten == MAX_LINES)
+                if (this.linesWritten == MAX_LINES_PER_PAGE)
                 {
                     this.ChangePage();
                 }
@@ -101,7 +97,7 @@ namespace Application.Writers
                     base.currentLine++;
                     this.linesWritten++;
 
-                    if (this.linesWritten == MAX_LINES)
+                    if (this.linesWritten == MAX_LINES_PER_PAGE)
                     {
                         this.ChangePage();
                     }
@@ -126,7 +122,7 @@ namespace Application.Writers
             {
                 excelApiLink.CloseWorkBook(form.Path);
 
-                throw new Exceptions.IncoherentValueException("The number of measures is different between the report to modify and the source file(s).");
+                throw new Exceptions.IncoherentValueException("Le nombre de pages n'est pas suffisant");
             }
 
             base.currentLine -= linesWritten;

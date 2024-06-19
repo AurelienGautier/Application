@@ -10,30 +10,27 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Creates a worksheet for each capability measure
-        /// </summary>
-        /// <exception cref="Exceptions.IncorrectValuesToTreatException"></exception>
-        public override void CreateWorkSheets()
+        protected override int CalculateNumberOfMeasurePagesToWrite()
         {
-            if(form.CapabilityMeasureNumber == null)
+            if (form.CapabilityMeasureNumber == null)
                 throw new Exceptions.IncorrectValuesToTreatException("Le nombre de mesures de capacité n'a pas été renseigné.");
 
-            int pagesToWrite = form.CapabilityMeasureNumber.Count;
-            int firstPageToCreate = base.form.Modify ? this.getCapaPagesNumber() + 1 : 2;
+            return form.CapabilityMeasureNumber.Count;
+        }
 
-            if (firstPageToCreate > pagesToWrite)
-            {
-                for(int i = firstPageToCreate - 1; i > pagesToWrite; i--)
-                {
-                    excelApiLink.DeleteWorkSheet(form.Path, "Capa (" + i + ")");
-                }
-            }
+        protected override string GetPageToCopyName(int index)
+        {
+            return "Capa";
+        }
 
-            for (int i = firstPageToCreate; i <= pagesToWrite; i++)
-            {
-                excelApiLink.CopyWorkSheet(form.Path, "Capa", "Capa (" + i + ")");
-            }
+        protected override string GetCopiedPageName(int index)
+        {
+            return "Capa (" + (index + 1) + ")";
+        }
+
+        protected override int GetDataPagesNumber()
+        {
+            return this.getCapaPagesNumber();
         }
 
         /*-------------------------------------------------------------------------*/
