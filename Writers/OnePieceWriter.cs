@@ -8,7 +8,7 @@ namespace Application.Writers
     internal class OnePieceWriter : ExcelWriter
     {
         private const int MAX_LINES_PER_PAGE = 22;
-        private int linesWritten;
+        private int linesWrittenOnCurrentPage;
         private int pageNumber;
 
         /*-------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace Application.Writers
         /// <param name="form">The form associated with the writer.</param>
         public OnePieceWriter(string fileName, Form form) : base(fileName, form)
         {
-            this.linesWritten = 0;
+            this.linesWrittenOnCurrentPage = 0;
             this.pageNumber = 1;
         }
 
@@ -58,25 +58,19 @@ namespace Application.Writers
         /// </summary>
         public override void WritePiecesValues()
         {
+            // Change the worksheet to the first measure page
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
             List<MeasurePlan> measurePlans = pieces[0].GetMeasurePlans();
 
-
+            // For each measure plan of the piece
             for (int i = 0; i < measurePlans.Count; i++)
             {
-                // Writing the plan
+                // Writing the name of the measure plan
                 if (measurePlans[i].GetName() != "")
                 {
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measurePlans[i].GetName());
-                    base.currentLine++;
-                    this.linesWritten++;
-                }
-
-                // Changing page if the current one is full
-                if (this.linesWritten == MAX_LINES_PER_PAGE)
-                {
-                    this.ChangePage();
+                    this.writeCell(base.currentLine, base.currentColumn + 1, measurePlans[i].GetName());
+                    this.goToNextLine();
                 }
 
                 List<Measure> measures = measurePlans[i].GetMeasures();
@@ -84,24 +78,61 @@ namespace Application.Writers
                 // Writing the data line by line
                 for (int j = 0; j < measures.Count; j++)
                 {
-                    if (!base.form.Modify)
-                    {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measures[j].MeasureType.Symbol);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, measures[j].NominalValue);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 4, measures[j].TolerancePlus);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 5, measures[j].ToleranceMinus);
-                    }
-
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, measures[j].Value);
-
-                    base.currentLine++;
-                    this.linesWritten++;
-
-                    if (this.linesWritten == MAX_LINES_PER_PAGE)
-                    {
-                        this.ChangePage();
-                    }
+                    writeMeasure(measures[j]);
                 }
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Writes a measure into the Excel worksheet.
+        /// </summary>
+        /// <param name="measure">The measure to write.</param>
+        private void writeMeasure(Measure measure)
+        {
+            if (!base.form.Modify)
+            {
+                this.writeCell(base.currentLine, base.currentColumn + 1, measure.MeasureType.Symbol);
+                this.writeCell(base.currentLine, base.currentColumn + 2, measure.NominalValue);
+                this.writeCell(base.currentLine, base.currentColumn + 4, measure.TolerancePlus);
+                this.writeCell(base.currentLine, base.currentColumn + 5, measure.ToleranceMinus);
+            }
+
+            this.writeCell(base.currentLine, base.currentColumn + 6, measure.Value);
+            excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, measure.Value);
+
+            this.goToNextLine();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void writeCell(int row, int col, string value)
+        {
+            excelApiLink.WriteCell(form.Path, row, col, value);
+        }
+
+        private void writeCell(int row, int col, double value)
+        {
+            excelApiLink.WriteCell(form.Path, row, col, value);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Moves to the next line in the Excel worksheet.
+        /// </summary>
+        private void goToNextLine()
+        {
+            base.currentLine++;
+            this.linesWrittenOnCurrentPage++;
+
+            // Change page if the current one is full
+            if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
+            {
+                this.ChangePage();
+                this.linesWrittenOnCurrentPage = 0;
+                this.currentLine -= MAX_LINES_PER_PAGE;
             }
         }
 
@@ -124,9 +155,6 @@ namespace Application.Writers
 
                 throw new Exceptions.IncoherentValueException("Le nombre de pages n'est pas suffisant");
             }
-
-            base.currentLine -= linesWritten;
-            linesWritten = 0;
         }
 
         /*-------------------------------------------------------------------------*/

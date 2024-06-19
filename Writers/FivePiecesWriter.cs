@@ -181,8 +181,6 @@ namespace Application.Writers
             }
             catch
             {
-                Console.WriteLine(base.getMeasurePagesNumber());
-                Console.WriteLine(this.pageNumber);
                 base.throwIncoherentValueException();
             }
 
