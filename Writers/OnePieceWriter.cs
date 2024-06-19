@@ -69,7 +69,7 @@ namespace Application.Writers
                 // Writing the name of the measure plan
                 if (measurePlans[i].GetName() != "")
                 {
-                    this.writeCell(base.currentLine, base.currentColumn + 1, measurePlans[i].GetName());
+                    base.WriteCell(base.currentLine, base.currentColumn + 1, measurePlans[i].GetName());
                     this.goToNextLine();
                 }
 
@@ -86,35 +86,23 @@ namespace Application.Writers
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Writes a measure into the Excel worksheet.
+        /// Writes a measure on the line of the Excel worksheet.
         /// </summary>
         /// <param name="measure">The measure to write.</param>
         private void writeMeasure(Measure measure)
         {
             if (!base.form.Modify)
             {
-                this.writeCell(base.currentLine, base.currentColumn + 1, measure.MeasureType.Symbol);
-                this.writeCell(base.currentLine, base.currentColumn + 2, measure.NominalValue);
-                this.writeCell(base.currentLine, base.currentColumn + 4, measure.TolerancePlus);
-                this.writeCell(base.currentLine, base.currentColumn + 5, measure.ToleranceMinus);
+                base.WriteCell(base.currentLine, base.currentColumn + 1, measure.MeasureType.Symbol);
+                base.WriteCell(base.currentLine, base.currentColumn + 2, measure.NominalValue);
+                base.WriteCell(base.currentLine, base.currentColumn + 4, measure.TolerancePlus);
+                base.WriteCell(base.currentLine, base.currentColumn + 5, measure.ToleranceMinus);
             }
 
-            this.writeCell(base.currentLine, base.currentColumn + 6, measure.Value);
+            base.WriteCell(base.currentLine, base.currentColumn + 6, measure.Value);
             excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 6, measure.Value);
 
             this.goToNextLine();
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        private void writeCell(int row, int col, string value)
-        {
-            excelApiLink.WriteCell(form.Path, row, col, value);
-        }
-
-        private void writeCell(int row, int col, double value)
-        {
-            excelApiLink.WriteCell(form.Path, row, col, value);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -143,11 +131,11 @@ namespace Application.Writers
         /// </summary>
         private void ChangePage()
         {
-            pageNumber++;
+            this.pageNumber++;
 
             try
             {
-                excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + pageNumber.ToString() + ")");
+                excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"] + " (" + this.pageNumber.ToString() + ")");
             }
             catch
             {
@@ -155,39 +143,6 @@ namespace Application.Writers
 
                 throw new Exceptions.IncoherentValueException("Le nombre de pages n'est pas suffisant");
             }
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Checks if the next line in the Excel worksheet is empty.
-        /// </summary>
-        /// <returns>True if the next line is empty, false otherwise.</returns>
-        private bool isNextLineEmpty()
-        {
-            if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 2) != "")
-                return false;
-
-            return true;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Checks if the current line is the last line of the form to modify.
-        /// </summary>
-        /// <param name="pieceData">The piece data.</param>
-        /// <param name="i">The current index of the measure plan.</param>
-        /// <param name="j">The current index of the measurement data within the measure plan.</param>
-        /// <returns>True if the current line is the last line, false otherwise.</returns>
-        private bool isLastLine(List<List<Data.Measure>> pieceData, int i, int j)
-        {
-            if (i != pieceData.Count - 1) return false;
-
-            if (pieceData[i].Count == 0 || j == pieceData[i].Count - 1)
-                return true;
-
-            return false;
         }
 
         /*-------------------------------------------------------------------------*/

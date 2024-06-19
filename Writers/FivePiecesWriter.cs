@@ -8,8 +8,7 @@ namespace Application.Writers
     internal class FivePiecesWriter : ExcelWriter
     {
         private int pageNumber;
-        private int linesWritten;
-        readonly private List<List<MeasurePlan>> measurePlans;
+        private int linesWrittenOnCurrentPage;
         private int min;
         private int max;
         private const int MAX_LINES_PER_PAGE = 23;
@@ -24,8 +23,7 @@ namespace Application.Writers
         public FivePiecesWriter(string fileName, Form form) : base(fileName, form)
         {
             this.pageNumber = 1;
-            this.measurePlans = new List<List<MeasurePlan>>();
-            this.linesWritten = 0;
+            this.linesWrittenOnCurrentPage = 0;
             this.min = 0;
             this.max = 5;
         }
@@ -78,15 +76,10 @@ namespace Application.Writers
         {
             excelApiLink.ChangeWorkSheet(form.Path, ConfigSingleton.Instance.GetPageNames()["MeasurePage"]);
 
-            for (int i = 0; i < base.pieces.Count; i++)
-            {
-                this.measurePlans.Add(base.pieces[i].GetMeasurePlans());
-            }
+            this.max = base.pieces.Count < 5 ? base.pieces.Count : 5;
 
-            this.max = this.measurePlans.Count < 5 ? this.measurePlans.Count : 5;
-
-            int iterations = this.measurePlans.Count / 5;
-            if (this.measurePlans.Count % 5 != 0) iterations++;
+            int iterations = base.pieces.Count / 5;
+            if (base.pieces.Count % 5 != 0) iterations++;
 
             for (int i = 0; i < iterations; i++)
             {
@@ -94,10 +87,11 @@ namespace Application.Writers
 
                 this.min += 5;
 
-                if (i == this.measurePlans.Count / 5 - 1 && this.measurePlans.Count % 5 != 0) this.max = this.measurePlans.Count;
-                else this.max += 5;
+                this.max = i == base.pieces.Count / 5 - 1 && base.pieces.Count % 5 != 0 ? base.pieces.Count : this.max + 5;
 
                 if (i < iterations - 1) this.ChangePage();
+                this.linesWrittenOnCurrentPage = 0;
+                this.currentLine = form.FirstLine;
             }
         }
 
@@ -108,61 +102,92 @@ namespace Application.Writers
         /// </summary>
         private void write5pieces()
         {
+            List<MeasurePlan> measurePlans = pieces[0].GetMeasurePlans();
+
             // For each plan
-            for (int i = 0; i < measurePlans[0].Count; i++)
+            for (int i = 0; i < measurePlans.Count; i++)
             {
                 // Write the plan
-                if (measurePlans[0][i].GetName() != "")
+                if (measurePlans[i].GetName() != "")
                 {
-                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[0][i].GetName());
-                    base.currentLine++;
-                    this.linesWritten++;
+                    base.WriteCell(base.currentLine, base.currentColumn, measurePlans[i].GetName());
+                    this.goToNextLine();
                 }
 
-                // Change page if the current one is full
-                if (this.linesWritten == MAX_LINES_PER_PAGE) { this.ChangePage(); }
-
-                List<Measure> measures = measurePlans[0][i].GetMeasures();
+                List<Measure> measures = measurePlans[i].GetMeasures();
 
                 // For each measurement in the plan
                 for (int j = 0; j < measures.Count; j++)
                 {
-                    if (!base.form.Modify)
-                    {
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measures[j].MeasureType.Symbol);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 1, measures[j].NominalValue);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 2, measures[j].TolerancePlus);
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn + 3, measures[j].ToleranceMinus);
-                    }
+                    writeMeasure(measures[j]);
 
-                    base.currentColumn += 3;
-
-                    if (base.form.Modify)
-                    {
-                        int tempCurrentColumn = 4;
-
-                        for(int l = 0; l < 5; l++)
-                        {
-                            tempCurrentColumn += 3;
-                            excelApiLink.WriteCell(form.Path, base.currentLine, tempCurrentColumn, "");
-                        }
-                    }
+                    int columnToWriteValue = base.currentColumn + 3;
 
                     // Write the values of the pieces
                     for (int k = this.min; k < this.max; k++)
                     {
-                        base.currentColumn += 3;
-                        excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, measurePlans[k][i].GetMeasures()[j].Value);
+                        double currentValueToWrite = base.pieces[k].GetMeasurePlans()[i].GetMeasures()[j].Value;
+
+                        columnToWriteValue += 3;
+                        base.WriteCell(base.currentLine, columnToWriteValue, currentValueToWrite);
                     }
 
-                    base.currentColumn -= (3 + 3 * (this.max - this.min));
-
-                    base.currentLine++;
-                    this.linesWritten++;
-
-                    // Change page if the current one is full
-                    if (this.linesWritten == MAX_LINES_PER_PAGE) { this.ChangePage(); }
+                    Console.WriteLine(base.currentLine);
+                    this.goToNextLine();
                 }
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void clearCurrentLineValues()
+        {
+            int tempCurrentColumn = 4;
+
+            for (int l = 0; l < 5; l++)
+            {
+                tempCurrentColumn += 3;
+                base.WriteCell(base.currentLine, tempCurrentColumn, "");
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Writes a measure on the line of the Excel worksheet.
+        /// </summary>
+        /// <param name="measure">The measure to write.</param>
+        private void writeMeasure(Measure measure)
+        {
+            // Write the measure type, nominal value and tolerances
+            if (!base.form.Modify)
+            {
+                base.WriteCell(base.currentLine, base.currentColumn, measure.MeasureType.Symbol);
+                base.WriteCell(base.currentLine, base.currentColumn + 1, measure.NominalValue);
+                base.WriteCell(base.currentLine, base.currentColumn + 2, measure.TolerancePlus);
+                base.WriteCell(base.currentLine, base.currentColumn + 3, measure.ToleranceMinus);
+            }
+
+            if (base.form.Modify) this.clearCurrentLineValues();
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        /// <summary>
+        /// Moves to the next line in the Excel worksheet.
+        /// </summary>
+        private void goToNextLine()
+        {
+            base.currentLine++;
+            this.linesWrittenOnCurrentPage++;
+
+            // Change page if the current one is full
+            if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
+            {
+                this.ChangePage();
+
+                this.linesWrittenOnCurrentPage = 0;
+                this.currentLine -= MAX_LINES_PER_PAGE;
             }
         }
 
@@ -184,50 +209,13 @@ namespace Application.Writers
                 base.throwIncoherentValueException();
             }
 
-            base.currentLine = 17;
-            this.linesWritten = 0;
-
-            int col = 7;
+    int col = 7;
 
             for (int i = this.min; i < this.min + 5; i++)
             {
                 excelApiLink.WriteCell(form.Path, 15, col, (i + 1).ToString());
                 col += 3;
             }
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Checks if the current line is the last line of the form to modify.
-        /// </summary>
-        /// <param name="pieceData">The piece data.</param>
-        /// <param name="i">The current index of the measure plan.</param>
-        /// <param name="j">The current index of the measurement data within the measure plan.</param>
-        /// <returns>True if the current line is the last line, false otherwise.</returns>
-        private bool isLastLine(List<List<Data.Measure>> pieceData, int i, int j)
-        {
-            if (i != pieceData.Count - 1) return false;
-
-            if (pieceData[i].Count == 0 || j == pieceData[i].Count - 1)
-                return true;
-
-            return false;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Checks if the next line in the Excel worksheet is empty.
-        /// </summary>
-        /// <returns>True if the next line is empty, false otherwise.</returns>
-        private bool isNextLineEmpty()
-        {
-            if (excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn) != ""
-                || excelApiLink.ReadCell(form.Path, base.currentLine + 1, base.currentColumn + 1) != "")
-                return false;
-
-            return true;
         }
 
         /*-------------------------------------------------------------------------*/

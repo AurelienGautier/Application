@@ -299,5 +299,17 @@ namespace Application.Writers
         }
 
         /*-------------------------------------------------------------------------*/
+
+        protected void WriteCell(int row, int col, string value)
+        {
+            excelApiLink.WriteCell(form.Path, row, col, value);
+        }
+
+        protected void WriteCell(int row, int col, double value)
+        {
+            excelApiLink.WriteCell(form.Path, row, col, value);
+        }
+
+        /*-------------------------------------------------------------------------*/
     }
 }
