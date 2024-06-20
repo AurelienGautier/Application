@@ -4,7 +4,9 @@ namespace Application.Writers
 {
     class CapabilityWriter : ExcelWriter
     {
-        private readonly int maxLines = 25;
+        private const int MAX_LINES_PER_PAGE = 25;
+        private int linesWrittenOnCurrentPage = 0;
+        private int pageNumber = 1;
 
         public CapabilityWriter(String fileName, Form form) : base(fileName, form) { }
 
@@ -42,9 +44,6 @@ namespace Application.Writers
         public override void WritePiecesValues()
         {
             excelApiLink.ChangeWorkSheet(form.Path, "Capa");
-            int linesWritten = 0;
-            int line = form.FirstLine;
-            int col = 5;
 
             if (form.CapabilityMeasureNumber == null) return;
             List<int> capabilityMeasureNumber = form.CapabilityMeasureNumber;
@@ -52,36 +51,19 @@ namespace Application.Writers
             // Write the values of the pieces in the capability form
             for (int i = 0; i < capabilityMeasureNumber.Count; i++)
             {
-                if(i > 0)
-                {
-                    excelApiLink.ChangeWorkSheet(form.Path, "Capa (" + (i + 1) + ")");
-                    line = form.FirstLine;
-                    col = 5;
-                    linesWritten = 0;
-                }
+                if (i > 0) this.changePage();
 
                 int num = capabilityMeasureNumber[i];
                 foreach (Piece piece in pieces)
                 {
-                    try
-                    {
-                        double currentValue = piece.GetMeasurePlans()[0].GetMeasures()[num].Value;
+                    if (num >= piece.GetMeasurePlans()[0].GetMeasures().Count)
+                        throw new Exceptions.IncoherentValueException("Le numéro de mesure de capacité " + num + " indiqué est incorrect.");
 
-                        excelApiLink.WriteCell(form.Path, line, col, currentValue);
-                        linesWritten++;
-                        line++;
+                    double currentValue = piece.GetMeasurePlans()[0].GetMeasures()[num].Value;
 
-                        if (linesWritten == maxLines)
-                        {
-                            linesWritten = 0;
-                            line = form.FirstLine;
-                            col++;
-                        }
-                    }
-                    catch
-                    {
-                        throw new Exceptions.IncoherentValueException("Le format du fichier n'est pas cohérent avec la valeur l'un des numéros de mesure fournis.");
-                    }
+                    excelApiLink.WriteCell(form.Path, base.currentLine, base.currentColumn, currentValue);
+
+                    this.goToNextLine();
                 }
             }
         }
@@ -94,17 +76,56 @@ namespace Application.Writers
         /// <returns>The number of pages</returns>
         private int getCapaPagesNumber()
         {
-            int pageNumber = 0;
+            int capaPageNumber = 0;
 
             for (int i = 1; i <= excelApiLink.GetNumberOfPages(form.Path); i++)
             {
                 string pageName = excelApiLink.GetPageName(form.Path, i);
 
                 if (pageName.StartsWith("Capa"))
-                    pageNumber++;
+                    capaPageNumber++;
             }
 
-            return pageNumber;
+            return capaPageNumber;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void goToNextLine()
+        {
+            base.currentLine++;
+            this.linesWrittenOnCurrentPage++;
+
+            // Change column if the current one is full
+            if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
+            {
+                this.linesWrittenOnCurrentPage = 0;
+                base.currentLine -= MAX_LINES_PER_PAGE;
+                base.currentColumn++;
+            }
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private void changePage()
+        {
+            this.pageNumber++;
+            this.linesWrittenOnCurrentPage = 0;
+            base.currentLine = base.form.FirstLine;
+            base.currentColumn = base.form.FirstColumn;
+
+            try
+            {
+                excelApiLink.ChangeWorkSheet(form.Path, "Capa (" + (this.pageNumber) + ")");
+            }
+            catch
+            {
+                excelApiLink.DisplayWorkSheets(form.Path);
+
+                excelApiLink.CloseWorkBook(form.Path);
+
+                throw new Exceptions.IncoherentValueException("Le nombre de pages n'est pas suffisant");
+            }
         }
 
         /*-------------------------------------------------------------------------*/

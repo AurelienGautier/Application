@@ -118,7 +118,7 @@ namespace Application.Writers
             // Change page if the current one is full
             if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
             {
-                this.ChangePage();
+                this.changePage();
                 this.linesWrittenOnCurrentPage = 0;
                 this.currentLine -= MAX_LINES_PER_PAGE;
             }
@@ -129,7 +129,7 @@ namespace Application.Writers
         /// <summary>
         /// Changes the current page to the next page in the Excel workbook.
         /// </summary>
-        private void ChangePage()
+        private void changePage()
         {
             this.pageNumber++;
 

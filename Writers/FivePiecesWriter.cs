@@ -89,7 +89,7 @@ namespace Application.Writers
 
                 this.max = i == base.pieces.Count / 5 - 1 && base.pieces.Count % 5 != 0 ? base.pieces.Count : this.max + 5;
 
-                if (i < iterations - 1) this.ChangePage();
+                if (i < iterations - 1) this.changePage();
                 this.linesWrittenOnCurrentPage = 0;
                 this.currentLine = form.FirstLine;
             }
@@ -132,7 +132,6 @@ namespace Application.Writers
                         base.WriteCell(base.currentLine, columnToWriteValue, currentValueToWrite);
                     }
 
-                    Console.WriteLine(base.currentLine);
                     this.goToNextLine();
                 }
             }
@@ -184,7 +183,7 @@ namespace Application.Writers
             // Change page if the current one is full
             if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
             {
-                this.ChangePage();
+                this.changePage();
 
                 this.linesWrittenOnCurrentPage = 0;
                 this.currentLine -= MAX_LINES_PER_PAGE;
@@ -196,7 +195,7 @@ namespace Application.Writers
         /// <summary>
         /// Switches to the next measurement page.
         /// </summary>
-        public void ChangePage()
+        public void changePage()
         {
             this.pageNumber++;
 
@@ -209,7 +208,7 @@ namespace Application.Writers
                 base.throwIncoherentValueException();
             }
 
-    int col = 7;
+            int col = 7;
 
             for (int i = this.min; i < this.min + 5; i++)
             {
