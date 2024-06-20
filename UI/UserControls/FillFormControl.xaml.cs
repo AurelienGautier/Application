@@ -22,7 +22,7 @@ namespace Application.UI.UserControls
         private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
 
-        private Form? currentForm;
+        private Form currentForm;
 
         /*-------------------------------------------------------------------------*/
 
@@ -90,11 +90,9 @@ namespace Application.UI.UserControls
 
             if(Modify.IsChecked == true) this.currentForm.Modify = true;
 
-            if (!isFormCorrectlyFilled()) return;
+            if (!isFormCorrectlyFilled() || this.currentForm == null) return;
 
             String? formToModify = null;
-
-            if (this.currentForm == null) return;
 
             if (this.currentForm.Modify)
             {
@@ -245,38 +243,6 @@ namespace Application.UI.UserControls
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
 
             if ((String)Forms.SelectedItem == null) Forms.SelectedIndex = 0;
-
-            this.changeForm(sender, e);
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Action called when the user selects a different form.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void changeForm(object sender, SelectionChangedEventArgs e)
-        {
-            Form? currentTempForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
-
-            if (currentTempForm == null)
-            {
-                this.currentForm = this.forms[0].Copy();
-            }
-            else
-            { 
-                this.currentForm = currentTempForm.Copy();
-            }
-
-            if (this.currentForm.Type == FormType.Capability)
-            {
-                MeasureNumStack.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                MeasureNumStack.Visibility = Visibility.Collapsed;
-            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -371,34 +337,6 @@ namespace Application.UI.UserControls
             if (fileToSave == "") return;
 
             DestinationPathTextBox.Text = fileToSave;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Action called when the user wants to modify an existing form.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Modify_Checked(object sender, RoutedEventArgs e)
-        {
-            if (this.currentForm == null) return;
-
-            this.currentForm.Modify = true;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Action called when the user wants to create a new form.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void New_Check(object sender, RoutedEventArgs e)
-        {
-            if (this.currentForm == null) return;
-
-            this.currentForm.Modify = false;
         }
 
         /*-------------------------------------------------------------------------*/

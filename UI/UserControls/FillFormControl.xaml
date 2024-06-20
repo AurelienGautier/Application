@@ -25,17 +25,19 @@
                         <!--#region From choice-->
                         <StackPanel Margin="0, 10, 0, 10">
                             <Label Content="Formulaire" Style="{StaticResource BaseStyle}" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White" SelectionChanged="changeForm"/>
+                            <ComboBox x:Name="Forms" Style="{StaticResource ComboBoxStyle1}" Background="White" BorderBrush="White"/>
                         </StackPanel>
                         <!--#endregion-->
 
                         <Separator />
 
+                        <!--#region Capability measure numbers choice-->
                         <StackPanel x:Name="MeasureNumStack" Margin="0, 10, 0, 0">
                             <Label Content="Numéros de mesure" Style="{StaticResource BaseStyle}" />
                             <TextBox x:Name="MeasureNum" Style="{StaticResource TextBoxStyle}" Background="White" Margin="0, 0, 0, 10" />
                             <Separator />
                         </StackPanel>
+                        <!--#endregion-->
 
                         <!--#region Source file path choice-->
                         <StackPanel  Margin="0, 10, 0, 10">
@@ -72,7 +74,7 @@
                             </Grid>
                         </StackPanel>
                         <!--#endregion-->
-
+                        
                     </StackPanel>
 
                     <StackPanel Orientation="Vertical" Margin="50, 0, 0, 0">
@@ -104,7 +106,7 @@
                             </Button>
                         </StackPanel>
                         <!--#endregion-->
-
+                        
                     </StackPanel>
                 </StackPanel>
 
@@ -124,8 +126,8 @@
 
                     <!--#region Choose to create or to modify-->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <RadioButton x:Name="New" Content="Nouveau" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" IsChecked="True" HorizontalAlignment="Left" Checked="New_Check"/>
-                        <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right" Checked="Modify_Checked"/>
+                        <RadioButton x:Name="New" Content="Nouveau" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" IsChecked="True" HorizontalAlignment="Left"/>
+                        <RadioButton x:Name="Modify" Content="Modifier" Style="{StaticResource RadioButtonStyle}" GroupName="NewOrModify" HorizontalAlignment="Right"/>
                     </StackPanel>
                     <!--#endregion-->
 

@@ -29,7 +29,7 @@
         public DataFrom DataFrom { get; set; }
         public int ClientLine { get; set; }
         public int StandardLine { get; set; }
-        public List<int>? CapabilityMeasureNumber { get; set; }
+        public List<int> CapabilityMeasureNumber { get; set; }
         public List<String> SourceFiles { get; set; }
 
         public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine, int standardLine)
@@ -47,6 +47,7 @@
             this.DataFrom = dataFrom;
             this.ClientLine = clientLine;
             this.StandardLine = standardLine;
+            this.CapabilityMeasureNumber = new List<int>();
             this.SourceFiles = new List<String>();
         }
 

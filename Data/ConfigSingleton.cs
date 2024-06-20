@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.IO;
-using System.Data;
+﻿using System.Data;
 using System.Drawing;
-using Application.Writers;
+using Application.Facade;
 
 namespace Application.Data
 {
@@ -12,11 +10,16 @@ namespace Application.Data
     internal class ConfigSingleton
     {
         private static ConfigSingleton? instance = null;
+        private readonly Facade.JsonLibraryLink jsonLibraryLink;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
-        private List<Standard> standards;
-        private Dictionary<string, string> headerFieldsMatch;
-        private Dictionary<string, string> pageNames;
+        readonly private List<Standard> standards;
+        readonly private Dictionary<string, string> headerFieldsMatch;
+        readonly private Dictionary<string, string> pageNames;
+
+        readonly string standardsFilePath = Environment.CurrentDirectory + "\\conf\\standards.json";
+        readonly string headerFieldsFilePath = Environment.CurrentDirectory + "\\conf\\headerFields.json";
+        readonly string pageNamesFilePath = Environment.CurrentDirectory + "\\conf\\pageNames.json";
 
         /*-------------------------------------------------------------------------*/
 
@@ -25,6 +28,8 @@ namespace Application.Data
         /// </summary>
         private ConfigSingleton()
         {
+            this.jsonLibraryLink = new Facade.JsonLibraryLink();
+
             this.measureTypes = new List<MeasureType>();
 
             this.Signature = this.GetSignatureFromFile();
@@ -33,15 +38,11 @@ namespace Application.Data
 
             this.GetMeasureDataFromFile();
 
-            this.GetStandardsFromJsonFile();
+            this.standards = this.jsonLibraryLink.GetJsonFilecontent<List<Standard>>(standardsFilePath);
 
-            this.headerFieldsMatch = new Dictionary<string, string>();
+            this.headerFieldsMatch = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(this.headerFieldsFilePath);
 
-            this.getHeaderFieldsFromFile();
-
-            this.pageNames = new Dictionary<string, string>();
-
-            this.getPageNamesFromFile();
+            this.pageNames = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(pageNamesFilePath);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -70,13 +71,9 @@ namespace Application.Data
         /// <returns>The signature image or null if it is not valid.</returns>
         private Image? GetSignatureFromFile()
         {
-            string? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\conf.json");
+            string filePath = Environment.CurrentDirectory + "\\conf\\conf.json";
 
-            if (json == null) return null;
-
-            Dictionary<string, string>? data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-
-            if (data == null) return null;
+            var data = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(filePath);
 
             Image? signature;
             try
@@ -86,6 +83,7 @@ namespace Application.Data
             catch
             {
                 signature = null;
+                throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect");
             }
 
             return signature;
@@ -100,14 +98,7 @@ namespace Application.Data
         {
             string filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            string? json = this.GetFileContent(filePath);
-
-            if (json == null) return;
-
-            DataSet? dataSet = JsonConvert.DeserializeObject<DataSet>(json);
-
-            if (dataSet == null)
-                throw new Exceptions.ConfigDataException("Une erreur s'est produite lors de la récupération des types de mesure.");
+            DataSet dataSet = this.jsonLibraryLink.GetJsonFilecontent<DataSet>(filePath);
 
             DataTable? dataTable = dataSet.Tables["Measures"];
 
@@ -154,31 +145,6 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Gets the content of a file.
-        /// </summary>
-        /// <param name="filePath">The path of the file to read.</param>
-        /// <returns>The content of the file or null if it cannot be read.</returns>
-        private string? GetFileContent(string filePath)
-        {
-            String content = "";
-
-            try
-            {
-                StreamReader reader = new StreamReader(filePath);
-                content = reader.ReadToEnd();
-                reader.Close();
-            }
-            catch
-            {
-                return null;
-            }
-
-            return content;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
         /// Converts the measure types to JSON and writes them to the configuration file.
         /// </summary>
         private void SerializeMeasureTypes()
@@ -209,7 +175,7 @@ namespace Application.Data
 
             dataSet.AcceptChanges();
 
-            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\measureTypes.json", dataSet);
+            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\measureTypes.json", dataSet);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -282,7 +248,7 @@ namespace Application.Data
                     { "Signature", signaturePath }
                 };
 
-            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
+            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -407,35 +373,15 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Gets the standards from the JSON file.
-        /// </summary>
-        private void GetStandardsFromJsonFile()
-        {
-            this.standards.Add(new Standard("", "", "", ""));
-
-            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\standards.json");
-
-            if (json == null) return;
-
-            List<Standard>? standardsFromFile = JsonConvert.DeserializeObject<List<Standard>>(json);
-
-            if (standardsFromFile != null) this.standards = standardsFromFile;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
         /// Updates the standards in the configuration file.
         /// </summary>
         public void UpdateStandards()
         {
             this.standards.Clear();
 
-            this.standards.Add(new Standard("", "", "", ""));
-
             this.GetStandardsFromExcelFile();
 
-            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
+            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -465,26 +411,6 @@ namespace Application.Data
                 }
 
             return null;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Gets the header key name from the configuration file.
-        /// </summary>
-        /// <exception cref="Exceptions.ConfigDataException">If the header config data could not have been got from the config file</exception>
-        private void getHeaderFieldsFromFile()
-        {
-            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\headerFields.json");
-
-            if (json == null) return;
-
-            Dictionary<String, String>? headerFields = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
-
-            if (headerFields == null)
-                throw new Exceptions.ConfigDataException("Le fichier de configuration des champs d'en-tête est incorrect ou a été déplacé.");
-
-            this.headerFieldsMatch = headerFields;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -520,27 +446,7 @@ namespace Application.Data
             this.headerFieldsMatch["PieceReceptionDate"] = pieceReceptionDate;
             this.headerFieldsMatch["Observations"] = observations;
 
-            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\headerFields.json", this.headerFieldsMatch);
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Gets the page names from the configuration file to know which page is the header page and which one is the measure page.
-        /// </summary>
-        /// <exception cref="Exceptions.ConfigDataException"></exception>
-        private void getPageNamesFromFile()
-        {
-            String? json = this.GetFileContent(Environment.CurrentDirectory + "\\conf\\pageNames.json");
-
-            if (json == null) return;
-
-            Dictionary<String, String>? pageNamesFromFile = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
-
-            if (pageNamesFromFile == null)
-                throw new Exceptions.ConfigDataException("Le fichier de configuration des noms de pages est incorrect ou a été déplacé.");
-
-            this.pageNames = pageNamesFromFile;
+            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\headerFields.json", this.headerFieldsMatch);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -555,7 +461,7 @@ namespace Application.Data
             this.pageNames["HeaderPage"] = headerPage;
             this.pageNames["MeasurePage"] = measurePage;
 
-            this.writeJsonFile(Environment.CurrentDirectory + "\\conf\\pageNames.json", this.pageNames);
+            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\pageNames.json", this.pageNames);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -567,24 +473,6 @@ namespace Application.Data
         public Dictionary<String, String> GetPageNames()
         {
             return this.pageNames;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Replace the content of a json file with the data passed as parameter.
-        /// </summary>
-        /// <param name="filePath">The path of the file to modify</param>
-        /// <param name="data">The data to write in the file</param>
-        private void writeJsonFile(String filePath, Object data)
-        {
-            String json = JsonConvert.SerializeObject(data, Formatting.Indented);
-
-            Directory.CreateDirectory(Environment.CurrentDirectory + "\\conf");
-            File.Create(filePath).Close();
-            StreamWriter writer = new StreamWriter(filePath);
-            writer.Write(json);
-            writer.Close();
         }
 
         /*-------------------------------------------------------------------------*/

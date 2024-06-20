@@ -45,15 +45,12 @@ namespace Application.Writers
         {
             excelApiLink.ChangeWorkSheet(form.Path, "Capa");
 
-            if (form.CapabilityMeasureNumber == null) return;
-            List<int> capabilityMeasureNumber = form.CapabilityMeasureNumber;
-
             // Write the values of the pieces in the capability form
-            for (int i = 0; i < capabilityMeasureNumber.Count; i++)
+            for (int i = 0; i < form.CapabilityMeasureNumber.Count; i++)
             {
                 if (i > 0) this.changePage();
 
-                int num = capabilityMeasureNumber[i];
+                int num = form.CapabilityMeasureNumber[i];
                 foreach (Piece piece in pieces)
                 {
                     if (num >= piece.GetMeasurePlans()[0].GetMeasures().Count)

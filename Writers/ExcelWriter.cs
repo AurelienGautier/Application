@@ -1,5 +1,6 @@
 ﻿using Application.Data;
 using Application.Exceptions;
+using Application.Facade;
 
 namespace Application.Writers
 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using Excel = Microsoft.Office.Interop.Excel;
 
-namespace Application.Writers
+namespace Application.Facade
 {
     /// <summary>
     /// Singleton class for managing the Excel Library.
@@ -14,7 +14,7 @@ namespace Application.Writers
     {
         private static ExcelLibraryLinkSingleton? instance = null;
         private readonly Excel.Application excelApp;
-        private readonly Dictionary<String, Excel.Workbook> workbooks;
+        private readonly Dictionary<string, Excel.Workbook> workbooks;
 
         /*-------------------------------------------------------------------------*/
 
@@ -41,9 +41,9 @@ namespace Application.Writers
         /// </summary>
         private ExcelLibraryLinkSingleton()
         {
-            this.excelApp = new Excel.Application();
-            this.excelApp.DisplayAlerts = false;
-            this.workbooks = new Dictionary<String, Excel.Workbook>();
+            excelApp = new Excel.Application();
+            excelApp.DisplayAlerts = false;
+            workbooks = new Dictionary<string, Excel.Workbook>();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -68,7 +68,7 @@ namespace Application.Writers
         /// The file is identified by its path.
         /// </summary>
         /// <param name="path">Path of the file to open.</param>
-        public void OpenWorkBook(String path)
+        public void OpenWorkBook(string path)
         {
             if (!workbooks.ContainsKey(path))
             {
@@ -90,7 +90,7 @@ namespace Application.Writers
         /// The file is identified by its path.
         /// </summary>
         /// <param name="path">Path of the file to close.</param>
-        public void CloseWorkBook(String path)
+        public void CloseWorkBook(string path)
         {
             if (!workbooks.ContainsKey(path)) return;
 
@@ -105,10 +105,10 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the file.</param>
         /// <param name="sheet">Number of the sheet to select.</param>
-        public void ChangeWorkSheet(String path, int sheet)
+        public void ChangeWorkSheet(string path, int sheet)
         {
             if (!workbooks.ContainsKey(path)) return;
-            
+
             workbooks[path].Sheets[sheet].Activate();
         }
 
@@ -119,10 +119,10 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the file.</param>
         /// <param name="sheet">Name of the sheet to select.</param>
-        public void ChangeWorkSheet(String path, String sheet)
+        public void ChangeWorkSheet(string path, string sheet)
         {
             if (!workbooks.ContainsKey(path)) return;
-            
+
             workbooks[path].Sheets[sheet].Activate();
         }
 
@@ -134,13 +134,13 @@ namespace Application.Writers
         /// <param name="path">Path of the file.</param>
         /// <param name="sheetName">Name of the sheet to copy.</param>
         /// <param name="newSheetName">Name of the new sheet.</param>
-        public void CopyWorkSheet(String path, String sheetName, String newSheetName)
+        public void CopyWorkSheet(string path, string sheetName, string newSheetName)
         {
             if (!workbooks.ContainsKey(path)) return;
 
             try
             {
-                workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);            
+                workbooks[path].Sheets[sheetName].Copy(Type.Missing, workbooks[path].Sheets[workbooks[path].Sheets.Count]);
                 workbooks[path].Sheets[workbooks[path].Sheets.Count].Name = newSheetName;
             }
             catch
@@ -156,7 +156,7 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the file</param>
         /// <param name="sheetName">Name of the sheet to delete</param>
-        public void DeleteWorkSheet(String path, String sheetName)
+        public void DeleteWorkSheet(string path, string sheetName)
         {
             if (!workbooks.ContainsKey(path)) return;
 
@@ -172,7 +172,7 @@ namespace Application.Writers
         /// <param name="line">Line number.</param>
         /// <param name="column">Column number.</param>
         /// <param name="value">Value to write to the cell.</param>
-        public void WriteCell(String path, int line, int column, String value)
+        public void WriteCell(string path, int line, int column, string value)
         {
             if (workbooks.ContainsKey(path))
             {
@@ -189,7 +189,7 @@ namespace Application.Writers
         /// <param name="line">Line number.</param>
         /// <param name="column">Column number.</param>
         /// <param name="value">Value to write to the cell.</param>
-        public void WriteCell(String path, int line, int column, double value)
+        public void WriteCell(string path, int line, int column, double value)
         {
             if (workbooks.ContainsKey(path))
             {
@@ -206,7 +206,7 @@ namespace Application.Writers
         /// <param name="line">Line number.</param>
         /// <param name="column">Column number.</param>
         /// <returns>Value of the cell.</returns>
-        public String ReadCell(String path, int line, int column)
+        public string ReadCell(string path, int line, int column)
         {
             if (workbooks.ContainsKey(path) && workbooks[path].ActiveSheet.Cells[line, column].Value != null)
             {
@@ -226,10 +226,10 @@ namespace Application.Writers
         /// <param name="column1">Column number of the first cell.</param>
         /// <param name="line2">Line number of the second cell.</param>
         /// <param name="column2">Column number of the second cell.</param>
-        public void MergeCells(String path, int line1, int column1, int line2, int column2)
+        public void MergeCells(string path, int line1, int column1, int line2, int column2)
         {
             if (!workbooks.ContainsKey(path)) return;
-            
+
             Excel.Range range = workbooks[path].ActiveSheet.Range[
                 workbooks[path].ActiveSheet.Cells[line1, column1],
                 workbooks[path].ActiveSheet.Cells[line2, column2]];
@@ -248,9 +248,9 @@ namespace Application.Writers
         /// <param name="line2">Line number of the second cell.</param>
         /// <param name="column2">Column number of the second cell.</param>
         /// <returns>True if the cells are merged, false otherwise.</returns>
-        public bool MergedCells(String path, int line1, int column1, int line2, int column2)
+        public bool MergedCells(string path, int line1, int column1, int line2, int column2)
         {
-            if(!workbooks.ContainsKey(path)) return false;
+            if (!workbooks.ContainsKey(path)) return false;
 
             Excel.Range range = workbooks[path].ActiveSheet.Range[
                 workbooks[path].ActiveSheet.Cells[line1, column1],
@@ -258,7 +258,7 @@ namespace Application.Writers
 
             return range.MergeCells;
         }
-        
+
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Application.Writers
         /// <param name="startColumn">Number of the first column to move.</param>
         /// <param name="endColumn">Number of the last column to move.</param>
         /// <param name="linesToShift">Number of lines to move.</param>
-        public void ShiftLines(String path, int line, int startColumn, int endColumn, int linesToShift)
+        public void ShiftLines(string path, int line, int startColumn, int endColumn, int linesToShift)
         {
             if (!workbooks.ContainsKey(path)) return;
 
@@ -290,7 +290,7 @@ namespace Application.Writers
         /// <param name="row">Row number.</param>
         /// <param name="col">Column number.</param>
         /// <returns>Address of the cell.</returns>
-        public String GetCellAddress(int row, int col)
+        public string GetCellAddress(int row, int col)
         {
             if (col <= 0 || row <= 0)
             {
@@ -319,13 +319,13 @@ namespace Application.Writers
         /// <param name="line">Line number to place the image.</param>
         /// <param name="column">Column number to place the image.</param>
         /// <param name="image">Image to paste.</param>
-        public void PasteImage(String path, int line, int column, Image image)
+        public void PasteImage(string path, int line, int column, Image image)
         {
             if (!workbooks.ContainsKey(path)) return;
 
             Clipboard.SetDataObject(image, true);
-            var cellRngImg = (Excel.Range)this.workbooks[path].ActiveSheet.Cells[line, column];
-            this.workbooks[path].ActiveSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
+            var cellRngImg = (Excel.Range)workbooks[path].ActiveSheet.Cells[line, column];
+            workbooks[path].ActiveSheet.Paste(cellRngImg, ConfigSingleton.Instance.Signature);
         }
 
         /// <summary>
@@ -334,11 +334,11 @@ namespace Application.Writers
         /// <param name="path">Path of the Excel file.</param>
         /// <param name="line">Line number of the image to delete.</param>
         /// <param name="column">Column number of the image to delete.</param>
-        public void DeleteImage(String path, int line, int column)
+        public void DeleteImage(string path, int line, int column)
         {
             if (!workbooks.ContainsKey(path)) return;
 
-            var shapes = this.workbooks[path].ActiveSheet.Shapes;
+            var shapes = workbooks[path].ActiveSheet.Shapes;
             for (int i = shapes.Count; i >= 1; i--)
             {
                 var shape = shapes.Item(i);
@@ -357,7 +357,7 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the Excel file.</param>
         /// <param name="pdfPath">Path of the PDF file to export.</param>
-        public void ExportToPdf(String path, String pdfPath)
+        public void ExportToPdf(string path, string pdfPath)
         {
             if (!workbooks.ContainsKey(path)) return;
 
@@ -367,7 +367,7 @@ namespace Application.Writers
             }
             catch
             {
-                throw new Exceptions.FileAlreadyInUseException(pdfPath);
+                throw new FileAlreadyInUseException(pdfPath);
             }
         }
 
@@ -378,18 +378,18 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the file to save.</param>
         /// <param name="pathToSave">Path to save the file.</param>
-        public void SaveWorkBook(String path, String pathToSave)
+        public void SaveWorkBook(string path, string pathToSave)
         {
             if (!workbooks.ContainsKey(path)) return;
 
-            this.workbooks[path].Sheets[1].Activate();
+            workbooks[path].Sheets[1].Activate();
             try
             {
                 workbooks[path].SaveAs(pathToSave);
             }
             catch
             {
-                throw new Exceptions.FileAlreadyInUseException(pathToSave);
+                throw new FileAlreadyInUseException(pathToSave);
             }
         }
 
@@ -400,7 +400,7 @@ namespace Application.Writers
         /// </summary>
         /// <param name="path">Path of the file.</param>
         /// <returns>Number of worksheets.</returns>
-        public int GetNumberOfPages(String path)
+        public int GetNumberOfPages(string path)
         {
             if (!workbooks.ContainsKey(path)) return 0;
 
@@ -415,7 +415,7 @@ namespace Application.Writers
         /// <param name="path">Path of the file.</param>
         /// <param name="page">Number of the worksheet.</param>
         /// <returns>Name of the worksheet.</returns>
-        public String GetPageName(String path, int page)
+        public string GetPageName(string path, int page)
         {
             if (!workbooks.ContainsKey(path)) return "";
 
@@ -424,7 +424,7 @@ namespace Application.Writers
 
         /*-------------------------------------------------------------------------*/
 
-        public void DisplayWorkSheets(String path)
+        public void DisplayWorkSheets(string path)
         {
             foreach (Excel.Worksheet sheet in workbooks[path].Sheets)
             {
