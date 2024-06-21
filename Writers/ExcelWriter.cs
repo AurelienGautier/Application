@@ -32,7 +32,7 @@ namespace Application.Writers
 
             ExcelLibraryLinkSingleton.Instance.OpenWorkBook(form.Path);
 
-            this.pieces = new List<Data.Piece>();
+            this.pieces = [];
 
             this.excelApiLink = ExcelLibraryLinkSingleton.Instance;
         }
@@ -44,11 +44,11 @@ namespace Application.Writers
         /// </summary>
         /// <param name="data">The list of pieces to write.</param>
         /// <param name="standards">The list of standards to write.</param>
-        public void WriteData(List<Data.Piece> data, List<Standard> standards)
+        public void WriteData(List<Data.Piece> data)
         {
             this.pieces = data;
 
-            writeHeader(data[0].GetHeader(), standards);
+            writeHeader(data[0].GetHeader());
 
             CreateWorkSheets();
 
@@ -71,7 +71,7 @@ namespace Application.Writers
         /// </summary>
         /// <param name="header">The dictionary containing the header information.</param>
         /// <param name="standards">The list of standards to write.</param>
-        private void writeHeader(Header header, List<Standard> standards)
+        private void writeHeader(Header header)
         {
             if (!form.Modify)
             {
@@ -85,7 +85,7 @@ namespace Application.Writers
                 excelApiLink.WriteCell(form.Path, 40, 4, header.Observations);
 
                 this.writeClient(header.ClientName);
-                this.writeStandards(standards);
+                this.writeStandards(this.form.Standards);
             }
         }
 
@@ -244,7 +244,7 @@ namespace Application.Writers
         /// <summary>
         /// Throws an exception indicating that the number of measures is different between the report to modify and the source file(s).
         /// </summary>
-        protected void throwIncoherentValueException()
+        protected void ThrowIncoherentValueException()
         {
             excelApiLink.CloseWorkBook(form.Path);
             
@@ -257,7 +257,7 @@ namespace Application.Writers
         /// Gets the number of pages containing measurement values in the Excel file.
         /// </summary>
         /// <returns>The number of pages</returns>
-        protected int getMeasurePagesNumber()
+        protected int GetMeasurePagesNumber()
         {
             int pageNumber = 0;
 

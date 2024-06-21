@@ -21,14 +21,14 @@ namespace Application.UI.UserControls
         /// <param name="standards">The list of standards to be used for filling the form.</param>
         /// <param name="dataPath">The path to the data file.</param>
         /// <param name="fileToSave">The path to save the filled form.</param>
-        public void ManageFormFilling(Form form, Parser.Parser parser, List<Standard> standards, String fileToSave)
+        public void ManageFormFilling(Form form, String fileToSave)
         {
             // Parsing the data
-            List<Piece>? data = this.GetData(form, parser);
+            List<Piece>? data = this.GetData(form);
             if (data == null) return;
 
             // Filling the form
-            this.FillForm(form, data, standards, fileToSave);
+            FillForm(form, data, fileToSave);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -40,9 +40,9 @@ namespace Application.UI.UserControls
         /// <param name="parser">The parser corresponding to the file type to parse.</param>
         /// <param name="dataPath">The path to the data file.</param>
         /// <returns>The list of data pieces to be inserted into the form.</returns>
-        private List<Piece>? GetData(Form form, Parser.Parser parser)
+        private List<Piece>? GetData(Form form)
         {
-            List<Piece> data = new List<Piece>();
+            List<Piece> data = [];
             int? measureNumber = null;
 
             // Parsing the data
@@ -50,7 +50,7 @@ namespace Application.UI.UserControls
             {
                 for (int i = 0; i < form.SourceFiles.Count; i++)
                 {
-                    List<Piece> newPieces = parser.ParseFile(form.SourceFiles[i]);
+                    List<Piece> newPieces = form.MeasureMachine.Parser.ParseFile(form.SourceFiles[i]);
 
                     if(measureNumber == null)
                     {
@@ -62,7 +62,7 @@ namespace Application.UI.UserControls
                         return null;
                     }
 
-                    data.AddRange(parser.ParseFile(form.SourceFiles[i]));
+                    data.AddRange(form.MeasureMachine.Parser.ParseFile(form.SourceFiles[i]));
                 }
             }
             catch (MeasureTypeNotFoundException e)
@@ -88,7 +88,7 @@ namespace Application.UI.UserControls
         /// <param name="data">The data to be inserted into the form.</param>
         /// <param name="standards">The information to be inserted into the form header.</param>
         /// <param name="fileToSave">The path to save the filled form.</param>
-        public void FillForm(Form form, List<Piece> data, List<Standard> standards, String fileToSave)
+        public static void FillForm(Form form, List<Piece> data, String fileToSave)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace Application.UI.UserControls
                 else if (form.Type == FormType.FivePieces) writer = new FivePiecesWriter(fileToSave, form);
                 else writer = new CapabilityWriter(fileToSave, form);
 
-                writer.WriteData(data, standards);
+                writer.WriteData(data);
             }
             catch (FileAlreadyInUseException e)
             {
@@ -123,11 +123,13 @@ namespace Application.UI.UserControls
         /// <param name="title">The title of the dialog window.</param>
         /// <param name="extensions">The allowed file extensions.</param>
         /// <returns>The selected file path.</returns>
-        public String GetFileToOpen(String title, String extensions)
+        public static String GetFileToOpen(String title, String extensions)
         {
-            var dialog = new OpenFileDialog();
-            dialog.Title = title;
-            dialog.Filter = extensions;
+            var dialog = new OpenFileDialog
+            {
+                Title = title,
+                Filter = extensions
+            };
 
             String fileName = "";
 
@@ -147,12 +149,14 @@ namespace Application.UI.UserControls
         /// <returns>The selected file path.</returns>
         public List<String> GetFilesToOpen(String title, String extensions, bool multiSelect)
         {
-            var dialog = new OpenFileDialog();
-            dialog.Title = title;
-            dialog.Filter = extensions;
-            dialog.Multiselect = multiSelect;
+            var dialog = new OpenFileDialog
+            {
+                Title = title,
+                Filter = extensions,
+                Multiselect = multiSelect
+            };
 
-            List<String> fileNames = new List<String>();
+            List<String> fileNames = [];
 
             if (dialog.ShowDialog() == true)
             {
@@ -169,10 +173,12 @@ namespace Application.UI.UserControls
         /// </summary>
         /// <param name="title">The title of the dialog window.</param>
         /// <returns>The selected folder path.</returns>
-        public String GetFolderToOpen(String title)
+        public static String GetFolderToOpen(String title)
         {
-            var dialog = new OpenFolderDialog();
-            dialog.Title = title;
+            var dialog = new OpenFolderDialog
+            {
+                Title = title
+            };
 
             String folderName = "";
 
@@ -187,12 +193,13 @@ namespace Application.UI.UserControls
         /// Opens a dialog window to select the path where to save a file.
         /// </summary>
         /// <returns>The selected file path.</returns>
-        public String GetFileToSave()
+        public static String GetFileToSave()
         {
-            var saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm";
-
-            saveFileDialog.FileName = "rapport.xlsm";
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm",
+                FileName = "rapport.xlsm"
+            };
 
             String fileName = "";
 

@@ -1,6 +1,5 @@
 ﻿using Application.Data;
 using Application.Exceptions;
-using Application.Parser;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -15,14 +14,12 @@ namespace Application.UI.UserControls
     /// </summary>
     public partial class FillFormControl : UserControl
     {
-        private FormFillingManager formFillingManager;
-        List<String> machines;
-        ObservableCollection<Form> forms;
+        readonly private FormFillingManager formFillingManager;
+        readonly private List<MeasureMachine> machines;
+        private ObservableCollection<Form> forms;
 
-        private BindingList<ComboBoxItem> ComboBoxItems;
+        readonly private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
-
-        private Form currentForm;
 
         /*-------------------------------------------------------------------------*/
 
@@ -34,26 +31,24 @@ namespace Application.UI.UserControls
             InitializeComponent();
 
             // Initialize the list of machines and bind it to the form
-            this.machines = new List<String> { "Mitutoyo", "Ayonis" };
-            Machines.ItemsSource = this.machines;
+            this.machines = ConfigSingleton.Instance.Machines;
+            Machines.ItemsSource = this.machines.Select(machine => machine.Name).ToList();
             Machines.SelectedIndex = 0;
 
             // Initialize the FormFillingManager
             this.formFillingManager = new FormFillingManager();
 
             // Retrieve the list of existing forms
-            this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
+            this.forms = new ObservableCollection<Form>(this.machines[0].PossiblesForms);
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
             Forms.SelectedIndex = 0;
-
-            this.currentForm = this.forms[0].Copy();
 
             // Add the code attributes of each standards element to AvailableOptions
             List<String> standards = ConfigSingleton.Instance.GetStandards().Select(standard => standard.Code).ToList();
             AvailableOptions = new BindingList<string>(standards);
 
             // Initialize the ComboBoxItems list
-            ComboBoxItems = new BindingList<ComboBoxItem>();
+            ComboBoxItems = [];
             Standards.ItemsSource = ComboBoxItems;
 
             // Hide the measure number stack by default
@@ -86,119 +81,120 @@ namespace Application.UI.UserControls
         /// </summary>
         private void fillAform(object sender, RoutedEventArgs e)
         {
-            this.currentForm.SourceFiles = SourcePathTextBox.Text.Split('|').ToList();
-
-            if(Modify.IsChecked == true) this.currentForm.Modify = true;
-
-            if (!isFormCorrectlyFilled() || this.currentForm == null) return;
-
-            String? formToModify = null;
-
-            if (this.currentForm.Modify)
+            try
             {
-                formToModify = this.formFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
-                if (formToModify == "") return;
-            }
+                // Get data entered by the user
+                MeasureMachine machine = this.getCorrectMachine();
+                Form form = this.getCorrectForm(machine);
+                form.SourceFiles = this.getCorrectSourceFiles();
+                form.DestinationPath = this.getCorrectDestinationPath();
+                form.Standards = this.getStandardsFromComboBox();
+                form.Modify = Modify.IsChecked == true;
 
-            this.callFormFilling(formToModify);
-            this.currentForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem).Copy();
+                // Check if the signature is correct
+                if (SignForm.IsChecked == true)
+                {
+                    checkSignature();
+                    form.Sign = true;
+                }
+
+                // If the user wants to modify a form, ask him to select the form to modify
+                if (form.Modify)
+                {
+                    String formPathToModify;
+                    formPathToModify = FormFillingManager.GetFileToOpen("Choisir le formulaire à modifier", "(*.xlsx;*.xlsm)|*.xlsx;*.xlsm");
+                    if (formPathToModify == "") return;
+
+                    form.Path = formPathToModify;
+                }
+
+                this.formFillingManager.ManageFormFilling(form, DestinationPathTextBox.Text);
+            }
+            catch (InvalidFieldException ex)
+            {
+                MainWindow.DisplayError(ex.Message);
+            }
+            catch (ConfigDataException ex)
+            {
+                MainWindow.DisplayError(ex.Message);
+            }
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Checks if the form is correctly filled.
-        /// </summary>
-        /// <returns></returns>
-        private bool isFormCorrectlyFilled()
+        private MeasureMachine getCorrectMachine()
         {
-            if (this.currentForm == null)
-            {
-                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
-                return false;
-            }
+            MeasureMachine? machine = this.machines.Find(m => m.Name == (String)Machines.SelectedItem);
 
-            // Check the signature if the user wants to sign the document
-            if (SignForm.IsChecked == true && ConfigSingleton.Instance.Signature == null)
-            {
-                MainWindow.DisplayError("Il est impossible de signer le document car la signature est incorrecte ou non sélectionée.");
-                return false;
-            }
+            return machine ?? throw new InvalidFieldException("La machine sélectionnée n'existe pas");
+        }
 
-            if (SourcePathTextBox.Text == "")
-            {
-                MainWindow.DisplayError("Veuillez renseigner le chemin du fichier ou du dossier source.");
-                return false;
-            }
-            else
-            {
-                for(int i = 0; i < this.currentForm.SourceFiles.Count; i++)
-                {
-                    if (!File.Exists(this.currentForm.SourceFiles[i]))
-                    {
-                        MainWindow.DisplayError("Le fichier source " + this.currentForm.SourceFiles[i] + " n'existe pas.");
-                        return false;
-                    }
-                }
-            }
+        /*-------------------------------------------------------------------------*/
 
-            if (DestinationPathTextBox.Text == "")
-            {
-                MainWindow.DisplayError("Veuillez renseigner le chemin du formulaire de destination.");
-                return false;
-            }
-            else if (!Directory.Exists(Path.GetDirectoryName(DestinationPathTextBox.Text)))
-            {
-                MainWindow.DisplayError("Le chemin du dossier de destination n'existe pas.");
-                return false;
-            }
+        private Form getCorrectForm(MeasureMachine machine)
+        {
+            Form? form = machine.PossiblesForms.Find(f => f.Name == (String)Forms.SelectedItem) ?? throw new InvalidFieldException("Le formulaire sélectionné n'existe pas pour la machine " + machine.Name);
 
-            if (this.currentForm.Type == FormType.Capability)
+            if (form.Type == FormType.Capability)
             {
                 if (MeasureNum.Text == "")
                 {
-                    MainWindow.DisplayError("Veuillez renseigner le numéro de mesure.");
-                    return false;
+                    throw new InvalidFieldException("Veuillez renseigner le/les numéro(s) de mesure pour la capabilité");
                 }
 
                 try
                 {
-                    List<String> list = MeasureNum.Text.Split(',').ToList();
+                    List<String> list = [.. MeasureNum.Text.Split(',')];
                     List<int> capabilityValues = list.Select(int.Parse).ToList();
 
-                    this.currentForm.CapabilityMeasureNumber = capabilityValues;
+                    form.CapabilityMeasureNumber = capabilityValues;
                 }
                 catch
                 {
-                    MainWindow.DisplayError("Le numéro de mesure doit être un nombre.");
-                    return false;
+                    throw new InvalidFieldException("Les numéros de mesure doivent être des nombres");
                 }
             }
 
-            return true;
+            return form;
         }
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Prepares the Form object and sends it to the FormFillingManager to fill the form.
-        /// </summary>
-        private void callFormFilling(String? formToOverwritePath)
+        private List<String> getCorrectSourceFiles()
         {
-            if (this.currentForm == null)
+            if (SourcePathTextBox.Text == "")
             {
-                MainWindow.DisplayError("Le formulaire sélectionné n'est pas pris en compte.");
-                return;
+                throw new InvalidFieldException("Veuillez renseigner le chemin du/des fichier(s) ou du dossier source");
             }
 
-            this.currentForm.Sign = SignForm.IsChecked == true;
+            List<String> sourceFiles = [.. SourcePathTextBox.Text.Split('|')];
 
-            if (formToOverwritePath != null) this.currentForm.Path = formToOverwritePath;
+            foreach (String sourceFile in sourceFiles)
+            {
+                if (!File.Exists(sourceFile))
+                {
+                    throw new InvalidFieldException("Le fichier source " + sourceFile + " n'existe pas");
+                }
+            }
 
-            List<Standard> standards = this.getStandardsFromComboBox();
+            return sourceFiles;
+        }
 
-            // Fill the form using the FormFillingManager
-            this.formFillingManager.ManageFormFilling(this.currentForm, this.getParser(), standards, DestinationPathTextBox.Text);
+        /*-------------------------------------------------------------------------*/
+
+        private string getCorrectDestinationPath()
+        {
+            if (DestinationPathTextBox.Text == "")
+            {
+                throw new InvalidFieldException("Veuillez renseigner le chemin du formulaire de destination");
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(DestinationPathTextBox.Text)))
+            {
+                throw new InvalidFieldException("Le chemin du rapport de destination est inaccessible");
+            }
+
+            return DestinationPathTextBox.Text;
         }
 
         /*-------------------------------------------------------------------------*/
@@ -210,7 +206,7 @@ namespace Application.UI.UserControls
         /// <exception cref="ConfigDataException"></exception>
         private List<Standard> getStandardsFromComboBox()
         {
-            List<Standard> standards = new List<Standard>();
+            List<Standard> standards = [];
 
             var selectedOptions = ComboBoxItems.Select(comboBoxItem => comboBoxItem.SelectedOption);
 
@@ -219,13 +215,22 @@ namespace Application.UI.UserControls
                 if (selectedOption == null)
                     throw new ConfigDataException("Waw mé cé pa neaurmal ssa ia 1 preaublaym atancion oulala");
 
-                Standard? standard = ConfigSingleton.Instance.GetStandardFromCode(selectedOption);
-                if (standard == null) throw new ConfigDataException("L'étalon sélectionné n'existe pas.");
+                Standard? standard = ConfigSingleton.Instance.GetStandardFromCode(selectedOption) ?? throw new ConfigDataException("L'étalon sélectionné n'existe pas.");
 
                 standards.Add(standard);
             }
 
             return standards;
+        }
+
+        /*-------------------------------------------------------------------------*/
+
+        private static void checkSignature()
+        {
+            if (ConfigSingleton.Instance.Signature == null)
+            {
+                throw new ConfigDataException("Il est impossible de signer le document car la signature est incorrecte ou non sélectionée");
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -236,9 +241,11 @@ namespace Application.UI.UserControls
         /// </summary>
         private void changeMachine(object sender, SelectionChangedEventArgs e)
         {
-            if ((String)Machines.SelectedItem == "Ayonis")
-                this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetAyonisForms());
-            else this.forms = new ObservableCollection<Form>(ConfigSingleton.Instance.GetMitutoyoForms());
+            var selectedMachine = this.machines.Find(machine => machine.Name == (String)Machines.SelectedItem);
+
+            if (selectedMachine == null) return;
+
+            this.forms = new ObservableCollection<Form>(selectedMachine.PossiblesForms);
 
             Forms.ItemsSource = this.forms.Select(form => form.Name).ToList();
 
@@ -247,13 +254,24 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
-        /// <summary>
-        /// Returns the parser corresponding to the selected machine.
-        /// </summary>
-        private Parser.Parser getParser()
+        private void changeForm(object sender, SelectionChangedEventArgs e)
         {
-            if ((String)Machines.SelectedItem == "Ayonis") return new ExcelParser();
-            return new TextFileParser();
+            Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+
+            if (form == null)
+            {
+                MainWindow.DisplayError("Le formulaire sélectionné n'existe pas");
+                return;
+            }
+
+            if (form.Type == FormType.Capability)
+            {
+                MeasureNumStack.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MeasureNumStack.Visibility = Visibility.Collapsed;
+            }
         }
 
         /*-------------------------------------------------------------------------*/
@@ -265,8 +283,11 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void AddStandard_Click(object sender, RoutedEventArgs e)
         {
-            ComboBoxItem comboBoxItem = new ComboBoxItem { AvailableOptions = AvailableOptions };
-            comboBoxItem.SelectedOption = AvailableOptions[0];
+            ComboBoxItem comboBoxItem = new()
+            {
+                AvailableOptions = AvailableOptions,
+                SelectedOption = AvailableOptions[0]
+            };
             ComboBoxItems.Add(comboBoxItem);
         }
 
@@ -293,9 +314,10 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void browseSourceFiles(object sender, RoutedEventArgs e)
         {
-            if(this.currentForm == null) return;
+            Form? selectedForm = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);
+            if (selectedForm == null) return;
 
-            List<String> filesToParse = this.formFillingManager.GetFilesToOpen("Choisir le fichier à convertir", this.getParser().GetFileExtension(), this.currentForm.DataFrom == DataFrom.Files);
+            List<String> filesToParse = this.formFillingManager.GetFilesToOpen("Choisir le fichier à convertir", selectedForm.MeasureMachine.Parser.GetFileExtension(), selectedForm.DataFrom == DataFrom.Files);
             
             if (filesToParse.Count == 0) return;
 
@@ -318,7 +340,7 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void browseSourceFolder(object sender, RoutedEventArgs e)
         {
-            String folderToParse = this.formFillingManager.GetFolderToOpen("Choisir le dossier à convertir");
+            String folderToParse = FormFillingManager.GetFolderToOpen("Choisir le dossier à convertir");
             if (folderToParse == "") return;
 
             SourcePathTextBox.Text = folderToParse;
@@ -333,7 +355,7 @@ namespace Application.UI.UserControls
         /// <param name="e"></param>
         private void browseDestinationFile(object sender, RoutedEventArgs e)
         {
-            String fileToSave = this.formFillingManager.GetFileToSave();
+            String fileToSave = FormFillingManager.GetFileToSave();
             if (fileToSave == "") return;
 
             DestinationPathTextBox.Text = fileToSave;

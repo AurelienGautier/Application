@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using System.Drawing;
+using System.Reflection.PortableExecutable;
 using Application.Facade;
+using Application.Parser;
 
 namespace Application.Data
 {
@@ -10,12 +12,12 @@ namespace Application.Data
     internal class ConfigSingleton
     {
         private static ConfigSingleton? instance = null;
-        private readonly Facade.JsonLibraryLink jsonLibraryLink;
         private readonly List<MeasureType> measureTypes;
         public Image? Signature { get; set; }
         readonly private List<Standard> standards;
         readonly private Dictionary<string, string> headerFieldsMatch;
         readonly private Dictionary<string, string> pageNames;
+        public List<MeasureMachine> Machines { get; set; }
 
         readonly string standardsFilePath = Environment.CurrentDirectory + "\\conf\\standards.json";
         readonly string headerFieldsFilePath = Environment.CurrentDirectory + "\\conf\\headerFields.json";
@@ -28,21 +30,23 @@ namespace Application.Data
         /// </summary>
         private ConfigSingleton()
         {
-            this.jsonLibraryLink = new Facade.JsonLibraryLink();
+            this.measureTypes = [];
 
-            this.measureTypes = new List<MeasureType>();
+            this.Signature = GetSignatureFromFile();
 
-            this.Signature = this.GetSignatureFromFile();
-
-            this.standards = new List<Standard>();
+            this.standards = [];
 
             this.GetMeasureDataFromFile();
 
-            this.standards = this.jsonLibraryLink.GetJsonFilecontent<List<Standard>>(standardsFilePath);
+            this.standards = JsonLibraryLink.GetJsonFilecontent<List<Standard>>(standardsFilePath);
 
-            this.headerFieldsMatch = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(this.headerFieldsFilePath);
+            this.headerFieldsMatch = JsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(this.headerFieldsFilePath);
 
-            this.pageNames = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(pageNamesFilePath);
+            this.pageNames = JsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(pageNamesFilePath);
+
+            this.Machines = [];
+
+            this.GetMachinesAndForms();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -54,10 +58,7 @@ namespace Application.Data
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new ConfigSingleton();
-                }
+                instance ??= new ConfigSingleton();
 
                 return instance;
             }
@@ -69,11 +70,11 @@ namespace Application.Data
         /// Gets the signature from the configuration file.
         /// </summary>
         /// <returns>The signature image or null if it is not valid.</returns>
-        private Image? GetSignatureFromFile()
+        private static Image? GetSignatureFromFile()
         {
             string filePath = Environment.CurrentDirectory + "\\conf\\conf.json";
 
-            var data = this.jsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(filePath);
+            var data = JsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(filePath);
 
             Image? signature;
             try
@@ -82,7 +83,6 @@ namespace Application.Data
             }
             catch
             {
-                signature = null;
                 throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect");
             }
 
@@ -98,12 +98,9 @@ namespace Application.Data
         {
             string filePath = Environment.CurrentDirectory + "\\conf\\measureTypes.json";
 
-            DataSet dataSet = this.jsonLibraryLink.GetJsonFilecontent<DataSet>(filePath);
+            DataSet dataSet = JsonLibraryLink.GetJsonFilecontent<DataSet>(filePath);
 
-            DataTable? dataTable = dataSet.Tables["Measures"];
-
-            if (dataTable == null)
-                throw new Exceptions.ConfigDataException("La syntaxe du fichier contenant les types de mesure est incorrecte.");
+            DataTable? dataTable = dataSet.Tables["Measures"] ?? throw new Exceptions.ConfigDataException("La syntaxe du fichier contenant les types de mesure est incorrecte.");
 
             foreach (DataRow row in dataTable.Rows)
             {
@@ -149,8 +146,8 @@ namespace Application.Data
         /// </summary>
         private void SerializeMeasureTypes()
         {
-            DataSet dataSet = new DataSet();
-            DataTable dataTable = new DataTable("Measures");
+            DataSet dataSet = new();
+            DataTable dataTable = new("Measures");
             dataTable.Columns.Add("Name");
             dataTable.Columns.Add("NominalValueIndex");
             dataTable.Columns.Add("TolPlusIndex");
@@ -175,7 +172,7 @@ namespace Application.Data
 
             dataSet.AcceptChanges();
 
-            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\measureTypes.json", dataSet);
+            JsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\measureTypes.json", dataSet);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -243,12 +240,12 @@ namespace Application.Data
                 throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect.");
             }
 
-            Dictionary<string, string> data = new Dictionary<string, string>
-                {
+            Dictionary<string, string> data = new()
+            {
                     { "Signature", signaturePath }
                 };
 
-            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
+            JsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\conf.json", data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -302,35 +299,33 @@ namespace Application.Data
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Gets the list of Mitutoyo forms.
+        /// Sets the machines and the reports of the application
         /// </summary>
-        /// <returns>The list of Mitutoyo forms.</returns>
-        public List<Form> GetMitutoyoForms()
+        private void GetMachinesAndForms()
         {
-            List<Form> forms = new List<Form>();
+            MeasureMachine mitutoyoMachine = new ("Mitutoyo", new TextFileParser());
+            List<Form> mitutoyoForms =
+            [
+                new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75, mitutoyoMachine),
+                new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 26, 26, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75, mitutoyoMachine),
+                new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Files, 18, 75, mitutoyoMachine),
+                new Form("Capabilité", Environment.CurrentDirectory + "\\form\\capabilite", 26, 103, 5, 53, 11, FormType.Capability, DataFrom.File, 18, 75, mitutoyoMachine),
+            ];
+            mitutoyoMachine.setPossibleForms(mitutoyoForms);
 
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
-            forms.Add(new Form("Outillage de contrôle", Environment.CurrentDirectory + "\\form\\outillageDeControle", 26, 26, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.Files, 18, 75));
-            forms.Add(new Form("Capabilité", Environment.CurrentDirectory + "\\form\\capabilite", 26, 103, 5, 53, 11, FormType.Capability, DataFrom.File, 18, 75));
+            MeasureMachine ayonisMachine = new ("Ayonis", new ExcelParser());
+            List<Form> ayonisForms =
+            [
+                new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75, ayonisMachine),
+                new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.File, 18, 75, ayonisMachine),
+            ];
+            ayonisMachine.setPossibleForms(ayonisForms);
 
-            return forms;
-        }
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Gets the list of Ayonis forms.
-        /// </summary>
-        /// <returns>The list of Ayonis forms.</returns>
-        public List<Form> GetAyonisForms()
-        {
-            List<Form> forms = new List<Form>();
-
-            forms.Add(new Form("Rapport 1 pièce", Environment.CurrentDirectory + "\\form\\rapport1piece", 26, 30, 1, 53, 11, FormType.OnePiece, DataFrom.File, 18, 75));
-            forms.Add(new Form("Rapport 5 pièces", Environment.CurrentDirectory + "\\form\\rapport5pieces", 26, 17, 1, 51, 14, FormType.FivePieces, DataFrom.File, 18, 75));
-
-            return forms;
+            this.Machines =
+            [
+                mitutoyoMachine,
+                ayonisMachine
+            ];
         }
 
         /*-------------------------------------------------------------------------*/
@@ -359,8 +354,8 @@ namespace Application.Data
                     string code = excelApiLink.ReadCell(workbookPath, currentLine, 1);
                     string name = excelApiLink.ReadCell(workbookPath, currentLine, 2);
                     string raccordement = excelApiLink.ReadCell(workbookPath, currentLine + 1, 2);
-                    string validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2).Substring(0, 10);
-                    validity = validity.Substring(3);
+                    string validity = excelApiLink.ReadCell(workbookPath, currentLine + 2, 2)[..10];
+                    validity = validity[3..];
                     validity = validity.Insert(0, "\'");
 
                     this.standards.Add(new Standard(code, name, raccordement, validity));
@@ -381,7 +376,7 @@ namespace Application.Data
 
             this.GetStandardsFromExcelFile();
 
-            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
+            JsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\standards.json", this.standards);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -446,7 +441,7 @@ namespace Application.Data
             this.headerFieldsMatch["PieceReceptionDate"] = pieceReceptionDate;
             this.headerFieldsMatch["Observations"] = observations;
 
-            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\headerFields.json", this.headerFieldsMatch);
+            JsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\headerFields.json", this.headerFieldsMatch);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -461,7 +456,7 @@ namespace Application.Data
             this.pageNames["HeaderPage"] = headerPage;
             this.pageNames["MeasurePage"] = measurePage;
 
-            this.jsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\pageNames.json", this.pageNames);
+            JsonLibraryLink.WriteJsonFile(Environment.CurrentDirectory + "\\conf\\pageNames.json", this.pageNames);
         }
 
         /*-------------------------------------------------------------------------*/

@@ -3,20 +3,20 @@ using System.IO;
 
 namespace Application.Facade
 {
-    public class JsonLibraryLink
+    public static class JsonLibraryLink
     {
         /// <summary>
         /// Replace the content of a json file with the data passed as parameter.
         /// </summary>
         /// <param name="filePath">The path of the file to modify</param>
         /// <param name="data">The data to write in the file</param>
-        public void WriteJsonFile(String filePath, Object data)
+        public static void WriteJsonFile(String filePath, Object data)
         {
             String json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
             Directory.CreateDirectory(Environment.CurrentDirectory + "\\conf");
             File.Create(filePath).Close();
-            StreamWriter writer = new StreamWriter(filePath);
+            StreamWriter writer = new (filePath);
             writer.Write(json);
             writer.Close();
         }
@@ -27,14 +27,14 @@ namespace Application.Facade
         /// Gets the content of a file.
         /// </summary>
         /// <param name="filePath">The path of the file to read.</param>
-        /// <returns>The content of the file or null if it cannot be read.</returns>
-        public string GetFileContent(string filePath)
+        /// <returns>The content of the specified file.</returns>
+        public static string GetFileContent(string filePath)
         {
-            String content = "";
+            String content;
 
             try
             {
-                StreamReader reader = new StreamReader(filePath);
+                StreamReader reader = new (filePath);
                 content = reader.ReadToEnd();
                 reader.Close();
             }
@@ -48,18 +48,20 @@ namespace Application.Facade
 
         /*-------------------------------------------------------------------------*/
 
-        public T GetJsonFilecontent<T>(string filePath) where T : class
+        /// <summary>
+        /// Get the content of a json file and parse it to the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of the data to return</typeparam>
+        /// <param name="filePath">The json file with the content to get</param>
+        /// <returns>The json file to parse</returns>
+        /// <exception cref="Exceptions.ConfigDataException"></exception>
+        public static T GetJsonFilecontent<T>(string filePath) where T : class
         {
-            String content = this.GetFileContent(filePath);
+            String content = GetFileContent(filePath);
 
             T? data = JsonConvert.DeserializeObject<T>(content);
 
-            if(data == null)
-            {
-                throw new Exceptions.ConfigDataException("Le contenu du fichier " + filePath + " est invalide");
-            }
-
-            return data;
+            return data ?? throw new Exceptions.ConfigDataException("Le contenu du fichier " + filePath + " est invalide");
         }
 
         /*-------------------------------------------------------------------------*/

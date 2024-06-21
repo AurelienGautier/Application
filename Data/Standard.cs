@@ -1,6 +1,6 @@
 ﻿namespace Application.Data
 {
-    class Standard
+    public class Standard
     {
         public String Code { get; set; }
         public String Name { get; set; }

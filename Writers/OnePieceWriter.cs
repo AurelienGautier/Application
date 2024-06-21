@@ -5,24 +5,16 @@ namespace Application.Writers
     /// <summary>
     /// Represents a writer for a one piece report that writes data to an Excel file.
     /// </summary>
-    internal class OnePieceWriter : ExcelWriter
+    /// <remarks>
+    /// Initializes a new instance of the OnePieceWriter class with the specified file name and form.
+    /// </remarks>
+    /// <param name="fileName">The name of the Excel file.</param>
+    /// <param name="form">The form associated with the writer.</param>
+    internal class OnePieceWriter(string fileName, Form form) : ExcelWriter(fileName, form)
     {
         private const int MAX_LINES_PER_PAGE = 22;
-        private int linesWrittenOnCurrentPage;
-        private int pageNumber;
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Initializes a new instance of the OnePieceWriter class with the specified file name and form.
-        /// </summary>
-        /// <param name="fileName">The name of the Excel file.</param>
-        /// <param name="form">The form associated with the writer.</param>
-        public OnePieceWriter(string fileName, Form form) : base(fileName, form)
-        {
-            this.linesWrittenOnCurrentPage = 0;
-            this.pageNumber = 1;
-        }
+        private int linesWrittenOnCurrentPage = 0;
+        private int pageNumber = 1;
 
         /*-------------------------------------------------------------------------*/
 
@@ -48,7 +40,7 @@ namespace Application.Writers
 
         protected override int GetDataPagesNumber()
         {
-            return base.getMeasurePagesNumber();
+            return base.GetMeasurePagesNumber();
         }
 
         /*-------------------------------------------------------------------------*/

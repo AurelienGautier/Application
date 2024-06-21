@@ -5,28 +5,18 @@ namespace Application.Writers
     /// <summary>
     /// Represents a writer for a specific type of Excel file that handles five pieces of data.
     /// </summary>
-    internal class FivePiecesWriter : ExcelWriter
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="FivePiecesWriter"/> class.
+    /// </remarks>
+    /// <param name="fileName">The name of the file to be saved.</param>
+    /// <param name="form">The form associated with the writer.</param>
+    internal class FivePiecesWriter(string fileName, Form form) : ExcelWriter(fileName, form)
     {
-        private int pageNumber;
-        private int linesWrittenOnCurrentPage;
-        private int min;
-        private int max;
+        private int pageNumber = 1;
+        private int linesWrittenOnCurrentPage = 0;
+        private int min = 0;
+        private int max = 5;
         private const int MAX_LINES_PER_PAGE = 23;
-
-        /*-------------------------------------------------------------------------*/
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FivePiecesWriter"/> class.
-        /// </summary>
-        /// <param name="fileName">The name of the file to be saved.</param>
-        /// <param name="form">The form associated with the writer.</param>
-        public FivePiecesWriter(string fileName, Form form) : base(fileName, form)
-        {
-            this.pageNumber = 1;
-            this.linesWrittenOnCurrentPage = 0;
-            this.min = 0;
-            this.max = 5;
-        }
 
         /*-------------------------------------------------------------------------*/
 
@@ -47,7 +37,7 @@ namespace Application.Writers
 
         protected override string GetPageToCopyName(int index)
         {
-            int numberOfExistingMeasurePages = base.getMeasurePagesNumber();
+            int numberOfExistingMeasurePages = base.GetMeasurePagesNumber();
 
             string nbToCopy = " (" + (index - numberOfExistingMeasurePages + 1).ToString() + ")";
             if (nbToCopy == " (1)") nbToCopy = "";
@@ -64,7 +54,7 @@ namespace Application.Writers
 
         protected override int GetDataPagesNumber()
         {
-            return base.getMeasurePagesNumber();
+            return base.GetMeasurePagesNumber();
         }
 
         /*-------------------------------------------------------------------------*/
@@ -89,7 +79,7 @@ namespace Application.Writers
 
                 this.max = i == base.pieces.Count / 5 - 1 && base.pieces.Count % 5 != 0 ? base.pieces.Count : this.max + 5;
 
-                if (i < iterations - 1) this.changePage();
+                if (i < iterations - 1) this.ChangePage();
                 this.linesWrittenOnCurrentPage = 0;
                 this.currentLine = form.FirstLine;
             }
@@ -183,7 +173,7 @@ namespace Application.Writers
             // Change page if the current one is full
             if (this.linesWrittenOnCurrentPage == MAX_LINES_PER_PAGE)
             {
-                this.changePage();
+                this.ChangePage();
 
                 this.linesWrittenOnCurrentPage = 0;
                 this.currentLine -= MAX_LINES_PER_PAGE;
@@ -195,7 +185,7 @@ namespace Application.Writers
         /// <summary>
         /// Switches to the next measurement page.
         /// </summary>
-        public void changePage()
+        public void ChangePage()
         {
             this.pageNumber++;
 
@@ -205,7 +195,7 @@ namespace Application.Writers
             }
             catch
             {
-                base.throwIncoherentValueException();
+                base.ThrowIncoherentValueException();
             }
 
             int col = 7;

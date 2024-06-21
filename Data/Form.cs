@@ -1,55 +1,39 @@
 ﻿namespace Application.Data
 {
-    enum FormType
+    public enum FormType
     {
         OnePiece,
         FivePieces,
         Capability
     }
 
-    enum DataFrom
+    public enum DataFrom
     {
         File,
         Files,
         Folder
     }
 
-    class Form
+    public class Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine, int standardLine, MeasureMachine measureMachine)
     {
-        public String Name { get; set; }
-        public String Path { get; set; }
-        public int DesignLine { get; set; }
-        public int FirstLine { get; set; }
-        public int FirstColumn { get; set; }
-        public int LineToSign { get; set; }
-        public int ColumnToSign { get; set; }
-        public bool Modify { get; set; }
-        public bool Sign { get; set; }
-        public FormType Type { get; set; }
-        public DataFrom DataFrom { get; set; }
-        public int ClientLine { get; set; }
-        public int StandardLine { get; set; }
-        public List<int> CapabilityMeasureNumber { get; set; }
-        public List<String> SourceFiles { get; set; }
-
-        public Form(String name, String path, int designLine, int firstLine, int firstColumn, int lineToSign, int columnToSign, FormType type, DataFrom dataFrom, int clientLine, int standardLine)
-        {
-            this.Name = name;
-            this.Path = path;
-            this.DesignLine = designLine;
-            this.FirstLine = firstLine;
-            this.FirstColumn = firstColumn;
-            this.LineToSign = lineToSign;
-            this.ColumnToSign = columnToSign;
-            this.Modify = false;
-            this.Sign = false;
-            this.Type = type;
-            this.DataFrom = dataFrom;
-            this.ClientLine = clientLine;
-            this.StandardLine = standardLine;
-            this.CapabilityMeasureNumber = new List<int>();
-            this.SourceFiles = new List<String>();
-        }
+        public String Name { get; set; } = name;
+        public String Path { get; set; } = path;
+        public int DesignLine { get; set; } = designLine;
+        public int FirstLine { get; set; } = firstLine;
+        public int FirstColumn { get; set; } = firstColumn;
+        public int LineToSign { get; set; } = lineToSign;
+        public int ColumnToSign { get; set; } = columnToSign;
+        public bool Modify { get; set; } = false;
+        public bool Sign { get; set; } = false;
+        public FormType Type { get; set; } = type;
+        public DataFrom DataFrom { get; set; } = dataFrom;
+        public int ClientLine { get; set; } = clientLine;
+        public int StandardLine { get; set; } = standardLine;
+        public List<int> CapabilityMeasureNumber { get; set; } = [];
+        public List<String> SourceFiles { get; set; } = [];
+        public MeasureMachine MeasureMachine { get; set; } = measureMachine;
+        public List<Standard> Standards { get; set; } = [];
+        public string DestinationPath { get; set; } = "";
 
         public Form Copy()
         {
