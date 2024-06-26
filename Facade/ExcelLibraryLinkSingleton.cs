@@ -49,9 +49,9 @@ namespace Application.Facade
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
-        /// Destructor of the class.
+        /// Closes the Excel application and the open workbooks.
         /// </summary>
-        ~ExcelLibraryLinkSingleton()
+        public void ExitApp()
         {
             foreach (var workbook in workbooks)
             {

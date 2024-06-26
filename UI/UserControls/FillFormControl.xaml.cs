@@ -254,6 +254,11 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        /// <summary>
+        /// Action called when the user selects a different form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void changeForm(object sender, SelectionChangedEventArgs e)
         {
             Form? form = this.forms.ToList<Form>().Find(f => f.Name == (String)Forms.SelectedItem);

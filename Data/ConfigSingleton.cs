@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Drawing;
-using System.Reflection.PortableExecutable;
 using Application.Facade;
 using Application.Parser;
 
@@ -23,8 +22,6 @@ namespace Application.Data
         readonly string headerFieldsFilePath = Environment.CurrentDirectory + "\\conf\\headerFields.json";
         readonly string pageNamesFilePath = Environment.CurrentDirectory + "\\conf\\pageNames.json";
 
-        /*-------------------------------------------------------------------------*/
-
         /// <summary>
         /// Private constructor for the ConfigSingleton class.
         /// </summary>
@@ -34,11 +31,12 @@ namespace Application.Data
 
             this.Signature = GetSignatureFromFile();
 
-            this.standards = [];
-
             this.GetMeasureDataFromFile();
 
             this.standards = JsonLibraryLink.GetJsonFilecontent<List<Standard>>(standardsFilePath);
+
+            // Add an empty standard at the beginning of the list
+            this.standards.Insert(0, new Standard("", "", "", ""));
 
             this.headerFieldsMatch = JsonLibraryLink.GetJsonFilecontent<Dictionary<String, String>>(this.headerFieldsFilePath);
 
@@ -335,6 +333,8 @@ namespace Application.Data
         /// </summary>
         private void GetStandardsFromExcelFile()
         {
+            this.standards.Add(new Standard("", "", "", ""));
+
             ExcelLibraryLinkSingleton excelApiLink = ExcelLibraryLinkSingleton.Instance;
             string workbookPath = Environment.CurrentDirectory + "\\res\\etalons.xlsm";
             excelApiLink.OpenWorkBook(workbookPath);
@@ -363,6 +363,8 @@ namespace Application.Data
                     currentLine += 3;
                 }
             }
+
+            excelApiLink.CloseWorkBook(workbookPath);
         }
 
         /*-------------------------------------------------------------------------*/

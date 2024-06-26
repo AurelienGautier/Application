@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.IO;
+using System.Globalization;
 
 namespace Application.Parser
 {
@@ -174,8 +175,8 @@ namespace Application.Parser
 
             for (int i = startIndex; i < endIndex; i++)
             {
-                if (double.TryParse(words[i].Replace('.', ','), out testDouble))
-                    values.Add(Convert.ToDouble(words[i].Replace('.', ',')));
+                if (double.TryParse(words[i], CultureInfo.InvariantCulture, out testDouble))
+                    values.Add(testDouble);
             }
 
             return values;
