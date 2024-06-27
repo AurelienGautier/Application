@@ -21,14 +21,14 @@ namespace Application.UI.UserControls
         /// <param name="standards">The list of standards to be used for filling the form.</param>
         /// <param name="dataPath">The path to the data file.</param>
         /// <param name="fileToSave">The path to save the filled form.</param>
-        public void ManageFormFilling(Form form, String fileToSave)
+        public void ManageFormFilling(Form form)
         {
             // Parsing the data
             List<Piece>? data = this.GetData(form);
             if (data == null) return;
 
             // Filling the form
-            FillForm(form, data, fileToSave);
+            FillForm(form, data);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -88,16 +88,16 @@ namespace Application.UI.UserControls
         /// <param name="data">The data to be inserted into the form.</param>
         /// <param name="standards">The information to be inserted into the form header.</param>
         /// <param name="fileToSave">The path to save the filled form.</param>
-        public static void FillForm(Form form, List<Piece> data, String fileToSave)
+        public static void FillForm(Form form, List<Piece> data)
         {
             try
             {
                 // Writing the form
                 ExcelWriter writer;
 
-                if (form.Type == FormType.OnePiece) writer = new OnePieceWriter(fileToSave, form);
-                else if (form.Type == FormType.FivePieces) writer = new FivePiecesWriter(fileToSave, form);
-                else writer = new CapabilityWriter(fileToSave, form);
+                if (form.Type == FormType.OnePiece) writer = new OnePieceWriter(form);
+                else if (form.Type == FormType.FivePieces) writer = new FivePiecesWriter(form);
+                else writer = new CapabilityWriter(form);
 
                 writer.WriteData(data);
             }

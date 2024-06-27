@@ -38,7 +38,7 @@ namespace Application.Parser
         public override List<Data.Piece> ParseFile(string fileToParse)
         {
             this.fileToParse = fileToParse;
-            base.dataParsed = new List<Data.Piece>();
+            base.dataParsed = [];
 
             sr = new StreamReader(fileToParse, Encoding.GetEncoding(ENCODING));
 
@@ -67,17 +67,15 @@ namespace Application.Parser
             List<string> words;
 
             // Retrieves each word from the line in words by removing spaces
-            words = line.Split(' ').ToList();
+            words = [.. line.Split(' ')];
             words = words.Where((item, index) => item != "" && item != " ").ToList();
-
-            int testInt;
 
             // If the line is empty
             if (words.Count == 0) return;
             // If the line is a measure plan
             if (words[0][0] == '*') manageMeasurePlan(words);
             // If the line is a list of values from a measure
-            else if (int.TryParse(words[0], out testInt)) manageValueType(words);
+            else if (int.TryParse(words[0], out int testInt)) manageValueType(words);
             // If the line is a header
             else manageHeaderType(line);
         }
@@ -99,7 +97,7 @@ namespace Application.Parser
                 this.addPieceWhenHeaderMet = false;
             }
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.Append(line);
 
             this.lineIndex++;
@@ -117,8 +115,8 @@ namespace Application.Parser
         {
             if (!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append(words[0].Substring(5));
+            StringBuilder sb = new();
+            sb.Append(words[0].AsSpan(5));
 
             for (int i = 1; i < words.Count; i++)
             {
@@ -126,7 +124,7 @@ namespace Application.Parser
             }
 
             string measurePlan = sb.ToString();
-            dataParsed![dataParsed!.Count - 1].AddMeasurePlan(measurePlan);
+            dataParsed![^1].AddMeasurePlan(measurePlan);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -140,22 +138,21 @@ namespace Application.Parser
             if (!this.addPieceWhenHeaderMet) this.addPieceWhenHeaderMet = true;
 
             // Removes the unnecessary number that sometimes appears on certain measures
-            int testInt;
-            if (int.TryParse(words[3], out testInt)) words.RemoveAt(3);
+            if (int.TryParse(words[3], out int testInt)) words.RemoveAt(3);
 
             List<double> values = getLineToDoubleList(words, 3, words.Count - 1);
 
-            string? nextLine = sr != null ? sr.ReadLine() : null;
+            string? nextLine = sr?.ReadLine();
 
             if (nextLine != null)
             {
-                List<string> nextLineWords = nextLine.Split(' ').ToList();
+                List<string> nextLineWords = [.. nextLine.Split(' ')];
                 nextLineWords = nextLineWords.Where((item, index) => item != "" && item != " ").ToList();
 
                 values.AddRange(getLineToDoubleList(nextLineWords, 0, nextLineWords.Count));
             }
 
-            dataParsed![dataParsed!.Count - 1].AddData(getData(words, values));
+            dataParsed![^1].AddData(getData(words, values));
         }
 
         /*-------------------------------------------------------------------------*/
@@ -167,15 +164,14 @@ namespace Application.Parser
         /// <param name="startIndex">The first word to convert in the list</param>
         /// <param name="endIndex">The last word to convert in the list</param>
         /// <returns>A list of doubles converted from a line of the file</returns>
-        private List<double> getLineToDoubleList(List<string> words, int startIndex, int endIndex)
+        private static List<double> getLineToDoubleList(List<string> words, int startIndex, int endIndex)
         {
-            List<double> values = new List<double>();
+            List<double> values = [];
 
-            double testDouble;
 
             for (int i = startIndex; i < endIndex; i++)
             {
-                if (double.TryParse(words[i], CultureInfo.InvariantCulture, out testDouble))
+                if (double.TryParse(words[i], CultureInfo.InvariantCulture, out double testDouble))
                     values.Add(testDouble);
             }
 
@@ -192,12 +188,7 @@ namespace Application.Parser
         /// <returns>The measure type of the line.</returns>
         private Data.Measure getData(List<string> line, List<double> values)
         {
-            Data.Measure? data = Data.ConfigSingleton.Instance.GetData(line, values);
-
-            if (data == null)
-            {
-                throw new Application.Exceptions.MeasureTypeNotFoundException(line[2], this.fileToParse, this.lineIndex);
-            }
+            Data.Measure? data = Data.ConfigSingleton.Instance.GetData(line, values) ?? throw new Application.Exceptions.MeasureTypeNotFoundException(line[2], this.fileToParse, this.lineIndex);
 
             return data;
         }

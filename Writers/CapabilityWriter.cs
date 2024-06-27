@@ -8,7 +8,7 @@ namespace Application.Writers
         private int linesWrittenOnCurrentPage = 0;
         private int pageNumber = 1;
 
-        public CapabilityWriter(String fileName, Form form) : base(fileName, form) { }
+        public CapabilityWriter(Form form) : base(form) { }
 
         /*-------------------------------------------------------------------------*/
 

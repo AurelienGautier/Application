@@ -19,7 +19,7 @@ namespace Application
         private readonly UI.UserControls.AddMeasureTypeControl addMesureTypeControl;
         private readonly UI.UserControls.Settings settingsControl;
 
-        private ImageSource? logo = null;
+        private readonly ImageSource? logo = null;
 
         private bool measureTypesWarning = false;
         private bool settingsWarning = false;
@@ -30,6 +30,8 @@ namespace Application
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Closing += (sender, e) => exitMethod();
 
             this.fillFormControl = new UI.UserControls.FillFormControl();
             this.measureTypesControl = new UI.UserControls.MeasureTypesControl();
@@ -126,10 +128,11 @@ namespace Application
         /// <param name="e">The event arguments.</param>
         private void chooseSignature(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog();
-
-            dialog.Filter = "(*.png;*.jpg)|*.png;*.jpg";
-            dialog.Title = "Sélectionner une signature";
+            var dialog = new OpenFileDialog
+            {
+                Filter = "(*.png;*.jpg)|*.png;*.jpg",
+                Title = "Sélectionner une signature"
+            };
 
             String filePath = "";
 
@@ -179,7 +182,8 @@ namespace Application
 
         /*-------------------------------------------------------------------------*/
 
-        private void exitMethod()
+        
+        private static void exitMethod()
         {
             ExcelLibraryLinkSingleton.Instance.ExitApp();
         }

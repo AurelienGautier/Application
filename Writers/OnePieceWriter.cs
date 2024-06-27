@@ -10,7 +10,7 @@ namespace Application.Writers
     /// </remarks>
     /// <param name="fileName">The name of the Excel file.</param>
     /// <param name="form">The form associated with the writer.</param>
-    internal class OnePieceWriter(string fileName, Form form) : ExcelWriter(fileName, form)
+    internal class OnePieceWriter(Form form) : ExcelWriter(form)
     {
         private const int MAX_LINES_PER_PAGE = 22;
         private int linesWrittenOnCurrentPage = 0;

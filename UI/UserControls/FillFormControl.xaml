@@ -7,7 +7,9 @@
              xmlns:local="clr-namespace:Application.UI.UserControls" 
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1200"
-             Background="{StaticResource BackgroundColor}">
+             Background="{StaticResource BackgroundColor}"
+             xmlns:gif="http://wpfanimatedgif.codeplex.com"
+             gif:ImageBehavior.AnimateInDesignMode="True">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical">
@@ -74,7 +76,7 @@
                             </Grid>
                         </StackPanel>
                         <!--#endregion-->
-                        
+
                     </StackPanel>
 
                     <StackPanel Orientation="Vertical" Margin="50, 0, 0, 0">
@@ -106,7 +108,7 @@
                             </Button>
                         </StackPanel>
                         <!--#endregion-->
-                        
+
                     </StackPanel>
                 </StackPanel>
 
@@ -136,7 +138,10 @@
                 <Separator/>
 
                 <!--#region Create destination excel file-->
-                <Button Margin="0, 10, 0, 0" x:Name="NewForm" Content="Valider" Click="fillAform" Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Center"/>
+                <StackPanel Margin="40, 0, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Margin="0, 10, 0, 0" x:Name="NewForm" Content="Valider" Click="fillAform" Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Center"/>
+                    <Image x:Name="Loading" Height="35" Width="35" VerticalAlignment="Center" Margin="10, 10, 0, 0" />
+                </StackPanel>
                 <!--#endregion-->
             </StackPanel>
         </Grid>

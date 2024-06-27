@@ -6,6 +6,9 @@ using System.Data;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using WpfAnimatedGif;
 
 namespace Application.UI.UserControls
 {
@@ -21,6 +24,8 @@ namespace Application.UI.UserControls
         readonly private BindingList<ComboBoxItem> ComboBoxItems;
         private BindingList<String> AvailableOptions;
 
+        private readonly ImageSource? loadingGif = null;
+
         /*-------------------------------------------------------------------------*/
 
         /// <summary>
@@ -29,6 +34,10 @@ namespace Application.UI.UserControls
         public FillFormControl()
         {
             InitializeComponent();
+
+            Loading.Visibility = Visibility.Hidden;
+            this.loadingGif = new BitmapImage(new System.Uri(Environment.CurrentDirectory + "\\res\\loading.gif"));
+            ImageBehavior.SetAnimatedSource(Loading, loadingGif);
 
             // Initialize the list of machines and bind it to the form
             this.machines = ConfigSingleton.Instance.Machines;
@@ -108,7 +117,7 @@ namespace Application.UI.UserControls
                     form.Path = formPathToModify;
                 }
 
-                this.formFillingManager.ManageFormFilling(form, DestinationPathTextBox.Text);
+                Task.Run(() => this.fillTheForm(form));
             }
             catch (InvalidFieldException ex)
             {
@@ -122,9 +131,18 @@ namespace Application.UI.UserControls
 
         /*-------------------------------------------------------------------------*/
 
+        private void fillTheForm(Form form)
+        {
+            Dispatcher.Invoke(() => Loading.Visibility = Visibility.Visible);
+            this.formFillingManager.ManageFormFilling(form);
+            Dispatcher.Invoke(() => Loading.Visibility = Visibility.Hidden);
+        }
+
+        /*-------------------------------------------------------------------------*/
+
         private MeasureMachine getCorrectMachine()
         {
-            MeasureMachine? machine = this.machines.Find(m => m.Name == (String)Machines.SelectedItem);
+            MeasureMachine? machine = this.machines.Find(m => m.Name == (String)Machines.SelectedItem); 
 
             return machine ?? throw new InvalidFieldException("La machine sélectionnée n'existe pas");
         }
@@ -141,7 +159,7 @@ namespace Application.UI.UserControls
                 {
                     throw new InvalidFieldException("Veuillez renseigner le/les numéro(s) de mesure pour la capabilité");
                 }
-
+                // je suis en train de commenter de la grosse merde mdr
                 try
                 {
                     List<String> list = [.. MeasureNum.Text.Split(',')];
@@ -157,7 +175,7 @@ namespace Application.UI.UserControls
 
             return form;
         }
-
+        
         /*-------------------------------------------------------------------------*/
 
         private List<String> getCorrectSourceFiles()

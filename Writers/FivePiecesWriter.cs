@@ -10,7 +10,7 @@ namespace Application.Writers
     /// </remarks>
     /// <param name="fileName">The name of the file to be saved.</param>
     /// <param name="form">The form associated with the writer.</param>
-    internal class FivePiecesWriter(string fileName, Form form) : ExcelWriter(fileName, form)
+    internal class FivePiecesWriter(Form form) : ExcelWriter(form)
     {
         private int pageNumber = 1;
         private int linesWrittenOnCurrentPage = 0;

@@ -9,7 +9,6 @@ namespace Application.Writers
     /// </summary>
     internal abstract class ExcelWriter
     {
-        private readonly string fileToSavePath;
         protected int currentLine;
         protected int currentColumn;
         protected List<Data.Piece> pieces;
@@ -23,9 +22,8 @@ namespace Application.Writers
         /// </summary>
         /// <param name="fileName">The path of the file to save.</param>
         /// <param name="form">The form object containing the initial line and column values.</param>
-        protected ExcelWriter(string fileName, Form form)
+        protected ExcelWriter(Form form)
         {
-            this.fileToSavePath = fileName;
             this.currentLine = form.FirstLine;
             this.currentColumn = form.FirstColumn;
             this.form = form;
@@ -223,7 +221,7 @@ namespace Application.Writers
         /// </summary>
         private void exportToPdf()
         {
-            excelApiLink.ExportToPdf(form.Path, fileToSavePath.Replace(".xlsx", ".pdf"));
+            excelApiLink.ExportToPdf(form.Path, form.DestinationPath.Replace(".xlsx", ".pdf"));
             excelApiLink.DeleteImage(form.Path, form.LineToSign, form.ColumnToSign);
         }
 
@@ -234,7 +232,7 @@ namespace Application.Writers
         /// </summary>
         private void saveAndQuit()
         {
-            excelApiLink.SaveWorkBook(form.Path, fileToSavePath);
+            excelApiLink.SaveWorkBook(form.Path, form.DestinationPath);
 
             excelApiLink.CloseWorkBook(form.Path);
         }
