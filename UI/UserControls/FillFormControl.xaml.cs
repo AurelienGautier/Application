@@ -134,8 +134,10 @@ namespace Application.UI.UserControls
         private void fillTheForm(Form form)
         {
             Dispatcher.Invoke(() => Loading.Visibility = Visibility.Visible);
+            Dispatcher.Invoke(() => NewForm.IsEnabled = false);
             this.formFillingManager.ManageFormFilling(form);
             Dispatcher.Invoke(() => Loading.Visibility = Visibility.Hidden);
+            Dispatcher.Invoke(() => NewForm.IsEnabled = true);
         }
 
         /*-------------------------------------------------------------------------*/
@@ -159,7 +161,7 @@ namespace Application.UI.UserControls
                 {
                     throw new InvalidFieldException("Veuillez renseigner le/les numéro(s) de mesure pour la capabilité");
                 }
-                // je suis en train de commenter de la grosse merde mdr
+
                 try
                 {
                     List<String> list = [.. MeasureNum.Text.Split(',')];

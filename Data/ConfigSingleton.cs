@@ -81,7 +81,7 @@ namespace Application.Data
             }
             catch
             {
-                throw new Exceptions.ConfigDataException("Le chemin vers la signature est incorrect");
+                signature = null;
             }
 
             return signature;
